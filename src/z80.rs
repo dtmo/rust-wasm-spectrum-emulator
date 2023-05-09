@@ -10,7 +10,7 @@ pub trait MemoryAccessor {
     fn write(&mut self, address: u16, data: u8);
 }
 
-const OPCODE_FUNCTIONS: [fn(&mut Z80, &mut dyn MemoryAccessor) -> u8; 65] = [
+const MAIN_FUNCTIONS: [fn(&mut Z80, &mut dyn MemoryAccessor) -> u8; 65] = [
     // 0b00000000 NOP
     |_, _| Z80::nop(),
     // 0b00000001
@@ -334,6 +334,273 @@ const OPCODE_FUNCTIONS: [fn(&mut Z80, &mut dyn MemoryAccessor) -> u8; 65] = [
     // 0b11111111
 ];
 
+// DD prefix
+const IX_FUNCTIONS: [fn(&mut Z80, &mut dyn MemoryAccessor) -> u8; 7] = [
+    // 0b00000000
+    // 0b00000001
+    // 0b00000010
+    // 0b00000011
+    // 0b00000100
+    // 0b00000101
+    // 0b00000110
+    // 0b00000111
+    // 0b00001000
+    // 0b00001001
+    // 0b00001010
+    // 0b00001011
+    // 0b00001100
+    // 0b00001101
+    // 0b00001110
+    // 0b00001111
+    // 0b00010000
+    // 0b00010001
+    // 0b00010010
+    // 0b00010011
+    // 0b00010100
+    // 0b00010101
+    // 0b00010110
+    // 0b00010111
+    // 0b00011000
+    // 0b00011001
+    // 0b00011010
+    // 0b00011011
+    // 0b00011100
+    // 0b00011101
+    // 0b00011110
+    // 0b00011111
+    // 0b00100000
+    // 0b00100001
+    // 0b00100010
+    // 0b00100011
+    // 0b00100100
+    // 0b00100101
+    // 0b00100110
+    // 0b00100111
+    // 0b00101000
+    // 0b00101001
+    // 0b00101010
+    // 0b00101011
+    // 0b00101100
+    // 0b00101101
+    // 0b00101110
+    // 0b00101111
+    // 0b00110000
+    // 0b00110001
+    // 0b00110010
+    // 0b00110011
+    // 0b00110100
+    // 0b00110101
+    // 0b00110110
+    // 0b00110111
+    // 0b00111000
+    // 0b00111001
+    // 0b00111010
+    // 0b00111011
+    // 0b00111100
+    // 0b00111101
+    // 0b00111110
+    // 0b00111111
+    // 0b01000000
+    // 0b01000001
+    // 0b01000010
+    // 0b01000011
+    // 0b01000100
+    // 0b01000101
+    // 0b01000110 LD B, (IX+d)
+    | z80, memory_accessor | { z80.ld_b_ix_d(memory_accessor) },
+    // 0b01000111
+    // 0b01001000
+    // 0b01001001
+    // 0b01001010
+    // 0b01001011
+    // 0b01001100
+    // 0b01001101
+    // 0b01001110 LD c, (IX+d)
+    | z80, memory_accessor | { z80.ld_c_ix_d(memory_accessor) },
+    // 0b01001111
+    // 0b01010000
+    // 0b01010001
+    // 0b01010010
+    // 0b01010011
+    // 0b01010100
+    // 0b01010101
+    // 0b01010110 LD D, (IX+d)
+    | z80, memory_accessor | { z80.ld_d_ix_d(memory_accessor) },
+    // 0b01010111
+    // 0b01011000
+    // 0b01011001
+    // 0b01011010
+    // 0b01011011
+    // 0b01011100
+    // 0b01011101
+    // 0b01011110 LD E, (IX+d)
+    | z80, memory_accessor | { z80.ld_e_ix_d(memory_accessor) },
+    // 0b01011111
+    // 0b01100000
+    // 0b01100001
+    // 0b01100010
+    // 0b01100011
+    // 0b01100100
+    // 0b01100101
+    // 0b01100110 LD H, (IX+d)
+    | z80, memory_accessor | { z80.ld_h_ix_d(memory_accessor) },
+    // 0b01100111
+    // 0b01101000
+    // 0b01101001
+    // 0b01101010
+    // 0b01101011
+    // 0b01101100
+    // 0b01101101
+    // 0b01101110 LD L, (IX+d)
+    | z80, memory_accessor | { z80.ld_l_ix_d(memory_accessor) },
+    // 0b01101111
+    // 0b01110000
+    // 0b01110001
+    // 0b01110010
+    // 0b01110011
+    // 0b01110100
+    // 0b01110101
+    // 0b01110110
+    // 0b01110111
+    // 0b01111000
+    // 0b01111001
+    // 0b01111010
+    // 0b01111011
+    // 0b01111100
+    // 0b01111101
+    // 0b01111110 LD A, (IX+d)
+    | z80, memory_accessor | { z80.ld_a_ix_d(memory_accessor) },
+    // 0b01111111
+    // 0b10000000
+    // 0b10000001
+    // 0b10000010
+    // 0b10000011
+    // 0b10000100
+    // 0b10000101
+    // 0b10000110
+    // 0b10000111
+    // 0b10001000
+    // 0b10001001
+    // 0b10001010
+    // 0b10001011
+    // 0b10001100
+    // 0b10001101
+    // 0b10001110
+    // 0b10001111
+    // 0b10010000
+    // 0b10010001
+    // 0b10010010
+    // 0b10010011
+    // 0b10010100
+    // 0b10010101
+    // 0b10010110
+    // 0b10010111
+    // 0b10011000
+    // 0b10011001
+    // 0b10011010
+    // 0b10011011
+    // 0b10011100
+    // 0b10011101
+    // 0b10011110
+    // 0b10011111
+    // 0b10100000
+    // 0b10100001
+    // 0b10100010
+    // 0b10100011
+    // 0b10100100
+    // 0b10100101
+    // 0b10100110
+    // 0b10100111
+    // 0b10101000
+    // 0b10101001
+    // 0b10101010
+    // 0b10101011
+    // 0b10101100
+    // 0b10101101
+    // 0b10101110
+    // 0b10101111
+    // 0b10110000
+    // 0b10110001
+    // 0b10110010
+    // 0b10110011
+    // 0b10110100
+    // 0b10110101
+    // 0b10110110
+    // 0b10110111
+    // 0b10111000
+    // 0b10111001
+    // 0b10111010
+    // 0b10111011
+    // 0b10111100
+    // 0b10111101
+    // 0b10111110
+    // 0b10111111
+    // 0b11000000
+    // 0b11000001
+    // 0b11000010
+    // 0b11000011
+    // 0b11000100
+    // 0b11000101
+    // 0b11000110
+    // 0b11000111
+    // 0b11001000
+    // 0b11001001
+    // 0b11001010
+    // 0b11001011
+    // 0b11001100
+    // 0b11001101
+    // 0b11001110
+    // 0b11001111
+    // 0b11010000
+    // 0b11010001
+    // 0b11010010
+    // 0b11010011
+    // 0b11010100
+    // 0b11010101
+    // 0b11010110
+    // 0b11010111
+    // 0b11011000
+    // 0b11011001
+    // 0b11011010
+    // 0b11011011
+    // 0b11011100
+    // 0b11011101
+    // 0b11011110
+    // 0b11011111
+    // 0b11100000
+    // 0b11100001
+    // 0b11100010
+    // 0b11100011
+    // 0b11100100
+    // 0b11100101
+    // 0b11100110
+    // 0b11100111
+    // 0b11101000
+    // 0b11101001
+    // 0b11101010
+    // 0b11101011
+    // 0b11101100
+    // 0b11101101
+    // 0b11101110
+    // 0b11101111
+    // 0b11110000
+    // 0b11110001
+    // 0b11110010
+    // 0b11110011
+    // 0b11110100
+    // 0b11110101
+    // 0b11110110
+    // 0b11110111
+    // 0b11111000
+    // 0b11111001
+    // 0b11111010
+    // 0b11111011
+    // 0b11111100
+    // 0b11111101
+    // 0b11111110
+    // 0b11111111
+];
+
 #[derive(Clone, Debug, PartialEq, Eq)]
 struct GeneralPurposeRegister {
     value: u8,
@@ -431,7 +698,7 @@ impl Z80 {
         let opcode = self.fetch_next_opcode(memory_accessor);
         t_states += 4;
 
-        let opcode_function = OPCODE_FUNCTIONS[opcode as usize];
+        let opcode_function = MAIN_FUNCTIONS[opcode as usize];
         t_states += opcode_function(self, memory_accessor);
 
         return t_states;
@@ -439,6 +706,8 @@ impl Z80 {
 
     // 8-Bit Load Group
 
+    /// ## LD r, r'
+    ///
     /// ### Operation
     ///
     /// r, ← r′
@@ -728,6 +997,8 @@ impl Z80 {
         Z80::ld_r_rp(&mut self.a, r_prime)
     }
 
+    /// ## LD r,n
+    ///
     /// ### Operation
     ///
     /// r ← n
@@ -804,24 +1075,26 @@ impl Z80 {
         Z80::ld_r_n(&mut self.l, n)
     }
 
+    /// ## LD r, (HL)
+    ///
     /// ### Operation
-    /// 
+    ///
     /// r ← (HL)
-    /// 
+    ///
     /// ### Op Code
-    /// 
+    ///
     /// LD
-    /// 
+    ///
     /// ### Operands
-    /// 
+    ///
     /// r, (HL)  `0 1 r r r 1 1 0`
-    /// 
+    ///
     /// ### Description
-    /// 
+    ///
     /// The 8-bit contents of memory location (HL) are loaded to register r, in
     /// which r identifies registers A, B, C, D, E, H, or L, assembled as
     /// follows in the object code:
-    /// 
+    ///
     /// | Register | r   |
     /// | -------- | --- |
     /// | A        | 111 |
@@ -831,13 +1104,13 @@ impl Z80 {
     /// | E        | 011 |
     /// | H        | 100 |
     /// | L        | 101 |
-    /// 
+    ///
     /// ### Condition Bits Affected
-    /// 
+    ///
     /// None.
-    /// 
+    ///
     /// ### Example
-    /// 
+    ///
     /// If register pair HL contains the number 75A1h, and memory address 75A1h
     /// contains byte 58h, the execution of LD C, (HL) results in 58h in
     /// Register C.
@@ -883,6 +1156,111 @@ impl Z80 {
     fn ld_l_hl(&mut self, memory_accessor: &dyn MemoryAccessor) -> u8 {
         let address: u16 = ((self.h.get() as u16) << 8) | self.l.get() as u16;
         Z80::ld_r_hl(&mut self.l, memory_accessor, address)
+    }
+
+    /// ## LD r, (IX+d)
+    ///
+    /// ### Operation
+    ///
+    /// r ← (IX+d)
+    ///
+    /// ### Op Code
+    ///
+    /// LD
+    ///
+    /// ### Operands
+    ///
+    /// r, (IX+d)
+    /// `1 1 0 1 1 1 0 1` DD
+    /// `0 1 r r r 1 1 0`
+    /// `d d d d d d d d`
+    ///
+    /// ### Description
+    ///
+    /// The (IX+d) operand (i.e., the contents of Index Register IX summed with
+    /// two’s-complement displacement integer d) is loaded to register r, in
+    /// which r identifies registers A, B, C, D, E, H, or L, assembled as
+    /// follows in the object code:
+    ///
+    /// | Register | r   |
+    /// | -------- | --- |
+    /// | A        | 111 |
+    /// | B        | 000 |
+    /// | C        | 001 |
+    /// | D        | 010 |
+    /// | E        | 011 |
+    /// | H        | 100 |
+    /// | L        | 101 |
+    ///
+    /// | M Cycles | T States           | 4 M Hz E.T. |
+    /// | -------- | ------------------ | ----------- |
+    /// | 5        | 19 (4, 4, 3, 5, 3) | 2.50        |
+    ///
+    /// ### Condition Bits Affected
+    ///
+    /// None.
+    ///
+    /// ### Example
+    ///
+    /// If Index Register IX contains the number 25AFh, the instruction LD B,
+    /// (IX+19h) allows the calculation of the sum 25AFh + 19h, which points to
+    /// memory location 25C8h. If this address contains byte 39h, the
+    /// instruction results in Register B also containing 39h.
+    fn ld_r_ix_d(r: &mut dyn Register, memory_accessor: &dyn MemoryAccessor, address: u16) -> u8 {
+        let data = memory_accessor.read(address);
+        r.load(data);
+
+        // T states
+        19
+    }
+
+    fn ld_a_ix_d(&mut self, memory_accessor: &dyn MemoryAccessor) -> u8 {
+        let next_opcode = self.fetch_next_opcode(memory_accessor);
+        let displacement = i8::from_ne_bytes(next_opcode.to_ne_bytes());
+        let address = self.ix.wrapping_add_signed(displacement as i16);
+        Z80::ld_r_ix_d(&mut self.a, memory_accessor, address)
+    }
+
+    fn ld_b_ix_d(&mut self, memory_accessor: &dyn MemoryAccessor) -> u8 {
+        let next_opcode = self.fetch_next_opcode(memory_accessor);
+        let displacement = i8::from_ne_bytes(next_opcode.to_ne_bytes());
+        let address = self.ix.wrapping_add_signed(displacement as i16);
+        Z80::ld_r_ix_d(&mut self.b, memory_accessor, address)
+    }
+
+    fn ld_c_ix_d(&mut self, memory_accessor: &dyn MemoryAccessor) -> u8 {
+        let next_opcode = self.fetch_next_opcode(memory_accessor);
+        let displacement = i8::from_ne_bytes(next_opcode.to_ne_bytes());
+        let address = self.ix.wrapping_add_signed(displacement as i16);
+        Z80::ld_r_ix_d(&mut self.c, memory_accessor, address)
+    }
+
+    fn ld_d_ix_d(&mut self, memory_accessor: &dyn MemoryAccessor) -> u8 {
+        let next_opcode = self.fetch_next_opcode(memory_accessor);
+        let displacement = i8::from_ne_bytes(next_opcode.to_ne_bytes());
+        let address = self.ix.wrapping_add_signed(displacement as i16);
+        Z80::ld_r_ix_d(&mut self.d, memory_accessor, address)
+    }
+
+    fn ld_e_ix_d(&mut self, memory_accessor: &dyn MemoryAccessor) -> u8 {
+        let next_opcode = self.fetch_next_opcode(memory_accessor);
+        let displacement = i8::from_ne_bytes(next_opcode.to_ne_bytes());
+        let address = self.ix.wrapping_add_signed(displacement as i16);
+        Z80::ld_r_ix_d(&mut self.e, memory_accessor, address)
+    }
+
+    fn ld_h_ix_d(&mut self, memory_accessor: &dyn MemoryAccessor) -> u8 {
+        let next_opcode = self.fetch_next_opcode(memory_accessor);
+        let displacement = i8::from_ne_bytes(next_opcode.to_ne_bytes());
+        let address = self.ix.wrapping_add_signed(displacement as i16);
+        Z80::ld_r_ix_d(&mut self.h, memory_accessor, address)
+    }
+
+    fn ld_l_ix_d(&mut self, memory_accessor: &dyn MemoryAccessor) -> u8 {
+        let next_opcode = self.fetch_next_opcode(memory_accessor);
+        let displacement = i8::from_ne_bytes(next_opcode.to_ne_bytes());
+        let address = self.ix.wrapping_add_signed(displacement as i16);
+        Z80::ld_r_ix_d(&mut self.l, memory_accessor, address)
     }
 
     // General-Purpose Arithmetic and CPU Control Groups
@@ -1046,9 +1424,7 @@ mod tests {
 
     impl<'a> Ram<'a> {
         fn new(bytes: &'a mut [u8]) -> Ram {
-            Ram {
-                bytes
-            }
+            Ram { bytes }
         }
     }
 
@@ -1838,4 +2214,108 @@ mod tests {
         assert_eq!(bytes[2], z80.l.get());
     }
 
+    #[test]
+    fn test_ld_a_ix_d() {
+        let mut bytes = [0xDD, 0x77, (-2i8).to_ne_bytes()[0], 0xCC];
+        let ram = Ram::new(&mut bytes);
+
+        let mut z80 = Z80::new();
+        z80.program_counter = 2;
+        z80.ix = 5;
+
+        let t_states = z80.ld_a_ix_d(&ram);
+
+        assert_eq!(19, t_states);
+        assert_eq!(0xCC, z80.a.get());
+    }
+
+    #[test]
+    fn test_ld_b_ix_d() {
+        let mut bytes = [0xDD, 0x77, (-2i8).to_ne_bytes()[0], 0xCC];
+        let ram = Ram::new(&mut bytes);
+
+        let mut z80 = Z80::new();
+        z80.program_counter = 2;
+        z80.ix = 5;
+
+        let t_states = z80.ld_b_ix_d(&ram);
+
+        assert_eq!(19, t_states);
+        assert_eq!(0xCC, z80.b.get());
+    }
+
+    #[test]
+    fn test_ld_c_ix_d() {
+        let mut bytes = [0xDD, 0x77, (-2i8).to_ne_bytes()[0], 0xCC];
+        let ram = Ram::new(&mut bytes);
+
+        let mut z80 = Z80::new();
+        z80.program_counter = 2;
+        z80.ix = 5;
+
+        let t_states = z80.ld_c_ix_d(&ram);
+
+        assert_eq!(19, t_states);
+        assert_eq!(0xCC, z80.c.get());
+    }
+
+    #[test]
+    fn test_ld_d_ix_d() {
+        let mut bytes = [0xDD, 0x77, (-2i8).to_ne_bytes()[0], 0xCC];
+        let ram = Ram::new(&mut bytes);
+
+        let mut z80 = Z80::new();
+        z80.program_counter = 2;
+        z80.ix = 5;
+
+        let t_states = z80.ld_d_ix_d(&ram);
+
+        assert_eq!(19, t_states);
+        assert_eq!(0xCC, z80.d.get());
+    }
+
+    #[test]
+    fn test_ld_e_ix_d() {
+        let mut bytes = [0xDD, 0x77, (-2i8).to_ne_bytes()[0], 0xCC];
+        let ram = Ram::new(&mut bytes);
+
+        let mut z80 = Z80::new();
+        z80.program_counter = 2;
+        z80.ix = 5;
+
+        let t_states = z80.ld_e_ix_d(&ram);
+
+        assert_eq!(19, t_states);
+        assert_eq!(0xCC, z80.e.get());
+    }
+
+    #[test]
+    fn test_ld_h_ix_d() {
+        let mut bytes = [0xDD, 0x77, (-2i8).to_ne_bytes()[0], 0xCC];
+        let ram = Ram::new(&mut bytes);
+
+        let mut z80 = Z80::new();
+        z80.program_counter = 2;
+        z80.ix = 5;
+
+        let t_states = z80.ld_h_ix_d(&ram);
+
+        assert_eq!(19, t_states);
+        assert_eq!(0xCC, z80.h.get());
+    }
+
+    #[test]
+    fn test_ld_l_ix_d() {
+        let mut bytes = [0xDD, 0x77, (-2i8).to_ne_bytes()[0], 0xCC];
+        let ram = Ram::new(&mut bytes);
+
+        let mut z80 = Z80::new();
+        z80.program_counter = 2;
+        z80.ix = 5;
+
+        let t_states = z80.ld_l_ix_d(&ram);
+
+        assert_eq!(19, t_states);
+        assert_eq!(0xCC, z80.l.get());
+    }
 }
