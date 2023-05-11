@@ -407,7 +407,7 @@ const IX_FUNCTIONS: [fn(&mut Z80, &mut dyn MemoryAccessor) -> u8; 7] = [
     // 0b01000100
     // 0b01000101
     // 0b01000110 LD B, (IX+d)
-    | z80, memory_accessor | { z80.ld_b_ix_d(memory_accessor) },
+    |z80, memory_accessor| z80.ld_b_ix_d(memory_accessor),
     // 0b01000111
     // 0b01001000
     // 0b01001001
@@ -416,7 +416,7 @@ const IX_FUNCTIONS: [fn(&mut Z80, &mut dyn MemoryAccessor) -> u8; 7] = [
     // 0b01001100
     // 0b01001101
     // 0b01001110 LD c, (IX+d)
-    | z80, memory_accessor | { z80.ld_c_ix_d(memory_accessor) },
+    |z80, memory_accessor| z80.ld_c_ix_d(memory_accessor),
     // 0b01001111
     // 0b01010000
     // 0b01010001
@@ -425,7 +425,7 @@ const IX_FUNCTIONS: [fn(&mut Z80, &mut dyn MemoryAccessor) -> u8; 7] = [
     // 0b01010100
     // 0b01010101
     // 0b01010110 LD D, (IX+d)
-    | z80, memory_accessor | { z80.ld_d_ix_d(memory_accessor) },
+    |z80, memory_accessor| z80.ld_d_ix_d(memory_accessor),
     // 0b01010111
     // 0b01011000
     // 0b01011001
@@ -434,7 +434,7 @@ const IX_FUNCTIONS: [fn(&mut Z80, &mut dyn MemoryAccessor) -> u8; 7] = [
     // 0b01011100
     // 0b01011101
     // 0b01011110 LD E, (IX+d)
-    | z80, memory_accessor | { z80.ld_e_ix_d(memory_accessor) },
+    |z80, memory_accessor| z80.ld_e_ix_d(memory_accessor),
     // 0b01011111
     // 0b01100000
     // 0b01100001
@@ -443,7 +443,7 @@ const IX_FUNCTIONS: [fn(&mut Z80, &mut dyn MemoryAccessor) -> u8; 7] = [
     // 0b01100100
     // 0b01100101
     // 0b01100110 LD H, (IX+d)
-    | z80, memory_accessor | { z80.ld_h_ix_d(memory_accessor) },
+    |z80, memory_accessor| z80.ld_h_ix_d(memory_accessor),
     // 0b01100111
     // 0b01101000
     // 0b01101001
@@ -452,7 +452,7 @@ const IX_FUNCTIONS: [fn(&mut Z80, &mut dyn MemoryAccessor) -> u8; 7] = [
     // 0b01101100
     // 0b01101101
     // 0b01101110 LD L, (IX+d)
-    | z80, memory_accessor | { z80.ld_l_ix_d(memory_accessor) },
+    |z80, memory_accessor| z80.ld_l_ix_d(memory_accessor),
     // 0b01101111
     // 0b01110000
     // 0b01110001
@@ -469,7 +469,274 @@ const IX_FUNCTIONS: [fn(&mut Z80, &mut dyn MemoryAccessor) -> u8; 7] = [
     // 0b01111100
     // 0b01111101
     // 0b01111110 LD A, (IX+d)
-    | z80, memory_accessor | { z80.ld_a_ix_d(memory_accessor) },
+    |z80, memory_accessor| z80.ld_a_ix_d(memory_accessor),
+    // 0b01111111
+    // 0b10000000
+    // 0b10000001
+    // 0b10000010
+    // 0b10000011
+    // 0b10000100
+    // 0b10000101
+    // 0b10000110
+    // 0b10000111
+    // 0b10001000
+    // 0b10001001
+    // 0b10001010
+    // 0b10001011
+    // 0b10001100
+    // 0b10001101
+    // 0b10001110
+    // 0b10001111
+    // 0b10010000
+    // 0b10010001
+    // 0b10010010
+    // 0b10010011
+    // 0b10010100
+    // 0b10010101
+    // 0b10010110
+    // 0b10010111
+    // 0b10011000
+    // 0b10011001
+    // 0b10011010
+    // 0b10011011
+    // 0b10011100
+    // 0b10011101
+    // 0b10011110
+    // 0b10011111
+    // 0b10100000
+    // 0b10100001
+    // 0b10100010
+    // 0b10100011
+    // 0b10100100
+    // 0b10100101
+    // 0b10100110
+    // 0b10100111
+    // 0b10101000
+    // 0b10101001
+    // 0b10101010
+    // 0b10101011
+    // 0b10101100
+    // 0b10101101
+    // 0b10101110
+    // 0b10101111
+    // 0b10110000
+    // 0b10110001
+    // 0b10110010
+    // 0b10110011
+    // 0b10110100
+    // 0b10110101
+    // 0b10110110
+    // 0b10110111
+    // 0b10111000
+    // 0b10111001
+    // 0b10111010
+    // 0b10111011
+    // 0b10111100
+    // 0b10111101
+    // 0b10111110
+    // 0b10111111
+    // 0b11000000
+    // 0b11000001
+    // 0b11000010
+    // 0b11000011
+    // 0b11000100
+    // 0b11000101
+    // 0b11000110
+    // 0b11000111
+    // 0b11001000
+    // 0b11001001
+    // 0b11001010
+    // 0b11001011
+    // 0b11001100
+    // 0b11001101
+    // 0b11001110
+    // 0b11001111
+    // 0b11010000
+    // 0b11010001
+    // 0b11010010
+    // 0b11010011
+    // 0b11010100
+    // 0b11010101
+    // 0b11010110
+    // 0b11010111
+    // 0b11011000
+    // 0b11011001
+    // 0b11011010
+    // 0b11011011
+    // 0b11011100
+    // 0b11011101
+    // 0b11011110
+    // 0b11011111
+    // 0b11100000
+    // 0b11100001
+    // 0b11100010
+    // 0b11100011
+    // 0b11100100
+    // 0b11100101
+    // 0b11100110
+    // 0b11100111
+    // 0b11101000
+    // 0b11101001
+    // 0b11101010
+    // 0b11101011
+    // 0b11101100
+    // 0b11101101
+    // 0b11101110
+    // 0b11101111
+    // 0b11110000
+    // 0b11110001
+    // 0b11110010
+    // 0b11110011
+    // 0b11110100
+    // 0b11110101
+    // 0b11110110
+    // 0b11110111
+    // 0b11111000
+    // 0b11111001
+    // 0b11111010
+    // 0b11111011
+    // 0b11111100
+    // 0b11111101
+    // 0b11111110
+    // 0b11111111
+];
+
+// FD prefix
+const IY_FUNCTIONS: [fn(&mut Z80, &mut dyn MemoryAccessor) -> u8; 7] = [
+    // 0b00000000
+    // 0b00000001
+    // 0b00000010
+    // 0b00000011
+    // 0b00000100
+    // 0b00000101
+    // 0b00000110
+    // 0b00000111
+    // 0b00001000
+    // 0b00001001
+    // 0b00001010
+    // 0b00001011
+    // 0b00001100
+    // 0b00001101
+    // 0b00001110
+    // 0b00001111
+    // 0b00010000
+    // 0b00010001
+    // 0b00010010
+    // 0b00010011
+    // 0b00010100
+    // 0b00010101
+    // 0b00010110
+    // 0b00010111
+    // 0b00011000
+    // 0b00011001
+    // 0b00011010
+    // 0b00011011
+    // 0b00011100
+    // 0b00011101
+    // 0b00011110
+    // 0b00011111
+    // 0b00100000
+    // 0b00100001
+    // 0b00100010
+    // 0b00100011
+    // 0b00100100
+    // 0b00100101
+    // 0b00100110
+    // 0b00100111
+    // 0b00101000
+    // 0b00101001
+    // 0b00101010
+    // 0b00101011
+    // 0b00101100
+    // 0b00101101
+    // 0b00101110
+    // 0b00101111
+    // 0b00110000
+    // 0b00110001
+    // 0b00110010
+    // 0b00110011
+    // 0b00110100
+    // 0b00110101
+    // 0b00110110
+    // 0b00110111
+    // 0b00111000
+    // 0b00111001
+    // 0b00111010
+    // 0b00111011
+    // 0b00111100
+    // 0b00111101
+    // 0b00111110
+    // 0b00111111
+    // 0b01000000
+    // 0b01000001
+    // 0b01000010
+    // 0b01000011
+    // 0b01000100
+    // 0b01000101
+    // 0b01000110 LD B, (IY+d)
+    |z80, memory_accessor| z80.ld_b_iy_d(memory_accessor),
+    // 0b01000111
+    // 0b01001000
+    // 0b01001001
+    // 0b01001010
+    // 0b01001011
+    // 0b01001100
+    // 0b01001101
+    // 0b01001110 LD C, (IY+d)
+    |z80, memory_accessor| z80.ld_c_iy_d(memory_accessor),
+    // 0b01001111
+    // 0b01010000
+    // 0b01010001
+    // 0b01010010
+    // 0b01010011
+    // 0b01010100
+    // 0b01010101
+    // 0b01010110 LD D, (IY+d)
+    |z80, memory_accessor| z80.ld_d_iy_d(memory_accessor),
+    // 0b01010111
+    // 0b01011000
+    // 0b01011001
+    // 0b01011010
+    // 0b01011011
+    // 0b01011100
+    // 0b01011101
+    // 0b01011110 LD E, (IY+d)
+    |z80, memory_accessor| z80.ld_e_iy_d(memory_accessor),
+    // 0b01011111
+    // 0b01100000
+    // 0b01100001
+    // 0b01100010
+    // 0b01100011
+    // 0b01100100
+    // 0b01100101
+    // 0b01100110 LD H, (IY+d)
+    |z80, memory_accessor| z80.ld_h_iy_d(memory_accessor),
+    // 0b01100111
+    // 0b01101000
+    // 0b01101001
+    // 0b01101010
+    // 0b01101011
+    // 0b01101100
+    // 0b01101101
+    // 0b01101110 LD L, (IY+d)
+    |z80, memory_accessor| z80.ld_l_iy_d(memory_accessor),
+    // 0b01101111
+    // 0b01110000
+    // 0b01110001
+    // 0b01110010
+    // 0b01110011
+    // 0b01110100
+    // 0b01110101
+    // 0b01110110
+    // 0b01110111
+    // 0b01111000
+    // 0b01111001
+    // 0b01111010
+    // 0b01111011
+    // 0b01111100
+    // 0b01111101
+    // 0b01111110 LD A, (IY+d)
+    |z80, memory_accessor| z80.ld_a_iy_d(memory_accessor),
     // 0b01111111
     // 0b10000000
     // 0b10000001
@@ -1246,6 +1513,99 @@ impl Z80 {
         Z80::ld_r_ix_d(&mut self.l, self.ix, d, memory_accessor)
     }
 
+    /// ## LD r, (IY+d)
+    ///
+    /// ### Operation
+    ///
+    /// r ← (IY+d)
+    ///
+    /// ### Op Code
+    ///
+    /// LD
+    ///
+    /// ### Operands
+    ///
+    /// r, (IY+d)
+    /// `1 1 0 1 1 1 0 1` FD
+    /// `0 1 r r r 1 1 0`
+    /// `d d d d d d d d`
+    ///
+    /// ### Description
+    ///
+    /// The (IY+d) operand (i.e., the contents of Index Register IY summed with
+    /// two’s-complement displacement integer d) is loaded to register r, in
+    /// which r identifies registers A, B, C, D, E, H, or L, assembled as
+    /// follows in the object code:
+    ///
+    /// | Register | r   |
+    /// | -------- | --- |
+    /// | A        | 111 |
+    /// | B        | 000 |
+    /// | C        | 001 |
+    /// | D        | 010 |
+    /// | E        | 011 |
+    /// | H        | 100 |
+    /// | L        | 101 |
+    ///
+    /// | M Cycles | T States           | 4 M Hz E.T. |
+    /// | -------- | ------------------ | ----------- |
+    /// | 5        | 19 (4, 4, 3, 5, 3) | 2.50        |
+    ///
+    /// ### Condition Bits Affected
+    ///
+    /// None.
+    ///
+    /// ### Example
+    ///
+    /// If Index Register IY contains the number 25AFh, the instruction LD B,
+    /// (IY+19h) allows the calculation of the sum 25AFh + 19h, which points to
+    /// memory location 25C8h. If this address contains byte 39h, the
+    /// instruction results in Register B also containing 39h.
+    fn ld_r_iy_d(r: &mut dyn Register, iy: u16, d: u8, memory_accessor: &dyn MemoryAccessor) -> u8 {
+        let displacement = i8::from_ne_bytes(d.to_ne_bytes());
+        let address = iy.wrapping_add_signed(displacement as i16);
+        let data = memory_accessor.read(address);
+        r.load(data);
+
+        // T states
+        19
+    }
+
+    fn ld_a_iy_d(&mut self, memory_accessor: &dyn MemoryAccessor) -> u8 {
+        let d = self.fetch_next_opcode(memory_accessor);
+        Z80::ld_r_iy_d(&mut self.a, self.iy, d, memory_accessor)
+    }
+
+    fn ld_b_iy_d(&mut self, memory_accessor: &dyn MemoryAccessor) -> u8 {
+        let d = self.fetch_next_opcode(memory_accessor);
+        Z80::ld_r_iy_d(&mut self.b, self.iy, d, memory_accessor)
+    }
+
+    fn ld_c_iy_d(&mut self, memory_accessor: &dyn MemoryAccessor) -> u8 {
+        let d = self.fetch_next_opcode(memory_accessor);
+        Z80::ld_r_iy_d(&mut self.c, self.iy, d, memory_accessor)
+    }
+
+    fn ld_d_iy_d(&mut self, memory_accessor: &dyn MemoryAccessor) -> u8 {
+        let d = self.fetch_next_opcode(memory_accessor);
+        Z80::ld_r_iy_d(&mut self.d, self.iy, d, memory_accessor)
+    }
+
+    fn ld_e_iy_d(&mut self, memory_accessor: &dyn MemoryAccessor) -> u8 {
+        let d = self.fetch_next_opcode(memory_accessor);
+        Z80::ld_r_iy_d(&mut self.e, self.iy, d, memory_accessor)
+    }
+
+    fn ld_h_iy_d(&mut self, memory_accessor: &dyn MemoryAccessor) -> u8 {
+        let d = self.fetch_next_opcode(memory_accessor);
+        Z80::ld_r_iy_d(&mut self.h, self.iy, d, memory_accessor)
+    }
+
+    fn ld_l_iy_d(&mut self, memory_accessor: &dyn MemoryAccessor) -> u8 {
+        let d = self.fetch_next_opcode(memory_accessor);
+        Z80::ld_r_iy_d(&mut self.l, self.iy, d, memory_accessor)
+    }
+
     // General-Purpose Arithmetic and CPU Control Groups
 
     /// ### Operation
@@ -1399,6 +1759,8 @@ impl Z80 {
 }
 
 mod tests {
+    use crate::register;
+
     use super::*;
 
     struct Ram<'a> {
@@ -1463,842 +1825,166 @@ mod tests {
     }
 
     #[test]
-    fn test_ld_b_b() {
-        let mut z80 = Z80::new();
+    fn test_ld_r_rp() {
+        let scenarios: [(
+            fn(&mut Z80) -> u8,
+            fn(&mut Z80) -> &mut GeneralPurposeRegister,
+            fn(&mut Z80) -> &mut GeneralPurposeRegister,
+        ); 49] = [
+            (Z80::ld_a_a, |z80: &mut Z80| &mut z80.a, |z80: &mut Z80| &mut z80.a),
+            (Z80::ld_a_b, |z80: &mut Z80| &mut z80.a, |z80: &mut Z80| &mut z80.b),
+            (Z80::ld_a_c, |z80: &mut Z80| &mut z80.a, |z80: &mut Z80| &mut z80.c),
+            (Z80::ld_a_d, |z80: &mut Z80| &mut z80.a, |z80: &mut Z80| &mut z80.d),
+            (Z80::ld_a_e, |z80: &mut Z80| &mut z80.a, |z80: &mut Z80| &mut z80.e),
+            (Z80::ld_a_h, |z80: &mut Z80| &mut z80.a, |z80: &mut Z80| &mut z80.h),
+            (Z80::ld_a_l, |z80: &mut Z80| &mut z80.a, |z80: &mut Z80| &mut z80.l),
+            (Z80::ld_b_a, |z80: &mut Z80| &mut z80.b, |z80: &mut Z80| &mut z80.a),
+            (Z80::ld_b_b, |z80: &mut Z80| &mut z80.b, |z80: &mut Z80| &mut z80.b),
+            (Z80::ld_b_c, |z80: &mut Z80| &mut z80.b, |z80: &mut Z80| &mut z80.c),
+            (Z80::ld_b_d, |z80: &mut Z80| &mut z80.b, |z80: &mut Z80| &mut z80.d),
+            (Z80::ld_b_e, |z80: &mut Z80| &mut z80.b, |z80: &mut Z80| &mut z80.e),
+            (Z80::ld_b_h, |z80: &mut Z80| &mut z80.b, |z80: &mut Z80| &mut z80.h),
+            (Z80::ld_b_l, |z80: &mut Z80| &mut z80.b, |z80: &mut Z80| &mut z80.l),
+            (Z80::ld_c_a, |z80: &mut Z80| &mut z80.c, |z80: &mut Z80| &mut z80.a),
+            (Z80::ld_c_b, |z80: &mut Z80| &mut z80.c, |z80: &mut Z80| &mut z80.b),
+            (Z80::ld_c_c, |z80: &mut Z80| &mut z80.c, |z80: &mut Z80| &mut z80.c),
+            (Z80::ld_c_d, |z80: &mut Z80| &mut z80.c, |z80: &mut Z80| &mut z80.d),
+            (Z80::ld_c_e, |z80: &mut Z80| &mut z80.c, |z80: &mut Z80| &mut z80.e),
+            (Z80::ld_c_h, |z80: &mut Z80| &mut z80.c, |z80: &mut Z80| &mut z80.h),
+            (Z80::ld_c_l, |z80: &mut Z80| &mut z80.c, |z80: &mut Z80| &mut z80.l),
+            (Z80::ld_d_a, |z80: &mut Z80| &mut z80.d, |z80: &mut Z80| &mut z80.a),
+            (Z80::ld_d_b, |z80: &mut Z80| &mut z80.d, |z80: &mut Z80| &mut z80.b),
+            (Z80::ld_d_c, |z80: &mut Z80| &mut z80.d, |z80: &mut Z80| &mut z80.c),
+            (Z80::ld_d_d, |z80: &mut Z80| &mut z80.d, |z80: &mut Z80| &mut z80.d),
+            (Z80::ld_d_e, |z80: &mut Z80| &mut z80.d, |z80: &mut Z80| &mut z80.e),
+            (Z80::ld_d_h, |z80: &mut Z80| &mut z80.d, |z80: &mut Z80| &mut z80.h),
+            (Z80::ld_d_l, |z80: &mut Z80| &mut z80.d, |z80: &mut Z80| &mut z80.l),
+            (Z80::ld_e_a, |z80: &mut Z80| &mut z80.e, |z80: &mut Z80| &mut z80.a),
+            (Z80::ld_e_b, |z80: &mut Z80| &mut z80.e, |z80: &mut Z80| &mut z80.b),
+            (Z80::ld_e_c, |z80: &mut Z80| &mut z80.e, |z80: &mut Z80| &mut z80.c),
+            (Z80::ld_e_d, |z80: &mut Z80| &mut z80.e, |z80: &mut Z80| &mut z80.d),
+            (Z80::ld_e_e, |z80: &mut Z80| &mut z80.e, |z80: &mut Z80| &mut z80.e),
+            (Z80::ld_e_h, |z80: &mut Z80| &mut z80.e, |z80: &mut Z80| &mut z80.h),
+            (Z80::ld_e_l, |z80: &mut Z80| &mut z80.e, |z80: &mut Z80| &mut z80.l),
+            (Z80::ld_h_a, |z80: &mut Z80| &mut z80.h, |z80: &mut Z80| &mut z80.a),
+            (Z80::ld_h_b, |z80: &mut Z80| &mut z80.h, |z80: &mut Z80| &mut z80.b),
+            (Z80::ld_h_c, |z80: &mut Z80| &mut z80.h, |z80: &mut Z80| &mut z80.c),
+            (Z80::ld_h_d, |z80: &mut Z80| &mut z80.h, |z80: &mut Z80| &mut z80.d),
+            (Z80::ld_h_e, |z80: &mut Z80| &mut z80.h, |z80: &mut Z80| &mut z80.e),
+            (Z80::ld_h_h, |z80: &mut Z80| &mut z80.h, |z80: &mut Z80| &mut z80.h),
+            (Z80::ld_h_l, |z80: &mut Z80| &mut z80.h, |z80: &mut Z80| &mut z80.l),
+            (Z80::ld_l_a, |z80: &mut Z80| &mut z80.l, |z80: &mut Z80| &mut z80.a),
+            (Z80::ld_l_b, |z80: &mut Z80| &mut z80.l, |z80: &mut Z80| &mut z80.b),
+            (Z80::ld_l_c, |z80: &mut Z80| &mut z80.l, |z80: &mut Z80| &mut z80.c),
+            (Z80::ld_l_d, |z80: &mut Z80| &mut z80.l, |z80: &mut Z80| &mut z80.d),
+            (Z80::ld_l_e, |z80: &mut Z80| &mut z80.l, |z80: &mut Z80| &mut z80.e),
+            (Z80::ld_l_h, |z80: &mut Z80| &mut z80.l, |z80: &mut Z80| &mut z80.h),
+            (Z80::ld_l_l, |z80: &mut Z80| &mut z80.l, |z80: &mut Z80| &mut z80.l),
+        ];
 
-        assert_eq!(0x00, z80.b.get());
+        for (opcode, r_supplier, r_prime_supplier) in scenarios {
+            let z80 = &mut Z80::new();
 
-        z80.b.load(0xDD);
+            r_prime_supplier(z80).load(0xDD);
 
-        z80.ld_b_b();
+            let t_states = opcode(z80);
+            assert_eq!(4, t_states);
 
-        assert_eq!(0xDD, z80.b.get());
+            let r = r_supplier(z80);
+            assert_eq!(0xDD, r.get());
+        }
     }
 
     #[test]
-    fn test_ld_b_c() {
-        let mut z80 = Z80::new();
+    fn test_ld_r_hl() {
+        let scenarios: [(
+            fn(&mut Z80, &dyn MemoryAccessor) -> u8,
+            fn(&mut Z80) -> &mut GeneralPurposeRegister,
+        ); 7] = [
+            (Z80::ld_a_hl, |z80: &mut Z80| &mut z80.a),
+            (Z80::ld_b_hl, |z80: &mut Z80| &mut z80.b),
+            (Z80::ld_c_hl, |z80: &mut Z80| &mut z80.c),
+            (Z80::ld_d_hl, |z80: &mut Z80| &mut z80.d),
+            (Z80::ld_e_hl, |z80: &mut Z80| &mut z80.e),
+            (Z80::ld_h_hl, |z80: &mut Z80| &mut z80.h),
+            (Z80::ld_l_hl, |z80: &mut Z80| &mut z80.l),
+        ];
 
-        assert_eq!(0x00, z80.b.get());
+        let bytes = &mut [0xAA, 0xBB, 0xCC];
+        let ram = Ram::new(bytes);
 
-        z80.c.load(0xDD);
+        for (opcode, register_supplier) in scenarios {
+            let z80 = &mut Z80::new();
+            z80.h.load(0x00);
+            z80.l.load(0x02);
 
-        z80.ld_b_c();
+            let t_states = opcode(z80, &ram);
+            assert_eq!(7, t_states);
 
-        assert_eq!(0xDD, z80.b.get());
+            let register = register_supplier(z80);
+            assert_eq!(ram.read(2), register.get());
+        }
     }
 
     #[test]
-    fn test_ld_b_d() {
-        let mut z80 = Z80::new();
+    fn test_ld_r_ix_d() {
+        let scenarios: [(
+            fn(&mut Z80, &dyn MemoryAccessor) -> u8,
+            fn(&mut Z80) -> &mut GeneralPurposeRegister,
+        ); 7] = [
+            (Z80::ld_a_ix_d, |z80: &mut Z80| &mut z80.a),
+            (Z80::ld_b_ix_d, |z80: &mut Z80| &mut z80.b),
+            (Z80::ld_c_ix_d, |z80: &mut Z80| &mut z80.c),
+            (Z80::ld_d_ix_d, |z80: &mut Z80| &mut z80.d),
+            (Z80::ld_e_ix_d, |z80: &mut Z80| &mut z80.e),
+            (Z80::ld_h_ix_d, |z80: &mut Z80| &mut z80.h),
+            (Z80::ld_l_ix_d, |z80: &mut Z80| &mut z80.l),
+        ];
 
-        assert_eq!(0x00, z80.b.get());
-
-        z80.d.load(0xDD);
-
-        z80.ld_b_d();
-
-        assert_eq!(0xDD, z80.b.get());
-    }
-
-    #[test]
-    fn test_ld_b_e() {
-        let mut z80 = Z80::new();
-
-        assert_eq!(0x00, z80.b.get());
-
-        z80.e.load(0xDD);
-
-        z80.ld_b_e();
-
-        assert_eq!(0xDD, z80.b.get());
-    }
-
-    #[test]
-    fn test_ld_b_h() {
-        let mut z80 = Z80::new();
-
-        assert_eq!(0x00, z80.b.get());
-
-        z80.h.load(0xDD);
-
-        z80.ld_b_h();
-
-        assert_eq!(0xDD, z80.b.get());
-    }
-
-    #[test]
-    fn test_ld_b_l() {
-        let mut z80 = Z80::new();
-
-        assert_eq!(0x00, z80.b.get());
-
-        z80.l.load(0xDD);
-
-        z80.ld_b_l();
-
-        assert_eq!(0xDD, z80.b.get());
-    }
-
-    #[test]
-    fn test_ld_b_a() {
-        let mut z80 = Z80::new();
-
-        assert_eq!(0x00, z80.b.get());
-
-        z80.a.load(0xDD);
-
-        z80.ld_b_a();
-
-        assert_eq!(0xDD, z80.b.get());
-    }
-
-    #[test]
-    fn test_ld_c_b() {
-        let mut z80 = Z80::new();
-
-        assert_eq!(0x00, z80.c.get());
-
-        z80.b.load(0xDD);
-
-        z80.ld_c_b();
-
-        assert_eq!(0xDD, z80.c.get());
-    }
-
-    #[test]
-    fn test_ld_c_c() {
-        let mut z80 = Z80::new();
-
-        assert_eq!(0x00, z80.c.get());
-
-        z80.c.load(0xDD);
-
-        z80.ld_c_c();
-
-        assert_eq!(0xDD, z80.c.get());
-    }
-
-    #[test]
-    fn test_ld_c_d() {
-        let mut z80 = Z80::new();
-
-        assert_eq!(0x00, z80.c.get());
-
-        z80.d.load(0xDD);
-
-        z80.ld_c_d();
-
-        assert_eq!(0xDD, z80.c.get());
-    }
-
-    #[test]
-    fn test_ld_c_e() {
-        let mut z80 = Z80::new();
-
-        assert_eq!(0x00, z80.c.get());
-
-        z80.e.load(0xDD);
-
-        z80.ld_c_e();
-
-        assert_eq!(0xDD, z80.c.get());
-    }
-
-    #[test]
-    fn test_ld_c_h() {
-        let mut z80 = Z80::new();
-
-        assert_eq!(0x00, z80.c.get());
-
-        z80.h.load(0xDD);
-
-        z80.ld_c_h();
-
-        assert_eq!(0xDD, z80.c.get());
-    }
-
-    #[test]
-    fn test_ld_c_l() {
-        let mut z80 = Z80::new();
-
-        assert_eq!(0x00, z80.c.get());
-
-        z80.l.load(0xDD);
-
-        z80.ld_c_l();
-
-        assert_eq!(0xDD, z80.c.get());
-    }
-
-    #[test]
-    fn test_ld_c_a() {
-        let mut z80 = Z80::new();
-
-        assert_eq!(0x00, z80.c.get());
-
-        z80.a.load(0xDD);
-
-        z80.ld_c_a();
-
-        assert_eq!(0xDD, z80.c.get());
-    }
-
-    #[test]
-    fn test_ld_d_b() {
-        let mut z80 = Z80::new();
-
-        assert_eq!(0x00, z80.d.get());
-
-        z80.b.load(0xDD);
-
-        z80.ld_d_b();
-
-        assert_eq!(0xDD, z80.d.get());
-    }
-
-    #[test]
-    fn test_ld_d_c() {
-        let mut z80 = Z80::new();
-
-        assert_eq!(0x00, z80.d.get());
-
-        z80.c.load(0xDD);
-
-        z80.ld_d_c();
-
-        assert_eq!(0xDD, z80.d.get());
-    }
-
-    #[test]
-    fn test_ld_d_d() {
-        let mut z80 = Z80::new();
-
-        assert_eq!(0x00, z80.d.get());
-
-        z80.c.load(0xDD);
-
-        z80.ld_d_c();
-
-        assert_eq!(0xDD, z80.d.get());
-    }
-
-    #[test]
-    fn test_ld_d_e() {
-        let mut z80 = Z80::new();
-
-        assert_eq!(0x00, z80.d.get());
-
-        z80.e.load(0xDD);
-
-        z80.ld_d_e();
-
-        assert_eq!(0xDD, z80.d.get());
-    }
-
-    #[test]
-    fn test_ld_d_h() {
-        let mut z80 = Z80::new();
-
-        assert_eq!(0x00, z80.d.get());
-
-        z80.h.load(0xDD);
-
-        z80.ld_d_h();
-
-        assert_eq!(0xDD, z80.d.get());
-    }
-
-    #[test]
-    fn test_ld_d_l() {
-        let mut z80 = Z80::new();
-
-        assert_eq!(0x00, z80.d.get());
-
-        z80.l.load(0xDD);
-
-        z80.ld_d_l();
-
-        assert_eq!(0xDD, z80.d.get());
-    }
-
-    #[test]
-    fn test_ld_d_a() {
-        let mut z80 = Z80::new();
-
-        assert_eq!(0x00, z80.d.get());
-
-        z80.a.load(0xDD);
-
-        z80.ld_d_a();
-
-        assert_eq!(0xDD, z80.d.get());
-    }
-
-    #[test]
-    fn test_ld_e_b() {
-        let mut z80 = Z80::new();
-
-        assert_eq!(0x00, z80.e.get());
-
-        z80.b.load(0xDD);
-
-        z80.ld_e_b();
-
-        assert_eq!(0xDD, z80.e.get());
-    }
-
-    #[test]
-    fn test_ld_e_c() {
-        let mut z80 = Z80::new();
-
-        assert_eq!(0x00, z80.e.get());
-
-        z80.c.load(0xDD);
-
-        z80.ld_e_c();
-
-        assert_eq!(0xDD, z80.e.get());
-    }
-
-    #[test]
-    fn test_ld_e_d() {
-        let mut z80 = Z80::new();
-
-        assert_eq!(0x00, z80.e.get());
-
-        z80.d.load(0xDD);
-
-        z80.ld_e_d();
-
-        assert_eq!(0xDD, z80.e.get());
-    }
-
-    #[test]
-    fn test_ld_e_e() {
-        let mut z80 = Z80::new();
-
-        assert_eq!(0x00, z80.e.get());
-
-        z80.e.load(0xDD);
-
-        z80.ld_e_e();
-
-        assert_eq!(0xDD, z80.e.get());
-    }
-
-    #[test]
-    fn test_ld_e_h() {
-        let mut z80 = Z80::new();
-
-        assert_eq!(0x00, z80.e.get());
-
-        z80.h.load(0xDD);
-
-        z80.ld_e_h();
-
-        assert_eq!(0xDD, z80.e.get());
-    }
-
-    #[test]
-    fn test_ld_e_l() {
-        let mut z80 = Z80::new();
-
-        assert_eq!(0x00, z80.e.get());
-
-        z80.l.load(0xDD);
-
-        z80.ld_e_l();
-
-        assert_eq!(0xDD, z80.e.get());
-    }
-
-    #[test]
-    fn test_ld_e_a() {
-        let mut z80 = Z80::new();
-
-        assert_eq!(0x00, z80.e.get());
-
-        z80.a.load(0xDD);
-
-        z80.ld_e_a();
-
-        assert_eq!(0xDD, z80.e.get());
-    }
-
-    #[test]
-    fn test_ld_h_b() {
-        let mut z80 = Z80::new();
-
-        assert_eq!(0x00, z80.h.get());
-
-        z80.b.load(0xDD);
-
-        z80.ld_h_b();
-
-        assert_eq!(0xDD, z80.h.get());
-    }
-
-    #[test]
-    fn test_ld_h_c() {
-        let mut z80 = Z80::new();
-
-        assert_eq!(0x00, z80.h.get());
-
-        z80.c.load(0xDD);
-
-        z80.ld_h_c();
-
-        assert_eq!(0xDD, z80.h.get());
-    }
-
-    #[test]
-    fn test_ld_h_d() {
-        let mut z80 = Z80::new();
-
-        assert_eq!(0x00, z80.h.get());
-
-        z80.d.load(0xDD);
-
-        z80.ld_h_d();
-
-        assert_eq!(0xDD, z80.h.get());
-    }
-
-    #[test]
-    fn test_ld_h_e() {
-        let mut z80 = Z80::new();
-
-        assert_eq!(0x00, z80.h.get());
-
-        z80.e.load(0xDD);
-
-        z80.ld_h_e();
-
-        assert_eq!(0xDD, z80.h.get());
-    }
-
-    #[test]
-    fn test_ld_h_h() {
-        let mut z80 = Z80::new();
-
-        assert_eq!(0x00, z80.h.get());
-
-        z80.h.load(0xDD);
-
-        z80.ld_h_h();
-
-        assert_eq!(0xDD, z80.h.get());
-    }
-
-    #[test]
-    fn test_ld_h_l() {
-        let mut z80 = Z80::new();
-
-        assert_eq!(0x00, z80.h.get());
-
-        z80.l.load(0xDD);
-
-        z80.ld_h_l();
-
-        assert_eq!(0xDD, z80.h.get());
-    }
-
-    #[test]
-    fn test_ld_h_a() {
-        let mut z80 = Z80::new();
-
-        assert_eq!(0x00, z80.h.get());
-
-        z80.a.load(0xDD);
-
-        z80.ld_h_a();
-
-        assert_eq!(0xDD, z80.h.get());
-    }
-
-    #[test]
-    fn test_ld_l_b() {
-        let mut z80 = Z80::new();
-
-        assert_eq!(0x00, z80.l.get());
-
-        z80.b.load(0xDD);
-
-        z80.ld_l_b();
-
-        assert_eq!(0xDD, z80.l.get());
-    }
-
-    #[test]
-    fn test_ld_l_c() {
-        let mut z80 = Z80::new();
-
-        assert_eq!(0x00, z80.l.get());
-
-        z80.c.load(0xDD);
-
-        z80.ld_l_c();
-
-        assert_eq!(0xDD, z80.l.get());
-    }
-
-    #[test]
-    fn test_ld_l_d() {
-        let mut z80 = Z80::new();
-
-        assert_eq!(0x00, z80.l.get());
-
-        z80.d.load(0xDD);
-
-        z80.ld_l_d();
-
-        assert_eq!(0xDD, z80.l.get());
-    }
-
-    #[test]
-    fn test_ld_l_e() {
-        let mut z80 = Z80::new();
-
-        assert_eq!(0x00, z80.l.get());
-
-        z80.e.load(0xDD);
-
-        z80.ld_l_e();
-
-        assert_eq!(0xDD, z80.l.get());
-    }
-
-    #[test]
-    fn test_ld_l_h() {
-        let mut z80 = Z80::new();
-
-        assert_eq!(0x00, z80.l.get());
-
-        z80.h.load(0xDD);
-
-        z80.ld_l_h();
-
-        assert_eq!(0xDD, z80.l.get());
-    }
-
-    #[test]
-    fn test_ld_l_l() {
-        let mut z80 = Z80::new();
-
-        assert_eq!(0x00, z80.l.get());
-
-        z80.l.load(0xDD);
-
-        z80.ld_l_l();
-
-        assert_eq!(0xDD, z80.l.get());
-    }
-
-    #[test]
-    fn test_ld_l_a() {
-        let mut z80 = Z80::new();
-
-        assert_eq!(0x00, z80.l.get());
-
-        z80.a.load(0xDD);
-
-        z80.ld_l_a();
-
-        assert_eq!(0xDD, z80.l.get());
-    }
-
-    #[test]
-    fn test_ld_a_b() {
-        let mut z80 = Z80::new();
-
-        assert_eq!(0x00, z80.a.get());
-
-        z80.b.load(0xDD);
-
-        z80.ld_a_b();
-
-        assert_eq!(0xDD, z80.a.get());
-    }
-
-    #[test]
-    fn test_ld_a_c() {
-        let mut z80 = Z80::new();
-
-        assert_eq!(0x00, z80.a.get());
-
-        z80.c.load(0xDD);
-
-        z80.ld_a_c();
-
-        assert_eq!(0xDD, z80.a.get());
-    }
-
-    #[test]
-    fn test_ld_a_d() {
-        let mut z80 = Z80::new();
-
-        assert_eq!(0x00, z80.a.get());
-
-        z80.d.load(0xDD);
-
-        z80.ld_a_d();
-
-        assert_eq!(0xDD, z80.a.get());
-    }
-
-    #[test]
-    fn test_ld_a_e() {
-        let mut z80 = Z80::new();
-
-        assert_eq!(0x00, z80.a.get());
-
-        z80.e.load(0xDD);
-
-        z80.ld_a_e();
-
-        assert_eq!(0xDD, z80.a.get());
-    }
-
-    #[test]
-    fn test_ld_a_h() {
-        let mut z80 = Z80::new();
-
-        assert_eq!(0x00, z80.a.get());
-
-        z80.h.load(0xDD);
-
-        z80.ld_a_h();
-
-        assert_eq!(0xDD, z80.a.get());
-    }
-
-    #[test]
-    fn test_ld_a_l() {
-        let mut z80 = Z80::new();
-
-        assert_eq!(0x00, z80.a.get());
-
-        z80.l.load(0xDD);
-
-        z80.ld_a_l();
-
-        assert_eq!(0xDD, z80.a.get());
-    }
-
-    #[test]
-    fn test_ld_a_a() {
-        let mut z80 = Z80::new();
-
-        assert_eq!(0x00, z80.a.get());
-
-        z80.a.load(0xDD);
-
-        z80.ld_a_a();
-
-        assert_eq!(0xDD, z80.a.get());
-    }
-
-    #[test]
-    fn test_ld_a_hl() {
-        let mut bytes = [0xAA, 0xBB, 0xCC];
-        let ram = Ram::new(&mut bytes);
-
-        let mut z80 = Z80::new();
-        z80.h.load(0x00);
-        z80.l.load(0x02);
-
-        z80.ld_a_hl(&ram);
-
-        assert_eq!(bytes[2], z80.a.get());
-    }
-
-    #[test]
-    fn test_ld_b_hl() {
-        let mut bytes = [0xAA, 0xBB, 0xCC];
-        let ram = Ram::new(&mut bytes);
-
-        let mut z80 = Z80::new();
-        z80.h.load(0x00);
-        z80.l.load(0x02);
-
-        z80.ld_b_hl(&ram);
-
-        assert_eq!(bytes[2], z80.b.get());
-    }
-
-    #[test]
-    fn test_ld_c_hl() {
-        let mut bytes = [0xAA, 0xBB, 0xCC];
-        let ram = Ram::new(&mut bytes);
-
-        let mut z80 = Z80::new();
-        z80.h.load(0x00);
-        z80.l.load(0x02);
-
-        z80.ld_c_hl(&ram);
-
-        assert_eq!(bytes[2], z80.c.get());
-    }
-
-    #[test]
-    fn test_ld_d_hl() {
-        let mut bytes = [0xAA, 0xBB, 0xCC];
-        let ram = Ram::new(&mut bytes);
-
-        let mut z80 = Z80::new();
-        z80.h.load(0x00);
-        z80.l.load(0x02);
-
-        z80.ld_d_hl(&ram);
-
-        assert_eq!(bytes[2], z80.d.get());
-    }
-
-    #[test]
-    fn test_ld_e_hl() {
-        let mut bytes = [0xAA, 0xBB, 0xCC];
-        let ram = Ram::new(&mut bytes);
-
-        let mut z80 = Z80::new();
-        z80.h.load(0x00);
-        z80.l.load(0x02);
-
-        z80.ld_e_hl(&ram);
-
-        assert_eq!(bytes[2], z80.e.get());
-    }
-
-    #[test]
-    fn test_ld_h_hl() {
-        let mut bytes = [0xAA, 0xBB, 0xCC];
-        let ram = Ram::new(&mut bytes);
-
-        let mut z80 = Z80::new();
-        z80.h.load(0x00);
-        z80.l.load(0x02);
-
-        z80.ld_h_hl(&ram);
-
-        assert_eq!(bytes[2], z80.h.get());
-    }
-
-    #[test]
-    fn test_ld_l_hl() {
-        let mut bytes = [0xAA, 0xBB, 0xCC];
-        let ram = Ram::new(&mut bytes);
-
-        let mut z80 = Z80::new();
-        z80.h.load(0x00);
-        z80.l.load(0x02);
-
-        z80.ld_l_hl(&ram);
-
-        assert_eq!(bytes[2], z80.l.get());
-    }
-
-    #[test]
-    fn test_ld_a_ix_d() {
         let mut bytes = [0xDD, 0x77, (-2i8).to_ne_bytes()[0], 0xCC];
         let ram = Ram::new(&mut bytes);
 
-        let mut z80 = Z80::new();
-        z80.program_counter = 2;
-        z80.ix = 5;
+        for (opcode, register_supplier) in scenarios {
+            let z80 = &mut Z80::new();
+            z80.program_counter = 2;
+            z80.ix = 5;
 
-        let t_states = z80.ld_a_ix_d(&ram);
+            let t_states = opcode(z80, &ram);
+            assert_eq!(19, t_states);
 
-        assert_eq!(19, t_states);
-        assert_eq!(0xCC, z80.a.get());
+            let register = register_supplier(z80);
+            assert_eq!(0xCC, register.get());
+        }
     }
 
     #[test]
-    fn test_ld_b_ix_d() {
+    fn test_ld_r_iy_d() {
+        let scenarios: [(
+            fn(&mut Z80, &dyn MemoryAccessor) -> u8,
+            fn(&mut Z80) -> &mut GeneralPurposeRegister,
+        ); 7] = [
+            (Z80::ld_a_iy_d, |z80: &mut Z80| &mut z80.a),
+            (Z80::ld_b_iy_d, |z80: &mut Z80| &mut z80.b),
+            (Z80::ld_c_iy_d, |z80: &mut Z80| &mut z80.c),
+            (Z80::ld_d_iy_d, |z80: &mut Z80| &mut z80.d),
+            (Z80::ld_e_iy_d, |z80: &mut Z80| &mut z80.e),
+            (Z80::ld_h_iy_d, |z80: &mut Z80| &mut z80.h),
+            (Z80::ld_l_iy_d, |z80: &mut Z80| &mut z80.l),
+        ];
+
         let mut bytes = [0xDD, 0x77, (-2i8).to_ne_bytes()[0], 0xCC];
         let ram = Ram::new(&mut bytes);
 
-        let mut z80 = Z80::new();
-        z80.program_counter = 2;
-        z80.ix = 5;
+        for (opcode, register_supplier) in scenarios {
+            let z80 = &mut Z80::new();
+            z80.program_counter = 2;
+            z80.iy = 5;
 
-        let t_states = z80.ld_b_ix_d(&ram);
+            let t_states = opcode(z80, &ram);
+            assert_eq!(19, t_states);
 
-        assert_eq!(19, t_states);
-        assert_eq!(0xCC, z80.b.get());
-    }
-
-    #[test]
-    fn test_ld_c_ix_d() {
-        let mut bytes = [0xDD, 0x77, (-2i8).to_ne_bytes()[0], 0xCC];
-        let ram = Ram::new(&mut bytes);
-
-        let mut z80 = Z80::new();
-        z80.program_counter = 2;
-        z80.ix = 5;
-
-        let t_states = z80.ld_c_ix_d(&ram);
-
-        assert_eq!(19, t_states);
-        assert_eq!(0xCC, z80.c.get());
-    }
-
-    #[test]
-    fn test_ld_d_ix_d() {
-        let mut bytes = [0xDD, 0x77, (-2i8).to_ne_bytes()[0], 0xCC];
-        let ram = Ram::new(&mut bytes);
-
-        let mut z80 = Z80::new();
-        z80.program_counter = 2;
-        z80.ix = 5;
-
-        let t_states = z80.ld_d_ix_d(&ram);
-
-        assert_eq!(19, t_states);
-        assert_eq!(0xCC, z80.d.get());
-    }
-
-    #[test]
-    fn test_ld_e_ix_d() {
-        let mut bytes = [0xDD, 0x77, (-2i8).to_ne_bytes()[0], 0xCC];
-        let ram = Ram::new(&mut bytes);
-
-        let mut z80 = Z80::new();
-        z80.program_counter = 2;
-        z80.ix = 5;
-
-        let t_states = z80.ld_e_ix_d(&ram);
-
-        assert_eq!(19, t_states);
-        assert_eq!(0xCC, z80.e.get());
-    }
-
-    #[test]
-    fn test_ld_h_ix_d() {
-        let mut bytes = [0xDD, 0x77, (-2i8).to_ne_bytes()[0], 0xCC];
-        let ram = Ram::new(&mut bytes);
-
-        let mut z80 = Z80::new();
-        z80.program_counter = 2;
-        z80.ix = 5;
-
-        let t_states = z80.ld_h_ix_d(&ram);
-
-        assert_eq!(19, t_states);
-        assert_eq!(0xCC, z80.h.get());
-    }
-
-    #[test]
-    fn test_ld_l_ix_d() {
-        let mut bytes = [0xDD, 0x77, (-2i8).to_ne_bytes()[0], 0xCC];
-        let ram = Ram::new(&mut bytes);
-
-        let mut z80 = Z80::new();
-        z80.program_counter = 2;
-        z80.ix = 5;
-
-        let t_states = z80.ld_l_ix_d(&ram);
-
-        assert_eq!(19, t_states);
-        assert_eq!(0xCC, z80.l.get());
+            let register = register_supplier(z80);
+            assert_eq!(0xCC, register.get());
+        }
     }
 }
