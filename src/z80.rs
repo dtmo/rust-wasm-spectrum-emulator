@@ -10,7 +10,7 @@ pub trait MemoryAccessor {
     fn write(&mut self, address: u16, data: u8);
 }
 
-const MAIN_FUNCTIONS: [fn(&mut Z80, &mut dyn MemoryAccessor) -> u8; 65] = [
+const MAIN_FUNCTIONS: [fn(&mut Z80, &mut dyn MemoryAccessor) -> u8; 72] = [
     // 0b00000000 NOP
     |_, _| Z80::nop(),
     // 0b00000001
@@ -180,14 +180,21 @@ const MAIN_FUNCTIONS: [fn(&mut Z80, &mut dyn MemoryAccessor) -> u8; 65] = [
     |z80, memory_accessor| z80.ld_l_hl(memory_accessor),
     // 0b01101111 LD L, A
     |z80, _| z80.ld_l_a(),
-    // 0b01110000
-    // 0b01110001
-    // 0b01110010
-    // 0b01110011
-    // 0b01110100
-    // 0b01110101
+    // 0b01110000 LD (HL), B
+    |z80, memory_accessor | z80.ld_hl_b(memory_accessor),
+    // 0b01110001 LD (HL), C
+    |z80, memory_accessor | z80.ld_hl_c(memory_accessor),
+    // 0b01110010 LD (HL), D
+    |z80, memory_accessor | z80.ld_hl_d(memory_accessor),
+    // 0b01110011 LD (HL), E
+    |z80, memory_accessor | z80.ld_hl_e(memory_accessor),
+    // 0b01110100 LD (HL), H
+    |z80, memory_accessor | z80.ld_hl_h(memory_accessor),
+    // 0b01110101 LD (HL), L
+    |z80, memory_accessor | z80.ld_hl_l(memory_accessor),
     // 0b01110110
-    // 0b01110111
+    // 0b01110111 LD (HL), A
+    |z80, memory_accessor | z80.ld_hl_a(memory_accessor),
     // 0b01111000 LD A, B
     |z80, _| z80.ld_a_b(),
     // 0b01111001 LD A, C
@@ -1606,6 +1613,93 @@ impl Z80 {
         Z80::ld_r_iy_d(&mut self.l, self.iy, d, memory_accessor)
     }
 
+    /// ## LD (HL), r
+    ///
+    /// ### Operation
+    ///
+    /// (HL) ← r
+    ///
+    /// ### Op Code
+    ///
+    /// LD
+    ///
+    /// ### Operands
+    ///
+    /// (HL), r
+    /// `0 1 1 1 0 r r r`
+    ///
+    /// ### Description
+    ///
+    /// The contents of register r are loaded to the memory location specified
+    /// by the contents of the HL register pair. The r symbol identifies
+    /// registers A, B, C, D, E, H, or L, assembled as follows in the object
+    /// code:
+    ///
+    /// | Register | r   |
+    /// | -------- | --- |
+    /// | A        | 111 |
+    /// | B        | 000 |
+    /// | C        | 001 |
+    /// | D        | 010 |
+    /// | E        | 011 |
+    /// | H        | 100 |
+    /// | L        | 101 |
+    ///
+    /// | M Cycles | T States | 4 MHz E.T. |
+    /// | -------- | -------- | ---------- |
+    /// | 2        | 7 (4, 3) | 1.75       |
+    ///
+    /// ### Condition Bits Affected
+    ///
+    /// None.
+    ///
+    /// ### Example
+    ///
+    /// If the contents of register pair HL specify memory location 2146h and
+    /// Register B contains byte 29h, then upon the execution of an LD (HL), B
+    /// instruction, memory address 2146h also contains 29h.
+    fn ld_hl_r(h: u8, l: u8, r: &mut dyn Register, memory_accessor: &mut dyn MemoryAccessor) -> u8 {
+        let address: u16 = ((h as u16) << 8) | l as u16;
+
+        println!("address: {:?}", address);
+
+        memory_accessor.write(address, r.get());
+
+        // T states
+        7
+    }
+
+    fn ld_hl_a(&mut self, memory_accessor: &mut dyn MemoryAccessor) -> u8 {
+        Z80::ld_hl_r(self.h.get(), self.l.get(), &mut self.a, memory_accessor)
+    }
+
+    fn ld_hl_b(&mut self, memory_accessor: &mut dyn MemoryAccessor) -> u8 {
+        Z80::ld_hl_r(self.h.get(), self.l.get(), &mut self.b, memory_accessor)
+    }
+
+    fn ld_hl_c(&mut self, memory_accessor: &mut dyn MemoryAccessor) -> u8 {
+        Z80::ld_hl_r(self.h.get(), self.l.get(), &mut self.c, memory_accessor)
+    }
+
+    fn ld_hl_d(&mut self, memory_accessor: &mut dyn MemoryAccessor) -> u8 {
+        Z80::ld_hl_r(self.h.get(), self.l.get(), &mut self.d, memory_accessor)
+    }
+
+    fn ld_hl_e(&mut self, memory_accessor: &mut dyn MemoryAccessor) -> u8 {
+        Z80::ld_hl_r(self.h.get(), self.l.get(), &mut self.e, memory_accessor)
+    }
+
+    fn ld_hl_h(&mut self, memory_accessor: &mut dyn MemoryAccessor) -> u8 {
+        let h = self.h.get();
+        println!("h: {:?}", h);
+        Z80::ld_hl_r(h, self.l.get(), &mut self.h, memory_accessor)
+    }
+
+    fn ld_hl_l(&mut self, memory_accessor: &mut dyn MemoryAccessor) -> u8 {
+        let l = self.l.get();
+        Z80::ld_hl_r(self.h.get(), l, &mut self.l, memory_accessor)
+    }
+
     // General-Purpose Arithmetic and CPU Control Groups
 
     /// ### Operation
@@ -1826,6 +1920,7 @@ mod tests {
 
     #[test]
     fn test_ld_r_rp() {
+        #[rustfmt::skip]
         let scenarios: [(
             fn(&mut Z80) -> u8,
             fn(&mut Z80) -> &mut GeneralPurposeRegister,
@@ -1986,5 +2081,71 @@ mod tests {
             let register = register_supplier(z80);
             assert_eq!(0xCC, register.get());
         }
+    }
+
+    #[test]
+    fn test_ld_hl_r() {
+        let scenarios: [(
+            fn(&mut Z80, &mut dyn MemoryAccessor) -> u8,
+            fn(&mut Z80) -> &mut GeneralPurposeRegister,
+        ); 5] = [
+            (Z80::ld_hl_a, |z80: &mut Z80| &mut z80.a),
+            (Z80::ld_hl_b, |z80: &mut Z80| &mut z80.b),
+            (Z80::ld_hl_c, |z80: &mut Z80| &mut z80.c),
+            (Z80::ld_hl_d, |z80: &mut Z80| &mut z80.d),
+            (Z80::ld_hl_e, |z80: &mut Z80| &mut z80.e),
+            // (Z80::ld_hl_h, |z80: &mut Z80| &mut z80.h),
+            // (Z80::ld_hl_l, |z80: &mut Z80| &mut z80.l),
+        ];
+
+        let bytes = &mut [0, 0, 0];
+        let ram = &mut Ram::new(bytes);
+
+        for (opcode, register_supplier) in scenarios {
+            let z80 = &mut Z80::new();
+
+            z80.h.load(0x00);
+            z80.l.load(0x02);
+
+            let register = register_supplier(z80);
+            register.load(0xDD);
+
+            let t_states = opcode(z80, ram);
+            assert_eq!(7, t_states);
+
+            assert_eq!(0xDD, ram.read(2));
+        }
+    }
+
+    #[test]
+    fn test_ld_hl_h() {
+        let bytes = &mut [5, 5, 5];
+        let ram = &mut Ram::new(bytes);
+
+        let z80 = &mut Z80::new();
+
+        z80.h.load(0x00);
+        z80.l.load(0x02);
+
+        let t_states = z80.ld_hl_h(ram);
+        assert_eq!(7, t_states);
+
+        assert_eq!(z80.h.get(), ram.read(2));
+    }
+
+    #[test]
+    fn test_ld_hl_l() {
+        let bytes = &mut [5, 5, 5];
+        let ram = &mut Ram::new(bytes);
+
+        let z80 = &mut Z80::new();
+
+        z80.h.load(0x00);
+        z80.l.load(0x02);
+
+        let t_states = z80.ld_hl_l(ram);
+        assert_eq!(7, t_states);
+
+        assert_eq!(z80.l.get(), ram.read(2));
     }
 }
