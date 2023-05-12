@@ -2141,7 +2141,7 @@ mod tests {
             (Z80::ld_l_ixd, |z80: &mut Z80| &mut z80.l),
         ];
 
-        let mut bytes = [0xDD, 0x77, (-2i8).to_ne_bytes()[0], 0xCC];
+        let mut bytes = [0xDD, 0x77, (-2i8).to_le_bytes()[0], 0xCC];
         let ram = Ram::new(&mut bytes);
 
         for (opcode, register_supplier) in scenarios {
@@ -2172,7 +2172,7 @@ mod tests {
             (Z80::ld_l_iyd, |z80: &mut Z80| &mut z80.l),
         ];
 
-        let mut bytes = [0xDD, 0x77, (-2i8).to_ne_bytes()[0], 0xCC];
+        let mut bytes = [0xDD, 0x77, (-2i8).to_le_bytes()[0], 0xCC];
         let ram = Ram::new(&mut bytes);
 
         for (opcode, register_supplier) in scenarios {
@@ -2269,7 +2269,7 @@ mod tests {
             (Z80::ld_ixd_l, |z80: &mut Z80| &mut z80.l),
         ];
 
-        let bytes = &mut [0xDD, 0x77, (-2i8).to_ne_bytes()[0], 0x00];
+        let bytes = &mut [0xDD, 0x77, (-2i8).to_le_bytes()[0], 0x00];
         let ram = &mut Ram::new(bytes);
 
         for (opcode, register_supplier) in scenarios {
