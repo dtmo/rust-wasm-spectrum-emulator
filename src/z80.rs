@@ -342,7 +342,7 @@ const MAIN_FUNCTIONS: [fn(&mut Z80, &mut dyn MemoryAccessor) -> u8; 72] = [
 ];
 
 // DD prefix
-const IX_FUNCTIONS: [fn(&mut Z80, &mut dyn MemoryAccessor) -> u8; 7] = [
+const IX_FUNCTIONS: [fn(&mut Z80, &mut dyn MemoryAccessor) -> u8; 14] = [
     // 0b00000000
     // 0b00000001
     // 0b00000010
@@ -414,7 +414,7 @@ const IX_FUNCTIONS: [fn(&mut Z80, &mut dyn MemoryAccessor) -> u8; 7] = [
     // 0b01000100
     // 0b01000101
     // 0b01000110 LD B, (IX+d)
-    |z80, memory_accessor| z80.ld_b_ix_d(memory_accessor),
+    |z80, memory_accessor| z80.ld_b_ixd(memory_accessor),
     // 0b01000111
     // 0b01001000
     // 0b01001001
@@ -422,8 +422,8 @@ const IX_FUNCTIONS: [fn(&mut Z80, &mut dyn MemoryAccessor) -> u8; 7] = [
     // 0b01001011
     // 0b01001100
     // 0b01001101
-    // 0b01001110 LD c, (IX+d)
-    |z80, memory_accessor| z80.ld_c_ix_d(memory_accessor),
+    // 0b01001110 LD C, (IX+d)
+    |z80, memory_accessor| z80.ld_c_ixd(memory_accessor),
     // 0b01001111
     // 0b01010000
     // 0b01010001
@@ -432,7 +432,7 @@ const IX_FUNCTIONS: [fn(&mut Z80, &mut dyn MemoryAccessor) -> u8; 7] = [
     // 0b01010100
     // 0b01010101
     // 0b01010110 LD D, (IX+d)
-    |z80, memory_accessor| z80.ld_d_ix_d(memory_accessor),
+    |z80, memory_accessor| z80.ld_d_ixd(memory_accessor),
     // 0b01010111
     // 0b01011000
     // 0b01011001
@@ -441,7 +441,7 @@ const IX_FUNCTIONS: [fn(&mut Z80, &mut dyn MemoryAccessor) -> u8; 7] = [
     // 0b01011100
     // 0b01011101
     // 0b01011110 LD E, (IX+d)
-    |z80, memory_accessor| z80.ld_e_ix_d(memory_accessor),
+    |z80, memory_accessor| z80.ld_e_ixd(memory_accessor),
     // 0b01011111
     // 0b01100000
     // 0b01100001
@@ -450,7 +450,7 @@ const IX_FUNCTIONS: [fn(&mut Z80, &mut dyn MemoryAccessor) -> u8; 7] = [
     // 0b01100100
     // 0b01100101
     // 0b01100110 LD H, (IX+d)
-    |z80, memory_accessor| z80.ld_h_ix_d(memory_accessor),
+    |z80, memory_accessor| z80.ld_h_ixd(memory_accessor),
     // 0b01100111
     // 0b01101000
     // 0b01101001
@@ -459,16 +459,23 @@ const IX_FUNCTIONS: [fn(&mut Z80, &mut dyn MemoryAccessor) -> u8; 7] = [
     // 0b01101100
     // 0b01101101
     // 0b01101110 LD L, (IX+d)
-    |z80, memory_accessor| z80.ld_l_ix_d(memory_accessor),
+    |z80, memory_accessor| z80.ld_l_ixd(memory_accessor),
     // 0b01101111
-    // 0b01110000
-    // 0b01110001
-    // 0b01110010
-    // 0b01110011
-    // 0b01110100
-    // 0b01110101
+    // 0b01110000 LD (IX+d), B
+    |z80, memory_accessor| z80.ld_ixd_b(memory_accessor),
+    // 0b01110001 LD (IX+d), C
+    |z80, memory_accessor| z80.ld_ixd_c(memory_accessor),
+    // 0b01110010 LD (IX+d), D
+    |z80, memory_accessor| z80.ld_ixd_d(memory_accessor),
+    // 0b01110011 LD (IX+d), E
+    |z80, memory_accessor| z80.ld_ixd_e(memory_accessor),
+    // 0b01110100 LD (IX+d), H
+    |z80, memory_accessor| z80.ld_ixd_h(memory_accessor),
+    // 0b01110101 LD (IX+d), L
+    |z80, memory_accessor| z80.ld_ixd_l(memory_accessor),
     // 0b01110110
-    // 0b01110111
+    // 0b01110111 LD (IX+d), A
+    |z80, memory_accessor| z80.ld_ixd_a(memory_accessor),
     // 0b01111000
     // 0b01111001
     // 0b01111010
@@ -476,7 +483,7 @@ const IX_FUNCTIONS: [fn(&mut Z80, &mut dyn MemoryAccessor) -> u8; 7] = [
     // 0b01111100
     // 0b01111101
     // 0b01111110 LD A, (IX+d)
-    |z80, memory_accessor| z80.ld_a_ix_d(memory_accessor),
+    |z80, memory_accessor| z80.ld_a_ixd(memory_accessor),
     // 0b01111111
     // 0b10000000
     // 0b10000001
@@ -681,7 +688,7 @@ const IY_FUNCTIONS: [fn(&mut Z80, &mut dyn MemoryAccessor) -> u8; 7] = [
     // 0b01000100
     // 0b01000101
     // 0b01000110 LD B, (IY+d)
-    |z80, memory_accessor| z80.ld_b_iy_d(memory_accessor),
+    |z80, memory_accessor| z80.ld_b_iyd(memory_accessor),
     // 0b01000111
     // 0b01001000
     // 0b01001001
@@ -690,7 +697,7 @@ const IY_FUNCTIONS: [fn(&mut Z80, &mut dyn MemoryAccessor) -> u8; 7] = [
     // 0b01001100
     // 0b01001101
     // 0b01001110 LD C, (IY+d)
-    |z80, memory_accessor| z80.ld_c_iy_d(memory_accessor),
+    |z80, memory_accessor| z80.ld_c_iyd(memory_accessor),
     // 0b01001111
     // 0b01010000
     // 0b01010001
@@ -699,7 +706,7 @@ const IY_FUNCTIONS: [fn(&mut Z80, &mut dyn MemoryAccessor) -> u8; 7] = [
     // 0b01010100
     // 0b01010101
     // 0b01010110 LD D, (IY+d)
-    |z80, memory_accessor| z80.ld_d_iy_d(memory_accessor),
+    |z80, memory_accessor| z80.ld_d_iyd(memory_accessor),
     // 0b01010111
     // 0b01011000
     // 0b01011001
@@ -708,7 +715,7 @@ const IY_FUNCTIONS: [fn(&mut Z80, &mut dyn MemoryAccessor) -> u8; 7] = [
     // 0b01011100
     // 0b01011101
     // 0b01011110 LD E, (IY+d)
-    |z80, memory_accessor| z80.ld_e_iy_d(memory_accessor),
+    |z80, memory_accessor| z80.ld_e_iyd(memory_accessor),
     // 0b01011111
     // 0b01100000
     // 0b01100001
@@ -717,7 +724,7 @@ const IY_FUNCTIONS: [fn(&mut Z80, &mut dyn MemoryAccessor) -> u8; 7] = [
     // 0b01100100
     // 0b01100101
     // 0b01100110 LD H, (IY+d)
-    |z80, memory_accessor| z80.ld_h_iy_d(memory_accessor),
+    |z80, memory_accessor| z80.ld_h_iyd(memory_accessor),
     // 0b01100111
     // 0b01101000
     // 0b01101001
@@ -726,7 +733,7 @@ const IY_FUNCTIONS: [fn(&mut Z80, &mut dyn MemoryAccessor) -> u8; 7] = [
     // 0b01101100
     // 0b01101101
     // 0b01101110 LD L, (IY+d)
-    |z80, memory_accessor| z80.ld_l_iy_d(memory_accessor),
+    |z80, memory_accessor| z80.ld_l_iyd(memory_accessor),
     // 0b01101111
     // 0b01110000
     // 0b01110001
@@ -743,7 +750,7 @@ const IY_FUNCTIONS: [fn(&mut Z80, &mut dyn MemoryAccessor) -> u8; 7] = [
     // 0b01111100
     // 0b01111101
     // 0b01111110 LD A, (IY+d)
-    |z80, memory_accessor| z80.ld_a_iy_d(memory_accessor),
+    |z80, memory_accessor| z80.ld_a_iyd(memory_accessor),
     // 0b01111111
     // 0b10000000
     // 0b10000001
@@ -1475,7 +1482,7 @@ impl Z80 {
     /// (IX+19h) allows the calculation of the sum 25AFh + 19h, which points to
     /// memory location 25C8h. If this address contains byte 39h, the
     /// instruction results in Register B also containing 39h.
-    fn ld_r_ix_d(r: &mut dyn Register, ix: u16, d: u8, memory_accessor: &dyn MemoryAccessor) -> u8 {
+    fn ld_r_ixd(r: &mut dyn Register, ix: u16, d: u8, memory_accessor: &dyn MemoryAccessor) -> u8 {
         let displacement = i8::from_ne_bytes(d.to_ne_bytes());
         let address = ix.wrapping_add_signed(displacement as i16);
         let data = memory_accessor.read(address);
@@ -1485,39 +1492,39 @@ impl Z80 {
         19
     }
 
-    fn ld_a_ix_d(&mut self, memory_accessor: &dyn MemoryAccessor) -> u8 {
+    fn ld_a_ixd(&mut self, memory_accessor: &dyn MemoryAccessor) -> u8 {
         let d = self.fetch_next_opcode(memory_accessor);
-        Z80::ld_r_ix_d(&mut self.a, self.ix, d, memory_accessor)
+        Z80::ld_r_ixd(&mut self.a, self.ix, d, memory_accessor)
     }
 
-    fn ld_b_ix_d(&mut self, memory_accessor: &dyn MemoryAccessor) -> u8 {
+    fn ld_b_ixd(&mut self, memory_accessor: &dyn MemoryAccessor) -> u8 {
         let d = self.fetch_next_opcode(memory_accessor);
-        Z80::ld_r_ix_d(&mut self.b, self.ix, d, memory_accessor)
+        Z80::ld_r_ixd(&mut self.b, self.ix, d, memory_accessor)
     }
 
-    fn ld_c_ix_d(&mut self, memory_accessor: &dyn MemoryAccessor) -> u8 {
+    fn ld_c_ixd(&mut self, memory_accessor: &dyn MemoryAccessor) -> u8 {
         let d = self.fetch_next_opcode(memory_accessor);
-        Z80::ld_r_ix_d(&mut self.c, self.ix, d, memory_accessor)
+        Z80::ld_r_ixd(&mut self.c, self.ix, d, memory_accessor)
     }
 
-    fn ld_d_ix_d(&mut self, memory_accessor: &dyn MemoryAccessor) -> u8 {
+    fn ld_d_ixd(&mut self, memory_accessor: &dyn MemoryAccessor) -> u8 {
         let d = self.fetch_next_opcode(memory_accessor);
-        Z80::ld_r_ix_d(&mut self.d, self.ix, d, memory_accessor)
+        Z80::ld_r_ixd(&mut self.d, self.ix, d, memory_accessor)
     }
 
-    fn ld_e_ix_d(&mut self, memory_accessor: &dyn MemoryAccessor) -> u8 {
+    fn ld_e_ixd(&mut self, memory_accessor: &dyn MemoryAccessor) -> u8 {
         let d = self.fetch_next_opcode(memory_accessor);
-        Z80::ld_r_ix_d(&mut self.e, self.ix, d, memory_accessor)
+        Z80::ld_r_ixd(&mut self.e, self.ix, d, memory_accessor)
     }
 
-    fn ld_h_ix_d(&mut self, memory_accessor: &dyn MemoryAccessor) -> u8 {
+    fn ld_h_ixd(&mut self, memory_accessor: &dyn MemoryAccessor) -> u8 {
         let d = self.fetch_next_opcode(memory_accessor);
-        Z80::ld_r_ix_d(&mut self.h, self.ix, d, memory_accessor)
+        Z80::ld_r_ixd(&mut self.h, self.ix, d, memory_accessor)
     }
 
-    fn ld_l_ix_d(&mut self, memory_accessor: &dyn MemoryAccessor) -> u8 {
+    fn ld_l_ixd(&mut self, memory_accessor: &dyn MemoryAccessor) -> u8 {
         let d = self.fetch_next_opcode(memory_accessor);
-        Z80::ld_r_ix_d(&mut self.l, self.ix, d, memory_accessor)
+        Z80::ld_r_ixd(&mut self.l, self.ix, d, memory_accessor)
     }
 
     /// ## LD r, (IY+d)
@@ -1568,7 +1575,7 @@ impl Z80 {
     /// (IY+19h) allows the calculation of the sum 25AFh + 19h, which points to
     /// memory location 25C8h. If this address contains byte 39h, the
     /// instruction results in Register B also containing 39h.
-    fn ld_r_iy_d(r: &mut dyn Register, iy: u16, d: u8, memory_accessor: &dyn MemoryAccessor) -> u8 {
+    fn ld_r_iyd(r: &mut dyn Register, iy: u16, d: u8, memory_accessor: &dyn MemoryAccessor) -> u8 {
         let displacement = i8::from_ne_bytes(d.to_ne_bytes());
         let address = iy.wrapping_add_signed(displacement as i16);
         let data = memory_accessor.read(address);
@@ -1578,39 +1585,39 @@ impl Z80 {
         19
     }
 
-    fn ld_a_iy_d(&mut self, memory_accessor: &dyn MemoryAccessor) -> u8 {
+    fn ld_a_iyd(&mut self, memory_accessor: &dyn MemoryAccessor) -> u8 {
         let d = self.fetch_next_opcode(memory_accessor);
-        Z80::ld_r_iy_d(&mut self.a, self.iy, d, memory_accessor)
+        Z80::ld_r_iyd(&mut self.a, self.iy, d, memory_accessor)
     }
 
-    fn ld_b_iy_d(&mut self, memory_accessor: &dyn MemoryAccessor) -> u8 {
+    fn ld_b_iyd(&mut self, memory_accessor: &dyn MemoryAccessor) -> u8 {
         let d = self.fetch_next_opcode(memory_accessor);
-        Z80::ld_r_iy_d(&mut self.b, self.iy, d, memory_accessor)
+        Z80::ld_r_iyd(&mut self.b, self.iy, d, memory_accessor)
     }
 
-    fn ld_c_iy_d(&mut self, memory_accessor: &dyn MemoryAccessor) -> u8 {
+    fn ld_c_iyd(&mut self, memory_accessor: &dyn MemoryAccessor) -> u8 {
         let d = self.fetch_next_opcode(memory_accessor);
-        Z80::ld_r_iy_d(&mut self.c, self.iy, d, memory_accessor)
+        Z80::ld_r_iyd(&mut self.c, self.iy, d, memory_accessor)
     }
 
-    fn ld_d_iy_d(&mut self, memory_accessor: &dyn MemoryAccessor) -> u8 {
+    fn ld_d_iyd(&mut self, memory_accessor: &dyn MemoryAccessor) -> u8 {
         let d = self.fetch_next_opcode(memory_accessor);
-        Z80::ld_r_iy_d(&mut self.d, self.iy, d, memory_accessor)
+        Z80::ld_r_iyd(&mut self.d, self.iy, d, memory_accessor)
     }
 
-    fn ld_e_iy_d(&mut self, memory_accessor: &dyn MemoryAccessor) -> u8 {
+    fn ld_e_iyd(&mut self, memory_accessor: &dyn MemoryAccessor) -> u8 {
         let d = self.fetch_next_opcode(memory_accessor);
-        Z80::ld_r_iy_d(&mut self.e, self.iy, d, memory_accessor)
+        Z80::ld_r_iyd(&mut self.e, self.iy, d, memory_accessor)
     }
 
-    fn ld_h_iy_d(&mut self, memory_accessor: &dyn MemoryAccessor) -> u8 {
+    fn ld_h_iyd(&mut self, memory_accessor: &dyn MemoryAccessor) -> u8 {
         let d = self.fetch_next_opcode(memory_accessor);
-        Z80::ld_r_iy_d(&mut self.h, self.iy, d, memory_accessor)
+        Z80::ld_r_iyd(&mut self.h, self.iy, d, memory_accessor)
     }
 
-    fn ld_l_iy_d(&mut self, memory_accessor: &dyn MemoryAccessor) -> u8 {
+    fn ld_l_iyd(&mut self, memory_accessor: &dyn MemoryAccessor) -> u8 {
         let d = self.fetch_next_opcode(memory_accessor);
-        Z80::ld_r_iy_d(&mut self.l, self.iy, d, memory_accessor)
+        Z80::ld_r_iyd(&mut self.l, self.iy, d, memory_accessor)
     }
 
     /// ## LD (HL), r
@@ -1699,6 +1706,104 @@ impl Z80 {
         let l = self.l.get();
         Z80::ld_hl_r(self.h.get(), l, &mut self.l, memory_accessor)
     }
+
+    /// ## LD (IX+d), r
+    ///
+    /// ### Operation
+    ///
+    /// (IX+d) ← r
+    ///
+    /// ### Op Code
+    ///
+    /// LD
+    ///
+    /// ### Operands
+    ///
+    /// (IX+d), r
+    /// `1 1 1 0 1 1 0 1` (DD)
+    /// `0 1 1 1 0 r r r`
+    /// `d d d d d d d d`
+    ///
+    /// ### Description
+    ///
+    /// The contents of register r are loaded to the memory address specified by
+    ///  the contents of Index Register IX summed with d, a two’s-complement
+    /// displacement integer. The r symbol identifies registers A, B, C, D, E,
+    /// H, or L, assembled as follows in the object code:
+    ///
+    /// | Register | r   |
+    /// | -------- | --- |
+    /// | A        | 111 |
+    /// | B        | 000 |
+    /// | C        | 001 |
+    /// | D        | 010 |
+    /// | E        | 011 |
+    /// | H        | 100 |
+    /// | L        | 101 |
+    ///
+    /// | M Cycles | T States           | 4 MHz E.T. |
+    /// | -------- | ------------------ | ---------- |
+    /// | 5        | 19 (4, 4, 3, 5, 3) | 4.75       |
+    ///
+    /// ### Condition Bits Affected
+    ///
+    /// None.
+    ///
+    /// ### Example
+    ///
+    /// If the C register contains byte 1Ch, and Index Register IX contains
+    /// 3100h, then the instruction LID (IX + 6h), C performs the sum 3100h + 6h
+    /// and loads 1Ch to memory location 3106h.
+    fn ld_ixd_r(
+        ix: u16,
+        d: u8,
+        r: &mut dyn Register,
+        memory_accessor: &mut dyn MemoryAccessor,
+    ) -> u8 {
+        let displacement = i8::from_ne_bytes(d.to_ne_bytes());
+        let address = ix.wrapping_add_signed(displacement as i16);
+        memory_accessor.write(address, r.get());
+
+        // T states
+        19
+    }
+
+    fn ld_ixd_a(&mut self, memory_accessor: &mut dyn MemoryAccessor) -> u8 {
+        let d = self.fetch_next_opcode(memory_accessor);
+        Z80::ld_ixd_r(self.ix, d, &mut self.a, memory_accessor)
+    }
+
+    fn ld_ixd_b(&mut self, memory_accessor: &mut dyn MemoryAccessor) -> u8 {
+        let d = self.fetch_next_opcode(memory_accessor);
+        Z80::ld_ixd_r(self.ix, d, &mut self.b, memory_accessor)
+    }
+
+    fn ld_ixd_c(&mut self, memory_accessor: &mut dyn MemoryAccessor) -> u8 {
+        let d = self.fetch_next_opcode(memory_accessor);
+        Z80::ld_ixd_r(self.ix, d, &mut self.c, memory_accessor)
+    }
+
+    fn ld_ixd_d(&mut self, memory_accessor: &mut dyn MemoryAccessor) -> u8 {
+        let d = self.fetch_next_opcode(memory_accessor);
+        Z80::ld_ixd_r(self.ix, d, &mut self.d, memory_accessor)
+    }
+
+    fn ld_ixd_e(&mut self, memory_accessor: &mut dyn MemoryAccessor) -> u8 {
+        let d = self.fetch_next_opcode(memory_accessor);
+        Z80::ld_ixd_r(self.ix, d, &mut self.e, memory_accessor)
+    }
+
+    fn ld_ixd_h(&mut self, memory_accessor: &mut dyn MemoryAccessor) -> u8 {
+        let d = self.fetch_next_opcode(memory_accessor);
+        Z80::ld_ixd_r(self.ix, d, &mut self.h, memory_accessor)
+    }
+
+    fn ld_ixd_l(&mut self, memory_accessor: &mut dyn MemoryAccessor) -> u8 {
+        let d = self.fetch_next_opcode(memory_accessor);
+        Z80::ld_ixd_r(self.ix, d, &mut self.l, memory_accessor)
+    }
+
+
 
     // General-Purpose Arithmetic and CPU Control Groups
 
@@ -1908,11 +2013,11 @@ mod tests {
             0xDD,
         ];
 
-        let mut ram = Ram::new(&mut bytes);
+        let ram = &mut Ram::new(&mut bytes);
 
         let mut z80 = Z80::new();
 
-        let t_states = z80.process_next_instruction(&mut ram);
+        let t_states = z80.process_next_instruction(ram);
 
         assert_eq!(11, t_states);
         assert_eq!(bytes[1], z80.h.get());
@@ -2022,18 +2127,18 @@ mod tests {
     }
 
     #[test]
-    fn test_ld_r_ix_d() {
+    fn test_ld_r_ixd() {
         let scenarios: [(
             fn(&mut Z80, &dyn MemoryAccessor) -> u8,
             fn(&mut Z80) -> &mut GeneralPurposeRegister,
         ); 7] = [
-            (Z80::ld_a_ix_d, |z80: &mut Z80| &mut z80.a),
-            (Z80::ld_b_ix_d, |z80: &mut Z80| &mut z80.b),
-            (Z80::ld_c_ix_d, |z80: &mut Z80| &mut z80.c),
-            (Z80::ld_d_ix_d, |z80: &mut Z80| &mut z80.d),
-            (Z80::ld_e_ix_d, |z80: &mut Z80| &mut z80.e),
-            (Z80::ld_h_ix_d, |z80: &mut Z80| &mut z80.h),
-            (Z80::ld_l_ix_d, |z80: &mut Z80| &mut z80.l),
+            (Z80::ld_a_ixd, |z80: &mut Z80| &mut z80.a),
+            (Z80::ld_b_ixd, |z80: &mut Z80| &mut z80.b),
+            (Z80::ld_c_ixd, |z80: &mut Z80| &mut z80.c),
+            (Z80::ld_d_ixd, |z80: &mut Z80| &mut z80.d),
+            (Z80::ld_e_ixd, |z80: &mut Z80| &mut z80.e),
+            (Z80::ld_h_ixd, |z80: &mut Z80| &mut z80.h),
+            (Z80::ld_l_ixd, |z80: &mut Z80| &mut z80.l),
         ];
 
         let mut bytes = [0xDD, 0x77, (-2i8).to_ne_bytes()[0], 0xCC];
@@ -2053,18 +2158,18 @@ mod tests {
     }
 
     #[test]
-    fn test_ld_r_iy_d() {
+    fn test_ld_r_iyd() {
         let scenarios: [(
             fn(&mut Z80, &dyn MemoryAccessor) -> u8,
             fn(&mut Z80) -> &mut GeneralPurposeRegister,
         ); 7] = [
-            (Z80::ld_a_iy_d, |z80: &mut Z80| &mut z80.a),
-            (Z80::ld_b_iy_d, |z80: &mut Z80| &mut z80.b),
-            (Z80::ld_c_iy_d, |z80: &mut Z80| &mut z80.c),
-            (Z80::ld_d_iy_d, |z80: &mut Z80| &mut z80.d),
-            (Z80::ld_e_iy_d, |z80: &mut Z80| &mut z80.e),
-            (Z80::ld_h_iy_d, |z80: &mut Z80| &mut z80.h),
-            (Z80::ld_l_iy_d, |z80: &mut Z80| &mut z80.l),
+            (Z80::ld_a_iyd, |z80: &mut Z80| &mut z80.a),
+            (Z80::ld_b_iyd, |z80: &mut Z80| &mut z80.b),
+            (Z80::ld_c_iyd, |z80: &mut Z80| &mut z80.c),
+            (Z80::ld_d_iyd, |z80: &mut Z80| &mut z80.d),
+            (Z80::ld_e_iyd, |z80: &mut Z80| &mut z80.e),
+            (Z80::ld_h_iyd, |z80: &mut Z80| &mut z80.h),
+            (Z80::ld_l_iyd, |z80: &mut Z80| &mut z80.l),
         ];
 
         let mut bytes = [0xDD, 0x77, (-2i8).to_ne_bytes()[0], 0xCC];
@@ -2147,5 +2252,36 @@ mod tests {
         assert_eq!(7, t_states);
 
         assert_eq!(z80.l.get(), ram.read(2));
+    }
+
+    #[test]
+    fn test_ld_ixd_r() {
+        let scenarios: [(
+            fn(&mut Z80, &mut dyn MemoryAccessor) -> u8,
+            fn(&mut Z80) -> &mut GeneralPurposeRegister,
+        ); 7] = [
+            (Z80::ld_ixd_a, |z80: &mut Z80| &mut z80.a),
+            (Z80::ld_ixd_b, |z80: &mut Z80| &mut z80.b),
+            (Z80::ld_ixd_c, |z80: &mut Z80| &mut z80.c),
+            (Z80::ld_ixd_d, |z80: &mut Z80| &mut z80.d),
+            (Z80::ld_ixd_e, |z80: &mut Z80| &mut z80.e),
+            (Z80::ld_ixd_h, |z80: &mut Z80| &mut z80.h),
+            (Z80::ld_ixd_l, |z80: &mut Z80| &mut z80.l),
+        ];
+
+        let bytes = &mut [0xDD, 0x77, (-2i8).to_ne_bytes()[0], 0x00];
+        let ram = &mut Ram::new(bytes);
+
+        for (opcode, register_supplier) in scenarios {
+            let z80 = &mut Z80::new();
+            z80.program_counter = 2;
+            z80.ix = 5;
+            register_supplier(z80).load(0xFF);
+            
+            let t_states = opcode(z80, ram);
+            assert_eq!(19, t_states);
+
+            assert_eq!(0xFF, ram.read(3));
+        }
     }
 }
