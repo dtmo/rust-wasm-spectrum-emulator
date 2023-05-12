@@ -19,8 +19,8 @@ impl Memory {
 }
 
 impl MemoryAccessor for Memory {
-    fn read(&self, address: u16) -> u8 {
-        let index = address as usize;
+    fn read(&self, address: &u16) -> u8 {
+        let index = *address as usize;
         if index < self.rom.len() {
             u8::from_le(self.rom[index])
         } else {
@@ -28,8 +28,8 @@ impl MemoryAccessor for Memory {
         }
     }
 
-    fn write(&mut self, address: u16, data: u8) {
-        let index = address as usize;
+    fn write(&mut self, address: &u16, data: &u8) {
+        let index = *address as usize;
         if index >= self.rom.len() {
             self.ram[index - self.rom.len()] = data.to_le();
         }

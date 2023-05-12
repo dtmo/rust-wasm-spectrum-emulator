@@ -1,5 +1,3 @@
-use crate::register::Register;
-
 /// Set if the 2-complement value is negative. It’s simply a copy of the
 /// most significant bit.
 pub const S_FLAG_BITMASK: u8 = 0b10000000;
@@ -29,435 +27,403 @@ pub const N_FLAG_BITMASK: u8 = 0b00000010;
 /// The carry flag, set if there was a carry after the most significant bit.
 pub const C_FLAG_BITMASK: u8 = 0b00000001;
 
-#[derive(Clone, Debug, PartialEq, Eq)]
-pub struct FlagRegister {
-    value: u8,
+fn flags_set(flag_bitmask: &u8, register: &u8) -> bool {
+    flag_bitmask & register == *flag_bitmask
 }
 
-impl Register for FlagRegister {
-    fn get(&self) -> u8 {
-        self.value
-    }
-
-    fn load(&mut self, r_prime: u8) {
-        self.value = r_prime;
-    }
+fn unset_flags(flag_bitmask: &u8, register: &mut u8) {
+    *register = *register & flag_bitmask.reverse_bits();
 }
 
-impl FlagRegister {
-    pub fn new() -> FlagRegister {
-        FlagRegister { value: 0 }
-    }
+fn set_flags(flag_bitmask: &u8, register: &mut u8) {
+    unset_flags(flag_bitmask, register);
+    *register = *register | *flag_bitmask;
+}
 
-    fn flags(&self, flag_bitmask: u8) -> bool {
-        self.value & flag_bitmask != 0
-    }
+pub fn s_flag_set(register: &u8) -> bool {
+    flags_set(&S_FLAG_BITMASK, register)
+}
 
-    fn unset_flags(&mut self, flag_bitmask: u8) {
-        self.value = self.value & flag_bitmask.reverse_bits();
-    }
+pub fn set_s_flag(register: &mut u8) {
+    set_flags(&S_FLAG_BITMASK, register);
+}
 
-    fn set_flags(&mut self, flag_bitmask: u8) {
-        self.unset_flags(flag_bitmask);
-        self.value = self.value | flag_bitmask;
-    }
+pub fn unset_s_flag(register: &mut u8) {
+    unset_flags(&S_FLAG_BITMASK, register);
+}
 
-    pub fn s_flag(&self) -> bool {
-        self.flags(S_FLAG_BITMASK)
-    }
+pub fn z_flag_set(register: &u8) -> bool {
+    flags_set(&Z_FLAG_BITMASK, register)
+}
 
-    pub  fn set_s_flag(&mut self) {
-        self.set_flags(S_FLAG_BITMASK);
-    }
+pub fn set_z_flag(register: &mut u8) {
+    set_flags(&Z_FLAG_BITMASK, register);
+}
 
-    pub fn unset_s_flag(&mut self) {
-        self.unset_flags(S_FLAG_BITMASK);
-    }
+pub fn unset_z_flag(register: &mut u8) {
+    unset_flags(&Z_FLAG_BITMASK, register);
+}
 
-    pub fn z_flag(&self) -> bool {
-        self.flags(Z_FLAG_BITMASK)
-    }
+pub fn y_flag_set(register: &u8) -> bool {
+    flags_set(&Y_FLAG_BITMASK, register)
+}
 
-    pub fn set_z_flag(&mut self) {
-        self.set_flags(Z_FLAG_BITMASK);
-    }
+pub fn set_y_flag(register: &mut u8) {
+    set_flags(&Y_FLAG_BITMASK, register);
+}
 
-    pub fn unset_z_flag(&mut self) {
-        self.unset_flags(Z_FLAG_BITMASK);
-    }
+pub fn unset_y_flag(register: &mut u8) {
+    unset_flags(&Y_FLAG_BITMASK, register);
+}
 
-    pub fn y_flag(&self) -> bool {
-        self.flags(Y_FLAG_BITMASK)
-    }
+pub fn h_flag_set(register: &u8) -> bool {
+    flags_set(&H_FLAG_BITMASK, register)
+}
 
-    pub fn set_y_flag(&mut self) {
-        self.set_flags(Y_FLAG_BITMASK);
-    }
+pub fn set_h_flag(register: &mut u8) {
+    set_flags(&H_FLAG_BITMASK, register);
+}
 
-    pub fn unset_y_flag(&mut self) {
-        self.unset_flags(Y_FLAG_BITMASK);
-    }
+pub fn unset_h_flag(register: &mut u8) {
+    unset_flags(&H_FLAG_BITMASK, register);
+}
 
-    pub fn h_flag(&self) -> bool {
-        self.flags(H_FLAG_BITMASK)
-    }
+pub fn x_flag_set(register: &u8) -> bool {
+    flags_set(&X_FLAG_BITMASK, register)
+}
 
-    pub fn set_h_flag(&mut self) {
-        self.set_flags(H_FLAG_BITMASK);
-    }
+pub fn set_x_flag(register: &mut u8) {
+    set_flags(&X_FLAG_BITMASK, register);
+}
 
-    pub fn unset_h_flag(&mut self) {
-        self.unset_flags(H_FLAG_BITMASK);
-    }
+pub fn unset_x_flag(register: &mut u8) {
+    unset_flags(&X_FLAG_BITMASK, register);
+}
 
-    pub fn x_flag(&self) -> bool {
-        self.flags(X_FLAG_BITMASK)
-    }
+pub fn p_flag_set(register: &u8) -> bool {
+    flags_set(&P_FLAG_BITMASK, register)
+}
 
-    pub fn set_x_flag(&mut self) {
-        self.set_flags(X_FLAG_BITMASK);
-    }
+pub fn set_p_flag(register: &mut u8) {
+    set_flags(&P_FLAG_BITMASK, register);
+}
 
-    pub fn unset_x_flag(&mut self) {
-        self.unset_flags(X_FLAG_BITMASK);
-    }
+pub fn unset_p_flag(register: &mut u8) {
+    unset_flags(&P_FLAG_BITMASK, register);
+}
 
-    pub fn p_flag(&self) -> bool {
-        self.flags(P_FLAG_BITMASK)
-    }
+pub fn n_flag_set(register: &u8) -> bool {
+    flags_set(&N_FLAG_BITMASK, register)
+}
 
-    pub fn set_p_flag(&mut self) {
-        self.set_flags(P_FLAG_BITMASK);
-    }
+pub fn set_n_flag(register: &mut u8) {
+    set_flags(&N_FLAG_BITMASK, register);
+}
 
-    pub fn unset_p_flag(&mut self) {
-        self.unset_flags(P_FLAG_BITMASK);
-    }
+pub fn unset_n_flag(register: &mut u8) {
+    unset_flags(&N_FLAG_BITMASK, register);
+}
 
-    pub fn n_flag(&self) -> bool {
-        self.flags(N_FLAG_BITMASK)
-    }
+pub fn c_flag_set(register: &u8) -> bool {
+    flags_set(&C_FLAG_BITMASK, register)
+}
 
-    pub fn set_n_flag(&mut self) {
-        self.set_flags(N_FLAG_BITMASK);
-    }
+pub fn set_c_flag(register: &mut u8) {
+    set_flags(&C_FLAG_BITMASK, register);
+}
 
-    pub fn unset_n_flag(&mut self) {
-        self.unset_flags(N_FLAG_BITMASK);
-    }
-
-    pub fn c_flag(&self) -> bool {
-        self.flags(C_FLAG_BITMASK)
-    }
-
-    pub fn set_c_flag(&mut self) {
-        self.set_flags(C_FLAG_BITMASK);
-    }
-
-    pub fn unset_c_flag(&mut self) {
-        self.unset_flags(C_FLAG_BITMASK);
-    }
+pub fn unset_c_flag(register: &mut u8) {
+    unset_flags(&C_FLAG_BITMASK, register);
 }
 
 mod tests {
     use super::*;
 
     #[test]
-    fn test_get_load() {
-        let mut flag_register = FlagRegister::new();
-
-        assert_eq!(0x00, flag_register.get());
-
-        flag_register.load(0xDD);
-
-        assert_eq!(0xDD, flag_register.get());
-    }
-
-    #[test]
     fn test_s_flag() {
-        let mut flag_register = FlagRegister::new();
+        let flag_register = &mut 0u8;
 
-        assert_eq!(false, flag_register.s_flag());
-        assert_eq!(false, flag_register.z_flag());
-        assert_eq!(false, flag_register.y_flag());
-        assert_eq!(false, flag_register.h_flag());
-        assert_eq!(false, flag_register.x_flag());
-        assert_eq!(false, flag_register.p_flag());
-        assert_eq!(false, flag_register.n_flag());
-        assert_eq!(false, flag_register.c_flag());
+        assert_eq!(false, s_flag_set(flag_register));
+        assert_eq!(false, z_flag_set(flag_register));
+        assert_eq!(false, y_flag_set(flag_register));
+        assert_eq!(false, h_flag_set(flag_register));
+        assert_eq!(false, x_flag_set(flag_register));
+        assert_eq!(false, p_flag_set(flag_register));
+        assert_eq!(false, n_flag_set(flag_register));
+        assert_eq!(false, c_flag_set(flag_register));
 
-        flag_register.set_s_flag();
+        set_s_flag(flag_register);
 
-        assert_eq!(true, flag_register.s_flag());
-        assert_eq!(false, flag_register.z_flag());
-        assert_eq!(false, flag_register.y_flag());
-        assert_eq!(false, flag_register.h_flag());
-        assert_eq!(false, flag_register.x_flag());
-        assert_eq!(false, flag_register.p_flag());
-        assert_eq!(false, flag_register.n_flag());
-        assert_eq!(false, flag_register.c_flag());
+        assert_eq!(true, s_flag_set(flag_register));
+        assert_eq!(false, z_flag_set(flag_register));
+        assert_eq!(false, y_flag_set(flag_register));
+        assert_eq!(false, h_flag_set(flag_register));
+        assert_eq!(false, x_flag_set(flag_register));
+        assert_eq!(false, p_flag_set(flag_register));
+        assert_eq!(false, n_flag_set(flag_register));
+        assert_eq!(false, c_flag_set(flag_register));
 
-        flag_register.unset_s_flag();
+        unset_s_flag(flag_register);
 
-        assert_eq!(false, flag_register.s_flag());
-        assert_eq!(false, flag_register.z_flag());
-        assert_eq!(false, flag_register.y_flag());
-        assert_eq!(false, flag_register.h_flag());
-        assert_eq!(false, flag_register.x_flag());
-        assert_eq!(false, flag_register.p_flag());
-        assert_eq!(false, flag_register.n_flag());
-        assert_eq!(false, flag_register.c_flag());
+        assert_eq!(false, s_flag_set(flag_register));
+        assert_eq!(false, z_flag_set(flag_register));
+        assert_eq!(false, y_flag_set(flag_register));
+        assert_eq!(false, h_flag_set(flag_register));
+        assert_eq!(false, x_flag_set(flag_register));
+        assert_eq!(false, p_flag_set(flag_register));
+        assert_eq!(false, n_flag_set(flag_register));
+        assert_eq!(false, c_flag_set(flag_register));
     }
 
     #[test]
     fn test_z_flag() {
-        let mut flag_register = FlagRegister::new();
+        let flag_register = &mut 0u8;
 
-        assert_eq!(false, flag_register.s_flag());
-        assert_eq!(false, flag_register.z_flag());
-        assert_eq!(false, flag_register.y_flag());
-        assert_eq!(false, flag_register.h_flag());
-        assert_eq!(false, flag_register.x_flag());
-        assert_eq!(false, flag_register.p_flag());
-        assert_eq!(false, flag_register.n_flag());
-        assert_eq!(false, flag_register.c_flag());
+        assert_eq!(false, s_flag_set(flag_register));
+        assert_eq!(false, z_flag_set(flag_register));
+        assert_eq!(false, y_flag_set(flag_register));
+        assert_eq!(false, h_flag_set(flag_register));
+        assert_eq!(false, x_flag_set(flag_register));
+        assert_eq!(false, p_flag_set(flag_register));
+        assert_eq!(false, n_flag_set(flag_register));
+        assert_eq!(false, c_flag_set(flag_register));
 
-        flag_register.set_z_flag();
+        set_z_flag(flag_register);
 
-        assert_eq!(false, flag_register.s_flag());
-        assert_eq!(true, flag_register.z_flag());
-        assert_eq!(false, flag_register.y_flag());
-        assert_eq!(false, flag_register.h_flag());
-        assert_eq!(false, flag_register.x_flag());
-        assert_eq!(false, flag_register.p_flag());
-        assert_eq!(false, flag_register.n_flag());
-        assert_eq!(false, flag_register.c_flag());
+        assert_eq!(false, s_flag_set(flag_register));
+        assert_eq!(true, z_flag_set(flag_register));
+        assert_eq!(false, y_flag_set(flag_register));
+        assert_eq!(false, h_flag_set(flag_register));
+        assert_eq!(false, x_flag_set(flag_register));
+        assert_eq!(false, p_flag_set(flag_register));
+        assert_eq!(false, n_flag_set(flag_register));
+        assert_eq!(false, c_flag_set(flag_register));
 
-        flag_register.unset_z_flag();
+        unset_z_flag(flag_register);
 
-        assert_eq!(false, flag_register.s_flag());
-        assert_eq!(false, flag_register.z_flag());
-        assert_eq!(false, flag_register.y_flag());
-        assert_eq!(false, flag_register.h_flag());
-        assert_eq!(false, flag_register.x_flag());
-        assert_eq!(false, flag_register.p_flag());
-        assert_eq!(false, flag_register.n_flag());
-        assert_eq!(false, flag_register.c_flag());
+        assert_eq!(false, s_flag_set(flag_register));
+        assert_eq!(false, z_flag_set(flag_register));
+        assert_eq!(false, y_flag_set(flag_register));
+        assert_eq!(false, h_flag_set(flag_register));
+        assert_eq!(false, x_flag_set(flag_register));
+        assert_eq!(false, p_flag_set(flag_register));
+        assert_eq!(false, n_flag_set(flag_register));
+        assert_eq!(false, c_flag_set(flag_register));
     }
 
     #[test]
     fn test_y_flag() {
-        let mut flag_register = FlagRegister::new();
+        let flag_register = &mut 0u8;
 
-        assert_eq!(false, flag_register.s_flag());
-        assert_eq!(false, flag_register.z_flag());
-        assert_eq!(false, flag_register.y_flag());
-        assert_eq!(false, flag_register.h_flag());
-        assert_eq!(false, flag_register.x_flag());
-        assert_eq!(false, flag_register.p_flag());
-        assert_eq!(false, flag_register.n_flag());
-        assert_eq!(false, flag_register.c_flag());
+        assert_eq!(false, s_flag_set(flag_register));
+        assert_eq!(false, z_flag_set(flag_register));
+        assert_eq!(false, y_flag_set(flag_register));
+        assert_eq!(false, h_flag_set(flag_register));
+        assert_eq!(false, x_flag_set(flag_register));
+        assert_eq!(false, p_flag_set(flag_register));
+        assert_eq!(false, n_flag_set(flag_register));
+        assert_eq!(false, c_flag_set(flag_register));
 
-        flag_register.set_y_flag();
+        set_y_flag(flag_register);
 
-        assert_eq!(false, flag_register.s_flag());
-        assert_eq!(false, flag_register.z_flag());
-        assert_eq!(true, flag_register.y_flag());
-        assert_eq!(false, flag_register.h_flag());
-        assert_eq!(false, flag_register.x_flag());
-        assert_eq!(false, flag_register.p_flag());
-        assert_eq!(false, flag_register.n_flag());
-        assert_eq!(false, flag_register.c_flag());
+        assert_eq!(false, s_flag_set(flag_register));
+        assert_eq!(false, z_flag_set(flag_register));
+        assert_eq!(true, y_flag_set(flag_register));
+        assert_eq!(false, h_flag_set(flag_register));
+        assert_eq!(false, x_flag_set(flag_register));
+        assert_eq!(false, p_flag_set(flag_register));
+        assert_eq!(false, n_flag_set(flag_register));
+        assert_eq!(false, c_flag_set(flag_register));
 
-        flag_register.unset_y_flag();
+        unset_y_flag(flag_register);
 
-        assert_eq!(false, flag_register.s_flag());
-        assert_eq!(false, flag_register.z_flag());
-        assert_eq!(false, flag_register.y_flag());
-        assert_eq!(false, flag_register.h_flag());
-        assert_eq!(false, flag_register.x_flag());
-        assert_eq!(false, flag_register.p_flag());
-        assert_eq!(false, flag_register.n_flag());
-        assert_eq!(false, flag_register.c_flag());
+        assert_eq!(false, s_flag_set(flag_register));
+        assert_eq!(false, z_flag_set(flag_register));
+        assert_eq!(false, y_flag_set(flag_register));
+        assert_eq!(false, h_flag_set(flag_register));
+        assert_eq!(false, x_flag_set(flag_register));
+        assert_eq!(false, p_flag_set(flag_register));
+        assert_eq!(false, n_flag_set(flag_register));
+        assert_eq!(false, c_flag_set(flag_register));
     }
 
     #[test]
     fn test_h_flag() {
-        let mut flag_register = FlagRegister::new();
+        let flag_register = &mut 0u8;
 
-        assert_eq!(false, flag_register.s_flag());
-        assert_eq!(false, flag_register.z_flag());
-        assert_eq!(false, flag_register.y_flag());
-        assert_eq!(false, flag_register.h_flag());
-        assert_eq!(false, flag_register.x_flag());
-        assert_eq!(false, flag_register.p_flag());
-        assert_eq!(false, flag_register.n_flag());
-        assert_eq!(false, flag_register.c_flag());
+        assert_eq!(false, s_flag_set(flag_register));
+        assert_eq!(false, z_flag_set(flag_register));
+        assert_eq!(false, y_flag_set(flag_register));
+        assert_eq!(false, h_flag_set(flag_register));
+        assert_eq!(false, x_flag_set(flag_register));
+        assert_eq!(false, p_flag_set(flag_register));
+        assert_eq!(false, n_flag_set(flag_register));
+        assert_eq!(false, c_flag_set(flag_register));
 
-        flag_register.set_h_flag();
+        set_h_flag(flag_register);
 
-        assert_eq!(false, flag_register.s_flag());
-        assert_eq!(false, flag_register.z_flag());
-        assert_eq!(false, flag_register.y_flag());
-        assert_eq!(true, flag_register.h_flag());
-        assert_eq!(false, flag_register.x_flag());
-        assert_eq!(false, flag_register.p_flag());
-        assert_eq!(false, flag_register.n_flag());
-        assert_eq!(false, flag_register.c_flag());
+        assert_eq!(false, s_flag_set(flag_register));
+        assert_eq!(false, z_flag_set(flag_register));
+        assert_eq!(false, y_flag_set(flag_register));
+        assert_eq!(true, h_flag_set(flag_register));
+        assert_eq!(false, x_flag_set(flag_register));
+        assert_eq!(false, p_flag_set(flag_register));
+        assert_eq!(false, n_flag_set(flag_register));
+        assert_eq!(false, c_flag_set(flag_register));
 
-        flag_register.unset_h_flag();
+        unset_h_flag(flag_register);
 
-        assert_eq!(false, flag_register.s_flag());
-        assert_eq!(false, flag_register.z_flag());
-        assert_eq!(false, flag_register.y_flag());
-        assert_eq!(false, flag_register.h_flag());
-        assert_eq!(false, flag_register.x_flag());
-        assert_eq!(false, flag_register.p_flag());
-        assert_eq!(false, flag_register.n_flag());
-        assert_eq!(false, flag_register.c_flag());
+        assert_eq!(false, s_flag_set(flag_register));
+        assert_eq!(false, z_flag_set(flag_register));
+        assert_eq!(false, y_flag_set(flag_register));
+        assert_eq!(false, h_flag_set(flag_register));
+        assert_eq!(false, x_flag_set(flag_register));
+        assert_eq!(false, p_flag_set(flag_register));
+        assert_eq!(false, n_flag_set(flag_register));
+        assert_eq!(false, c_flag_set(flag_register));
     }
 
     #[test]
     fn test_x_flag() {
-        let mut flag_register = FlagRegister::new();
+        let flag_register = &mut 0u8;
 
-        assert_eq!(false, flag_register.s_flag());
-        assert_eq!(false, flag_register.z_flag());
-        assert_eq!(false, flag_register.y_flag());
-        assert_eq!(false, flag_register.h_flag());
-        assert_eq!(false, flag_register.x_flag());
-        assert_eq!(false, flag_register.p_flag());
-        assert_eq!(false, flag_register.n_flag());
-        assert_eq!(false, flag_register.c_flag());
+        assert_eq!(false, s_flag_set(flag_register));
+        assert_eq!(false, z_flag_set(flag_register));
+        assert_eq!(false, y_flag_set(flag_register));
+        assert_eq!(false, h_flag_set(flag_register));
+        assert_eq!(false, x_flag_set(flag_register));
+        assert_eq!(false, p_flag_set(flag_register));
+        assert_eq!(false, n_flag_set(flag_register));
+        assert_eq!(false, c_flag_set(flag_register));
 
-        flag_register.set_x_flag();
+        set_x_flag(flag_register);
 
-        assert_eq!(false, flag_register.s_flag());
-        assert_eq!(false, flag_register.z_flag());
-        assert_eq!(false, flag_register.y_flag());
-        assert_eq!(false, flag_register.h_flag());
-        assert_eq!(true, flag_register.x_flag());
-        assert_eq!(false, flag_register.p_flag());
-        assert_eq!(false, flag_register.n_flag());
-        assert_eq!(false, flag_register.c_flag());
+        assert_eq!(false, s_flag_set(flag_register));
+        assert_eq!(false, z_flag_set(flag_register));
+        assert_eq!(false, y_flag_set(flag_register));
+        assert_eq!(false, h_flag_set(flag_register));
+        assert_eq!(true, x_flag_set(flag_register));
+        assert_eq!(false, p_flag_set(flag_register));
+        assert_eq!(false, n_flag_set(flag_register));
+        assert_eq!(false, c_flag_set(flag_register));
 
-        flag_register.unset_x_flag();
+        unset_x_flag(flag_register);
 
-        assert_eq!(false, flag_register.s_flag());
-        assert_eq!(false, flag_register.z_flag());
-        assert_eq!(false, flag_register.y_flag());
-        assert_eq!(false, flag_register.h_flag());
-        assert_eq!(false, flag_register.x_flag());
-        assert_eq!(false, flag_register.p_flag());
-        assert_eq!(false, flag_register.n_flag());
-        assert_eq!(false, flag_register.c_flag());
+        assert_eq!(false, s_flag_set(flag_register));
+        assert_eq!(false, z_flag_set(flag_register));
+        assert_eq!(false, y_flag_set(flag_register));
+        assert_eq!(false, h_flag_set(flag_register));
+        assert_eq!(false, x_flag_set(flag_register));
+        assert_eq!(false, p_flag_set(flag_register));
+        assert_eq!(false, n_flag_set(flag_register));
+        assert_eq!(false, c_flag_set(flag_register));
     }
 
     #[test]
     fn test_p_flag() {
-        let mut flag_register = FlagRegister::new();
+        let flag_register = &mut 0u8;
 
-        assert_eq!(false, flag_register.s_flag());
-        assert_eq!(false, flag_register.z_flag());
-        assert_eq!(false, flag_register.y_flag());
-        assert_eq!(false, flag_register.h_flag());
-        assert_eq!(false, flag_register.x_flag());
-        assert_eq!(false, flag_register.p_flag());
-        assert_eq!(false, flag_register.n_flag());
-        assert_eq!(false, flag_register.c_flag());
+        assert_eq!(false, s_flag_set(flag_register));
+        assert_eq!(false, z_flag_set(flag_register));
+        assert_eq!(false, y_flag_set(flag_register));
+        assert_eq!(false, h_flag_set(flag_register));
+        assert_eq!(false, x_flag_set(flag_register));
+        assert_eq!(false, p_flag_set(flag_register));
+        assert_eq!(false, n_flag_set(flag_register));
+        assert_eq!(false, c_flag_set(flag_register));
 
-        flag_register.set_p_flag();
+        set_p_flag(flag_register);
 
-        assert_eq!(false, flag_register.s_flag());
-        assert_eq!(false, flag_register.z_flag());
-        assert_eq!(false, flag_register.y_flag());
-        assert_eq!(false, flag_register.h_flag());
-        assert_eq!(false, flag_register.x_flag());
-        assert_eq!(true, flag_register.p_flag());
-        assert_eq!(false, flag_register.n_flag());
-        assert_eq!(false, flag_register.c_flag());
+        assert_eq!(false, s_flag_set(flag_register));
+        assert_eq!(false, z_flag_set(flag_register));
+        assert_eq!(false, y_flag_set(flag_register));
+        assert_eq!(false, h_flag_set(flag_register));
+        assert_eq!(false, x_flag_set(flag_register));
+        assert_eq!(true, p_flag_set(flag_register));
+        assert_eq!(false, n_flag_set(flag_register));
+        assert_eq!(false, c_flag_set(flag_register));
 
-        flag_register.unset_p_flag();
+        unset_p_flag(flag_register);
 
-        assert_eq!(false, flag_register.s_flag());
-        assert_eq!(false, flag_register.z_flag());
-        assert_eq!(false, flag_register.y_flag());
-        assert_eq!(false, flag_register.h_flag());
-        assert_eq!(false, flag_register.x_flag());
-        assert_eq!(false, flag_register.p_flag());
-        assert_eq!(false, flag_register.n_flag());
-        assert_eq!(false, flag_register.c_flag());
+        assert_eq!(false, s_flag_set(flag_register));
+        assert_eq!(false, z_flag_set(flag_register));
+        assert_eq!(false, y_flag_set(flag_register));
+        assert_eq!(false, h_flag_set(flag_register));
+        assert_eq!(false, x_flag_set(flag_register));
+        assert_eq!(false, p_flag_set(flag_register));
+        assert_eq!(false, n_flag_set(flag_register));
+        assert_eq!(false, c_flag_set(flag_register));
     }
 
     #[test]
     fn test_n_flag() {
-        let mut flag_register = FlagRegister::new();
+        let flag_register = &mut 0u8;
 
-        assert_eq!(false, flag_register.s_flag());
-        assert_eq!(false, flag_register.z_flag());
-        assert_eq!(false, flag_register.y_flag());
-        assert_eq!(false, flag_register.h_flag());
-        assert_eq!(false, flag_register.x_flag());
-        assert_eq!(false, flag_register.p_flag());
-        assert_eq!(false, flag_register.n_flag());
-        assert_eq!(false, flag_register.c_flag());
+        assert_eq!(false, s_flag_set(flag_register));
+        assert_eq!(false, z_flag_set(flag_register));
+        assert_eq!(false, y_flag_set(flag_register));
+        assert_eq!(false, h_flag_set(flag_register));
+        assert_eq!(false, x_flag_set(flag_register));
+        assert_eq!(false, p_flag_set(flag_register));
+        assert_eq!(false, n_flag_set(flag_register));
+        assert_eq!(false, c_flag_set(flag_register));
 
-        flag_register.set_n_flag();
+        set_n_flag(flag_register);
 
-        assert_eq!(false, flag_register.s_flag());
-        assert_eq!(false, flag_register.z_flag());
-        assert_eq!(false, flag_register.y_flag());
-        assert_eq!(false, flag_register.h_flag());
-        assert_eq!(false, flag_register.x_flag());
-        assert_eq!(false, flag_register.p_flag());
-        assert_eq!(true, flag_register.n_flag());
-        assert_eq!(false, flag_register.c_flag());
+        assert_eq!(false, s_flag_set(flag_register));
+        assert_eq!(false, z_flag_set(flag_register));
+        assert_eq!(false, y_flag_set(flag_register));
+        assert_eq!(false, h_flag_set(flag_register));
+        assert_eq!(false, x_flag_set(flag_register));
+        assert_eq!(false, p_flag_set(flag_register));
+        assert_eq!(true, n_flag_set(flag_register));
+        assert_eq!(false, c_flag_set(flag_register));
 
-        flag_register.unset_n_flag();
+        unset_n_flag(flag_register);
 
-        assert_eq!(false, flag_register.s_flag());
-        assert_eq!(false, flag_register.z_flag());
-        assert_eq!(false, flag_register.y_flag());
-        assert_eq!(false, flag_register.h_flag());
-        assert_eq!(false, flag_register.x_flag());
-        assert_eq!(false, flag_register.p_flag());
-        assert_eq!(false, flag_register.n_flag());
-        assert_eq!(false, flag_register.c_flag());
+        assert_eq!(false, s_flag_set(flag_register));
+        assert_eq!(false, z_flag_set(flag_register));
+        assert_eq!(false, y_flag_set(flag_register));
+        assert_eq!(false, h_flag_set(flag_register));
+        assert_eq!(false, x_flag_set(flag_register));
+        assert_eq!(false, p_flag_set(flag_register));
+        assert_eq!(false, n_flag_set(flag_register));
+        assert_eq!(false, c_flag_set(flag_register));
     }
 
     #[test]
     fn test_c_flag() {
-        let mut flag_register = FlagRegister::new();
+        let flag_register = &mut 0u8;
 
-        assert_eq!(false, flag_register.s_flag());
-        assert_eq!(false, flag_register.z_flag());
-        assert_eq!(false, flag_register.y_flag());
-        assert_eq!(false, flag_register.h_flag());
-        assert_eq!(false, flag_register.x_flag());
-        assert_eq!(false, flag_register.p_flag());
-        assert_eq!(false, flag_register.n_flag());
-        assert_eq!(false, flag_register.c_flag());
+        assert_eq!(false, s_flag_set(flag_register));
+        assert_eq!(false, z_flag_set(flag_register));
+        assert_eq!(false, y_flag_set(flag_register));
+        assert_eq!(false, h_flag_set(flag_register));
+        assert_eq!(false, x_flag_set(flag_register));
+        assert_eq!(false, p_flag_set(flag_register));
+        assert_eq!(false, n_flag_set(flag_register));
+        assert_eq!(false, c_flag_set(flag_register));
 
-        flag_register.set_c_flag();
+        set_c_flag(flag_register);
 
-        assert_eq!(false, flag_register.s_flag());
-        assert_eq!(false, flag_register.z_flag());
-        assert_eq!(false, flag_register.y_flag());
-        assert_eq!(false, flag_register.h_flag());
-        assert_eq!(false, flag_register.x_flag());
-        assert_eq!(false, flag_register.p_flag());
-        assert_eq!(false, flag_register.n_flag());
-        assert_eq!(true, flag_register.c_flag());
+        assert_eq!(false, s_flag_set(flag_register));
+        assert_eq!(false, z_flag_set(flag_register));
+        assert_eq!(false, y_flag_set(flag_register));
+        assert_eq!(false, h_flag_set(flag_register));
+        assert_eq!(false, x_flag_set(flag_register));
+        assert_eq!(false, p_flag_set(flag_register));
+        assert_eq!(false, n_flag_set(flag_register));
+        assert_eq!(true, c_flag_set(flag_register));
 
-        flag_register.unset_c_flag();
+        unset_c_flag(flag_register);
 
-        assert_eq!(false, flag_register.s_flag());
-        assert_eq!(false, flag_register.z_flag());
-        assert_eq!(false, flag_register.y_flag());
-        assert_eq!(false, flag_register.h_flag());
-        assert_eq!(false, flag_register.x_flag());
-        assert_eq!(false, flag_register.p_flag());
-        assert_eq!(false, flag_register.n_flag());
-        assert_eq!(false, flag_register.c_flag());
+        assert_eq!(false, s_flag_set(flag_register));
+        assert_eq!(false, z_flag_set(flag_register));
+        assert_eq!(false, y_flag_set(flag_register));
+        assert_eq!(false, h_flag_set(flag_register));
+        assert_eq!(false, x_flag_set(flag_register));
+        assert_eq!(false, p_flag_set(flag_register));
+        assert_eq!(false, n_flag_set(flag_register));
+        assert_eq!(false, c_flag_set(flag_register));
     }
 }

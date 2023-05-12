@@ -1,4 +1,3 @@
-mod register;
 mod flag_register;
 mod z80;
 mod zx_spectrum;
