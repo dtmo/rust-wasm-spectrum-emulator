@@ -10,7 +10,7 @@ pub trait MemoryAccessor {
     fn write(&mut self, address: u16, data: u8);
 }
 
-const MAIN_FUNCTIONS: [fn(&mut Z80, &mut dyn MemoryAccessor) -> u8; 72] = [
+const MAIN_FUNCTIONS: [fn(&mut Z80, &mut dyn MemoryAccessor) -> u8; 73] = [
     // 0b00000000 NOP
     |_, _| Z80::nop(),
     // 0b00000001
@@ -73,7 +73,8 @@ const MAIN_FUNCTIONS: [fn(&mut Z80, &mut dyn MemoryAccessor) -> u8; 72] = [
     // 0b00110011
     // 0b00110100
     // 0b00110101
-    // 0b00110110
+    // 0b00110110 LD (HL), n
+    Z80::ld_hl_n,
     // 0b00110111
     // 0b00111000
     // 0b00111001
@@ -342,7 +343,7 @@ const MAIN_FUNCTIONS: [fn(&mut Z80, &mut dyn MemoryAccessor) -> u8; 72] = [
 ];
 
 // DD prefix
-const IX_FUNCTIONS: [fn(&mut Z80, &mut dyn MemoryAccessor) -> u8; 14] = [
+const IX_FUNCTIONS: [fn(&mut Z80, &mut dyn MemoryAccessor) -> u8; 15] = [
     // 0b00000000
     // 0b00000001
     // 0b00000010
@@ -397,7 +398,8 @@ const IX_FUNCTIONS: [fn(&mut Z80, &mut dyn MemoryAccessor) -> u8; 14] = [
     // 0b00110011
     // 0b00110100
     // 0b00110101
-    // 0b00110110
+    // 0b00110110 LD (IX+d), n
+    Z80::ld_ixd_n,
     // 0b00110111
     // 0b00111000
     // 0b00111001
@@ -616,7 +618,7 @@ const IX_FUNCTIONS: [fn(&mut Z80, &mut dyn MemoryAccessor) -> u8; 14] = [
 ];
 
 // FD prefix
-const IY_FUNCTIONS: [fn(&mut Z80, &mut dyn MemoryAccessor) -> u8; 14] = [
+const IY_FUNCTIONS: [fn(&mut Z80, &mut dyn MemoryAccessor) -> u8; 15] = [
     // 0b00000000
     // 0b00000001
     // 0b00000010
@@ -671,7 +673,8 @@ const IY_FUNCTIONS: [fn(&mut Z80, &mut dyn MemoryAccessor) -> u8; 14] = [
     // 0b00110011
     // 0b00110100
     // 0b00110101
-    // 0b00110110
+    // 0b00110110 LD (IY+d), n
+    Z80::ld_iyd_n,
     // 0b00110111
     // 0b00111000
     // 0b00111001
@@ -1674,9 +1677,6 @@ impl Z80 {
     /// instruction, memory address 2146h also contains 29h.
     fn ld_hl_r(h: u8, l: u8, r: &mut dyn Register, memory_accessor: &mut dyn MemoryAccessor) -> u8 {
         let address: u16 = ((h as u16) << 8) | l as u16;
-
-        println!("address: {:?}", address);
-
         memory_accessor.write(address, r.get());
 
         // T states
@@ -1757,11 +1757,16 @@ impl Z80 {
     /// None.
     ///
     /// ### Example
-    /// 
+    ///
     /// If the C register contains byte 1Ch, and Index Register IX contains
     /// 3100h, then the instruction LID (IX + 6h), C performs the sum 3100h + 6h
     /// and loads 1Ch to memory location 3106h.
-    fn ld_ixd_r(ix: u16, d: u8, r: &mut dyn Register, memory_accessor: &mut dyn MemoryAccessor) -> u8 {
+    fn ld_ixd_r(
+        ix: u16,
+        d: u8,
+        r: &mut dyn Register,
+        memory_accessor: &mut dyn MemoryAccessor,
+    ) -> u8 {
         let displacement = i8::from_ne_bytes(d.to_ne_bytes());
         let address = ix.wrapping_add_signed(displacement as i16);
         memory_accessor.write(address, r.get());
@@ -1899,6 +1904,140 @@ impl Z80 {
     fn ld_iyd_l(&mut self, memory_accessor: &mut dyn MemoryAccessor) -> u8 {
         let d = self.fetch_next_opcode(memory_accessor);
         Z80::ld_iyd_r(self.iy, d, &mut self.l, memory_accessor)
+    }
+
+    /// ## LD (HL), n
+    ///
+    /// ### Operation
+    ///
+    /// (HL) ← n
+    ///
+    /// ### Op Code
+    ///
+    /// LD
+    ///
+    /// ### Operands
+    ///
+    /// (HL), n
+    /// `0 0 1 1 0 1 1 0` (36)
+    /// `n n n n n n n n`
+    ///
+    /// ### Description
+    ///
+    /// The n integer is loaded to the memory address specified by the contents
+    /// of the HL register pair.
+    ///
+    /// | M Cycles | T States     | 4 MHz E.T. |
+    /// | -------- | ------------ | ---------- |
+    /// | 3        | 10 (4, 3, 3) | 2.50       |
+    ///
+    /// ### Condition Bits Affected
+    ///
+    /// None.
+    ///
+    /// ### Example
+    ///
+    /// If the HL register pair contains 4444h, the instruction LD (HL), 28h
+    /// results in the memory location 4444h containing byte 28h.
+    fn ld_hl_n(&mut self, memory_accessor: &mut dyn MemoryAccessor) -> u8 {
+        let address: u16 = ((self.h.get() as u16) << 8) | self.l.get() as u16;
+        let n = self.fetch_next_opcode(memory_accessor);
+        memory_accessor.write(address, n);
+
+        // T states
+        3
+    }
+
+    /// ## LD (IX+d), n
+    ///
+    /// ### Operation
+    ///
+    /// (IX+d) ← n
+    ///
+    /// ### Op Code
+    ///
+    /// LD
+    ///
+    /// ### Operands
+    ///
+    /// (IX+d), n
+    /// `1 1 0 1 1 1 0 1` (DD)
+    /// `0 0 1 1 0 1 1 0` (36)
+    /// `d d d d d d d d`
+    /// `n n n n n n n n`
+    ///
+    /// ### Description
+    ///
+    /// The n operand is loaded to the memory address specified by the sum of
+    /// Index Register IX and the two’s complement displacement operand d.
+    ///
+    /// | M Cycles | T States         | 4 MHz E.T. |
+    /// | -------- | ---------------- | ---------- |
+    /// | 5        | 19 (4, 4, 3,5,3) | 4.75       |
+    ///
+    /// ### Condition Bits Affected
+    ///
+    /// None.
+    ///
+    /// ### Example
+    ///
+    /// If Index Register IX contains the number 219Ah, then upon execution of
+    /// an LD (IX+5h), 5Ah instruction, byte 5Ah is contained in memory address
+    /// 219Fh.
+    fn ld_ixd_n(&mut self, memory_accessor: &mut dyn MemoryAccessor) -> u8 {
+        let displacement = self.fetch_next_opcode(memory_accessor);
+        let n = self.fetch_next_opcode(memory_accessor);
+        let address = self.ix.wrapping_add_signed(displacement as i16);
+        memory_accessor.write(address, n);
+
+        // T states
+        19
+    }
+
+    /// ## LD (IY+d), n
+    ///
+    /// ### Operation
+    ///
+    /// (IY+d) ← n
+    ///
+    /// ### Op Code
+    ///
+    /// LD
+    ///
+    /// ### Operands
+    ///
+    /// (IY+d), n
+    /// `1 1 1 1 1 1 0 1` (FD)
+    /// `0 0 1 1 0 1 1 0` (36)
+    /// `d d d d d d d d`
+    /// `n n n n n n n n`
+    ///
+    /// ### Description
+    ///
+    /// The n operand is loaded to the memory address specified by the sum of
+    /// Index Register IX and the two’s complement displacement operand d.
+    ///
+    /// | M Cycles | T States         | 4 MHz E.T. |
+    /// | -------- | ---------------- | ---------- |
+    /// | 5        | 19 (4, 4, 3,5,3) | 4.75       |
+    ///
+    /// ### Condition Bits Affected
+    ///
+    /// None.
+    ///
+    /// ### Example
+    ///
+    /// If Index Register IY contains the number 219Ah, then upon execution of
+    /// an LD (IY+5h), 5Ah instruction, byte 5Ah is contained in memory address
+    /// 219Fh.
+    fn ld_iyd_n(&mut self, memory_accessor: &mut dyn MemoryAccessor) -> u8 {
+        let displacement = self.fetch_next_opcode(memory_accessor);
+        let n = self.fetch_next_opcode(memory_accessor);
+        let address = self.iy.wrapping_add_signed(displacement as i16);
+        memory_accessor.write(address, n);
+
+        // T states
+        19
     }
 
     // General-Purpose Arithmetic and CPU Control Groups
@@ -2410,5 +2549,48 @@ mod tests {
 
             assert_eq!(0xFF, ram.read(3));
         }
+    }
+
+    #[test]
+    fn test_ld_hl_n() {
+        let bytes = &mut [0x36, 0xFF, 0x00];
+        let ram = &mut Ram::new(bytes);
+
+        let z80 = &mut Z80::new();
+        z80.program_counter = 1;
+        z80.h.load(0x00);
+        z80.l.load(0x02);
+        let t_states = z80.ld_hl_n(ram);
+
+        assert_eq!(3, t_states);
+        assert_eq!(0xFF, ram.read(2));
+    }
+
+    #[test]
+    fn test_ld_ixd_n() {
+        let bytes = &mut [0xDD, 0x26, 0x02, 0xFF, 0x00];
+        let ram = &mut Ram::new(bytes);
+
+        let z80 = &mut Z80::new();
+        z80.program_counter = 2;
+        z80.ix = 0x02;
+        let t_states = z80.ld_ixd_n(ram);
+
+        assert_eq!(19, t_states);
+        assert_eq!(0xFF, ram.read(4));
+    }
+
+    #[test]
+    fn test_ld_iyd_n() {
+        let bytes = &mut [0xDD, 0x26, 0x02, 0xFF, 0x00];
+        let ram = &mut Ram::new(bytes);
+
+        let z80 = &mut Z80::new();
+        z80.program_counter = 2;
+        z80.iy = 0x02;
+        let t_states = z80.ld_iyd_n(ram);
+
+        assert_eq!(19, t_states);
+        assert_eq!(0xFF, ram.read(4));
     }
 }
