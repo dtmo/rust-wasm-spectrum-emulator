@@ -181,20 +181,20 @@ const MAIN_FUNCTIONS: [fn(&mut Z80, &mut dyn MemoryAccessor) -> u8; 72] = [
     // 0b01101111 LD L, A
     |z80, _| z80.ld_l_a(),
     // 0b01110000 LD (HL), B
-    |z80, memory_accessor | z80.ld_hl_b(memory_accessor),
+    |z80, memory_accessor| z80.ld_hl_b(memory_accessor),
     // 0b01110001 LD (HL), C
-    |z80, memory_accessor | z80.ld_hl_c(memory_accessor),
+    |z80, memory_accessor| z80.ld_hl_c(memory_accessor),
     // 0b01110010 LD (HL), D
-    |z80, memory_accessor | z80.ld_hl_d(memory_accessor),
+    |z80, memory_accessor| z80.ld_hl_d(memory_accessor),
     // 0b01110011 LD (HL), E
-    |z80, memory_accessor | z80.ld_hl_e(memory_accessor),
+    |z80, memory_accessor| z80.ld_hl_e(memory_accessor),
     // 0b01110100 LD (HL), H
-    |z80, memory_accessor | z80.ld_hl_h(memory_accessor),
+    |z80, memory_accessor| z80.ld_hl_h(memory_accessor),
     // 0b01110101 LD (HL), L
-    |z80, memory_accessor | z80.ld_hl_l(memory_accessor),
+    |z80, memory_accessor| z80.ld_hl_l(memory_accessor),
     // 0b01110110
     // 0b01110111 LD (HL), A
-    |z80, memory_accessor | z80.ld_hl_a(memory_accessor),
+    |z80, memory_accessor| z80.ld_hl_a(memory_accessor),
     // 0b01111000 LD A, B
     |z80, _| z80.ld_a_b(),
     // 0b01111001 LD A, C
@@ -1901,8 +1901,6 @@ impl Z80 {
         Z80::ld_iyd_r(self.iy, d, &mut self.l, memory_accessor)
     }
 
-
-
     // General-Purpose Arithmetic and CPU Control Groups
 
     /// ### Operation
@@ -2375,7 +2373,7 @@ mod tests {
             z80.program_counter = 2;
             z80.ix = 5;
             register_supplier(z80).load(0xFF);
-            
+
             let t_states = opcode(z80, ram);
             assert_eq!(19, t_states);
 
@@ -2406,7 +2404,7 @@ mod tests {
             z80.program_counter = 2;
             z80.iy = 5;
             register_supplier(z80).load(0xFF);
-            
+
             let t_states = opcode(z80, ram);
             assert_eq!(19, t_states);
 
