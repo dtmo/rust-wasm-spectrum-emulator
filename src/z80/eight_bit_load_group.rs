@@ -1,3 +1,7 @@
+use crate::flag_register::{
+    s_flag_set, set_p_flag_with, set_s_flag_with, set_z_flag_with, unset_h_flag, unset_n_flag,
+};
+
 use super::{MemoryAccessor, Z80};
 
 impl Z80 {
@@ -1246,10 +1250,198 @@ impl Z80 {
         // T states
         13
     }
+
+    /// ## LD A, I
+    ///
+    /// ### Operation
+    ///
+    /// A ← 1
+    ///
+    /// ### Op Code
+    ///
+    /// LD
+    ///
+    /// ### Operands
+    /// A, I
+    /// `1 1 1 0 1 1 0 1` (ED)
+    /// `0 1 0 1 0 1 1 1` (57)
+    ///
+    /// ### Description
+    ///
+    /// The contents of the Interrupt Vector Register I are loaded to the
+    /// Accumulator.
+    ///
+    /// | M Cycles | T States | MHz E.T. |
+    /// | -------- | -------- | -------- |
+    /// | 2        | 9 (4, 5) | 2.25     |
+    ///
+    /// ### Condition Bits Affected
+    ///
+    /// S is set if the I Register is negative; otherwise, it is reset.
+    /// Z is set if the I Register is 0; otherwise, it is reset.
+    /// H is reset.
+    /// P/V contains contents of IFF2.
+    /// N is reset.
+    /// C is not affected.
+    /// If an interrupt occurs during execution of this instruction, the Parity flag contains a 0.
+    pub fn ld_a_i(&mut self) -> u8 {
+        self.a = self.i;
+
+        // S is set if the I Register is negative; otherwise, it is reset.
+        set_s_flag_with(&mut self.f, s_flag_set(&self.i));
+
+        // Z is set if the I Register is 0; otherwise, it is reset.
+        set_z_flag_with(&mut self.f, self.i == 0);
+
+        // H is reset.
+        unset_h_flag(&mut self.f);
+
+        // P/V contains contents of IFF2.
+        set_p_flag_with(&mut self.f, self.iff2);
+
+        // N is reset.
+        unset_n_flag(&mut self.f);
+
+        // TODO: If an interrupt occurs during execution of this instruction,
+        // the Parity flag contains a 0.
+
+        // T states
+        9
+    }
+
+    /// ## LD A, R
+    ///
+    /// ### Operation
+    ///
+    /// A ← R
+    ///
+    /// ### Op Code
+    ///
+    /// LD
+    ///
+    /// ### Operands
+    ///
+    /// A, R
+    /// `1 1 1 0 1 1 0 1` (ED)
+    /// `0 1 0 1 1 1 1 1` (5F)
+    ///
+    /// ### Description
+    ///
+    /// The contents of Memory Refresh Register R are loaded to the Accumulator.
+    ///
+    /// | M Cycles | T States | MHz E.T. |
+    /// | -------- | -------- | -------- |
+    /// | 2        | 9 (4, 5) | 2.25     |
+    ///
+    /// ### Condition Bits Affected
+    ///
+    /// S is set if, R-Register is negative; otherwise, it is reset.
+    /// Z is set if the R Register is 0; otherwise, it is reset.
+    /// H is reset.
+    /// P/V contains contents of IFF2.
+    /// N is reset.
+    /// C is not affected.
+    /// If an interrupt occurs during execution of this instruction, the parity
+    /// contains a 0.
+    pub fn ld_a_r(&mut self) -> u8 {
+        self.a = self.r;
+
+        // S is set if the R-Register is negative; otherwise, it is reset.
+        set_s_flag_with(&mut self.f, s_flag_set(&self.r));
+
+        // Z is set if the R Register is 0; otherwise, it is reset.
+        set_z_flag_with(&mut self.f, self.r == 0);
+
+        // H is reset.
+        unset_h_flag(&mut self.f);
+
+        // P/V contains contents of IFF2.
+        set_p_flag_with(&mut self.f, self.iff2);
+
+        // N is reset.
+        unset_n_flag(&mut self.f);
+
+        // TODO: If an interrupt occurs during execution of this instruction,
+        // the Parity flag contains a 0.
+
+        // T states
+        9
+    }
+
+    /// ## LD I,A
+    ///
+    /// ### Operation
+    ///
+    /// I ← A
+    ///
+    /// ### Op Code
+    ///
+    /// LD
+    ///
+    /// ### Operands
+    ///
+    /// I, A
+    /// `1 1 1 0 1 1 0 1` (ED)
+    /// `0 1 0 0 0 1 1 1` (47)
+    ///
+    /// ### Description
+    ///
+    /// The contents of the Accumulator are loaded to the Interrupt Control
+    /// Vector Register, I.
+    ///
+    /// | M Cycles | T States | MHz E.T. |
+    /// | -------- | -------- | -------- |
+    /// | 2        | 9 (4, 5) | 2.25     |
+    ///
+    /// ### Condition Bits Affected
+    ///
+    /// None.
+    pub fn ld_i_a(&mut self) -> u8 {
+        self.i = self.a;
+        // T states
+        9
+    }
+
+    /// ## LD R,A
+    ///
+    /// ### Operation
+    ///
+    /// R ← A
+    ///
+    /// ### Op Code
+    ///
+    /// LD
+    ///
+    /// ### Operands
+    ///
+    /// R, A
+    /// `1 1 1 0 1 1 0 1` (ED)
+    /// `0 1 0 0 1 1 1 1` (47)
+    ///
+    /// ### Description
+    ///
+    /// The contents of the Accumulator are loaded to the Memory Refresh
+    /// register R.
+    ///
+    /// | M Cycles | T States | MHz E.T. |
+    /// | -------- | -------- | -------- |
+    /// | 2        | 9 (4, 5) | 2.25     |
+    ///
+    /// ### Condition Bits Affected
+    ///
+    /// None.
+    pub fn ld_r_a(&mut self) -> u8 {
+        self.r = self.a;
+        // T states
+        9
+    }
 }
 
 mod tests {
-    use crate::z80::tests::Ram;
+    use crate::{
+        flag_register::{h_flag_set, n_flag_set, p_flag_set, z_flag_set},
+        z80::tests::Ram,
+    };
 
     use super::*;
 
@@ -1674,5 +1866,187 @@ mod tests {
 
         assert_eq!(13, t_states);
         assert_eq!(0xFF, ram.read(&3));
+    }
+
+    #[test]
+    fn test_ld_a_i_positive() {
+        let z80 = &mut Z80::new();
+        z80.i = 0b01111111;
+        let t_states = z80.ld_a_i();
+        assert_eq!(9, t_states);
+
+        assert_eq!(z80.i, z80.a);
+
+        // S is set if the I Register is negative; otherwise, it is reset.
+        assert_eq!(false, s_flag_set(&z80.f));
+
+        // Z is set if the I Register is 0; otherwise, it is reset.
+        assert_eq!(false, z_flag_set(&z80.f));
+
+        // H is reset.
+        assert_eq!(false, h_flag_set(&z80.f));
+
+        // P/V contains contents of IFF2.
+        assert_eq!(z80.iff2, p_flag_set(&z80.f));
+
+        // N is reset.
+        assert_eq!(false, n_flag_set(&z80.f));
+
+        // TODO: If an interrupt occurs during execution of this instruction, the Parity flag contains a 0.
+    }
+    #[test]
+    fn test_ld_a_i_zero() {
+        let z80 = &mut Z80::new();
+        z80.i = 0;
+        let t_states = z80.ld_a_i();
+        assert_eq!(9, t_states);
+
+        assert_eq!(z80.i, z80.a);
+
+        // S is set if the I Register is negative; otherwise, it is reset.
+        assert_eq!(false, s_flag_set(&z80.f));
+
+        // Z is set if the I Register is 0; otherwise, it is reset.
+        assert_eq!(true, z_flag_set(&z80.f));
+
+        // H is reset.
+        assert_eq!(false, h_flag_set(&z80.f));
+
+        // P/V contains contents of IFF2.
+        assert_eq!(z80.iff2, p_flag_set(&z80.f));
+
+        // N is reset.
+        assert_eq!(false, n_flag_set(&z80.f));
+
+        // TODO: If an interrupt occurs during execution of this instruction, the Parity flag contains a 0.
+    }
+    #[test]
+    fn test_ld_a_i_negative() {
+        let z80 = &mut Z80::new();
+        z80.i = 0b11111111;
+        let t_states = z80.ld_a_i();
+        assert_eq!(9, t_states);
+
+        assert_eq!(z80.i, z80.a);
+
+        // S is set if the I Register is negative; otherwise, it is reset.
+        assert_eq!(true, s_flag_set(&z80.f));
+
+        // Z is set if the I Register is 0; otherwise, it is reset.
+        assert_eq!(false, z_flag_set(&z80.f));
+
+        // H is reset.
+        assert_eq!(false, h_flag_set(&z80.f));
+
+        // P/V contains contents of IFF2.
+        assert_eq!(z80.iff2, p_flag_set(&z80.f));
+
+        // N is reset.
+        assert_eq!(false, n_flag_set(&z80.f));
+
+        // TODO: If an interrupt occurs during execution of this instruction, the Parity flag contains a 0.
+    }
+
+    #[test]
+    fn test_ld_a_r_positive() {
+        let z80 = &mut Z80::new();
+        z80.r = 0b01111111;
+        let t_states = z80.ld_a_r();
+        assert_eq!(9, t_states);
+
+        assert_eq!(z80.r, z80.a);
+
+        // S is set if the R Register is negative; otherwise, it is reset.
+        assert_eq!(false, s_flag_set(&z80.f));
+
+        // Z is set if the R Register is 0; otherwise, it is reset.
+        assert_eq!(false, z_flag_set(&z80.f));
+
+        // H is reset.
+        assert_eq!(false, h_flag_set(&z80.f));
+
+        // P/V contains contents of IFF2.
+        assert_eq!(z80.iff2, p_flag_set(&z80.f));
+
+        // N is reset.
+        assert_eq!(false, n_flag_set(&z80.f));
+
+        // TODO: If an interrupt occurs during execution of this instruction, the Parity flag contains a 0.
+    }
+
+    #[test]
+    fn test_ld_a_r_zero() {
+        let z80 = &mut Z80::new();
+        z80.r = 0;
+        let t_states = z80.ld_a_r();
+        assert_eq!(9, t_states);
+
+        assert_eq!(z80.r, z80.a);
+
+        // S is set if the R Register is negative; otherwise, it is reset.
+        assert_eq!(false, s_flag_set(&z80.f));
+
+        // Z is set if the R Register is 0; otherwise, it is reset.
+        assert_eq!(true, z_flag_set(&z80.f));
+
+        // H is reset.
+        assert_eq!(false, h_flag_set(&z80.f));
+
+        // P/V contains contents of IFF2.
+        assert_eq!(z80.iff2, p_flag_set(&z80.f));
+
+        // N is reset.
+        assert_eq!(false, n_flag_set(&z80.f));
+
+        // TODO: If an interrupt occurs during execution of this instruction, the Parity flag contains a 0.
+    }
+
+    #[test]
+    fn test_ld_a_r_negative() {
+        let z80 = &mut Z80::new();
+        z80.r = 0b11111111;
+        let t_states = z80.ld_a_r();
+        assert_eq!(9, t_states);
+
+        assert_eq!(z80.r, z80.a);
+
+        // S is set if the R Register is negative; otherwise, it is reset.
+        assert_eq!(true, s_flag_set(&z80.f));
+
+        // Z is set if the R Register is 0; otherwise, it is reset.
+        assert_eq!(false, z_flag_set(&z80.f));
+
+        // H is reset.
+        assert_eq!(false, h_flag_set(&z80.f));
+
+        // P/V contains contents of IFF2.
+        assert_eq!(z80.iff2, p_flag_set(&z80.f));
+
+        // N is reset.
+        assert_eq!(false, n_flag_set(&z80.f));
+
+        // TODO: If an interrupt occurs during execution of this instruction, the Parity flag contains a 0.
+    }
+
+    #[test]
+    fn test_ld_i_a() {
+        let z80 = &mut Z80::new();
+        z80.a = 0xFF;
+
+        let t_states = z80.ld_i_a();
+        assert_eq!(9, t_states);
+
+        assert_eq!(0xFF, z80.i);
+    }
+
+    #[test]
+    fn test_ld_r_a() {
+        let z80 = &mut Z80::new();
+        z80.a = 0xFF;
+
+        let t_states = z80.ld_r_a();
+        assert_eq!(9, t_states);
+
+        assert_eq!(0xFF, z80.r);
     }
 }

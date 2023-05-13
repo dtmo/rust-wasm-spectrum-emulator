@@ -1,20 +1,17 @@
-use crate::z80::{Z80, MemoryAccessor};
+use crate::z80::{MemoryAccessor, Z80};
 
 static ROM_48: &[u8; 0x4000] = include_bytes!("48.rom");
 // static ROM_128_0: [u8] = include_bytes!("128-0.rom");
 // static ROM_128_1: [u8] = include_bytes!("128-1.rom");
 
 struct Memory {
-    rom: &'static[u8; 0x4000],
+    rom: &'static [u8; 0x4000],
     ram: [u8; 0x8000],
 }
 
 impl Memory {
-    fn new(rom: &'static[u8; 0x4000], ram: [u8; 0x8000]) -> Memory {
-        Memory {
-            rom,
-            ram,
-        }
+    fn new(rom: &'static [u8; 0x4000], ram: [u8; 0x8000]) -> Memory {
+        Memory { rom, ram }
     }
 }
 
