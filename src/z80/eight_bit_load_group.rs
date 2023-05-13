@@ -1118,6 +1118,134 @@ impl Z80 {
         // T states
         13
     }
+
+    /// ## LD (BC), A
+    ///
+    /// ### Operation
+    ///
+    /// (BC) ← A
+    ///
+    /// ### Op Code
+    ///
+    /// LD
+    ///
+    /// ### Operands
+    ///
+    /// (BC), A
+    /// `0 0 0 0 0 0 1 0` (02)
+    ///
+    /// ### Description
+    ///
+    /// The contents of the Accumulator are loaded to the memory location
+    /// specified by the contents of the register pair BC.
+    ///
+    /// | M Cycles | T States | 4 MHz E.T. |
+    /// | -------- | -------- | ---------- |
+    /// | 2        | 7 (4, 3) | 1.75       |
+    ///
+    /// ### Condition Bits Affected
+    ///
+    /// None.
+    ///
+    /// ### Example
+    ///
+    /// If the Accumulator contains 7Ah and the BC register pair contains 1212h
+    /// the instruction LD (BC), A results in 7Ah in memory location 1212h.
+    pub fn ld_bc_a(&mut self, memory_accessor: &mut dyn MemoryAccessor) -> u8 {
+        let address = ((self.b as u16) << 8) | self.c as u16;
+
+        memory_accessor.write(&address, &self.a);
+
+        // T states
+        7
+    }
+
+    /// ## LD (DE), A
+    ///
+    /// ### Operation
+    ///
+    /// (DE) ← A
+    ///
+    /// ### Op Code
+    ///
+    /// LD
+    ///
+    /// ### Operands
+    ///
+    /// (DE), A
+    /// `0 0 0 1 0 0 1 0` (12)
+    ///
+    /// ### Description
+    ///
+    /// The contents of the Accumulator are loaded to the memory location
+    /// specified by the contents of the register pair DE.
+    ///
+    /// | M Cycles | T States | 4 MHz E.T. |
+    /// | -------- | -------- | ---------- |
+    /// | 2        | 7 (4, 3) | 1.75       |
+    ///
+    /// ### Condition Bits Affected
+    ///
+    /// None.
+    ///
+    /// ### Example
+    ///
+    /// If register pair DE contains 1128h and the Accumulator contains byte
+    /// A0h, then the execution of a LD (DE), A instruction results in A0h being
+    /// stored in memory location 1128h.
+    pub fn ld_de_a(&mut self, memory_accessor: &mut dyn MemoryAccessor) -> u8 {
+        let address = ((self.d as u16) << 8) | self.e as u16;
+
+        memory_accessor.write(&address, &self.a);
+
+        // T states
+        7
+    }
+
+    /// ## LD (nn), A
+    ///
+    /// ### Operation
+    ///
+    /// (nn) ← A
+    ///
+    /// ### Op Code
+    ///
+    /// LD
+    ///
+    /// ### Operands
+    ///
+    /// (nn), A
+    /// `0 0 1 1 0 0 1 0` (32)
+    /// `n n n n n n n n`
+    /// `n n n n n n n n`
+    ///
+    /// ### Description
+    ///
+    /// The contents of the Accumulator are loaded to the memory address
+    /// specified by the operand nn. The first n operand after the op code is
+    /// the low-order byte of nn.
+    ///
+    /// | M Cycles | T States        | 4 MHz E.T. |
+    /// | -------- | --------------- | ---------- |
+    /// | 4        | 13 (4, 3, 3, 3) | 3.25       |
+    ///
+    /// ### Condition Bits Affected
+    ///
+    /// None.
+    ///
+    /// ### Example
+    ///
+    /// If the Accumulator contains byte D7h, then executing an LD (3141h), AD7h
+    /// instruction results in memory location 3141h.
+    pub fn ld_nn_a(&mut self, memory_accessor: &mut dyn MemoryAccessor) -> u8 {
+        let nh = self.fetch_next_opcode(memory_accessor);
+        let nl = self.fetch_next_opcode(memory_accessor);
+        let address = ((nh as u16) << 8) | nl as u16;
+        memory_accessor.write(&address, &self.a);
+
+        // T states
+        13
+    }
 }
 
 mod tests {
@@ -1479,7 +1607,7 @@ mod tests {
     #[test]
     fn test_ld_a_de() {
         let bytes = &mut [0x0A, 0xFF];
-        let ram = &mut Ram::new(bytes);
+        let ram = &Ram::new(bytes);
 
         let z80 = &mut Z80::new();
         z80.program_counter = 1;
@@ -1494,7 +1622,7 @@ mod tests {
     #[test]
     fn test_ld_a_nn() {
         let bytes = &mut [0x3A, 0x00, 0x03, 0xFF];
-        let ram = &mut Ram::new(bytes);
+        let ram = &Ram::new(bytes);
 
         let z80 = &mut Z80::new();
         z80.program_counter = 1;
@@ -1502,5 +1630,49 @@ mod tests {
 
         assert_eq!(13, t_states);
         assert_eq!(0xFF, z80.a);
+    }
+
+    #[test]
+    fn test_ld_bc_a() {
+        let bytes = &mut [0x00, 0x00];
+        let ram = &mut Ram::new(bytes);
+
+        let z80 = &mut Z80::new();
+        z80.a = 0xFF;
+        z80.b = 0x00;
+        z80.c = 0x01;
+        let t_states = z80.ld_bc_a(ram);
+
+        assert_eq!(7, t_states);
+        assert_eq!(0xFF, ram.read(&1));
+    }
+
+    #[test]
+    fn test_ld_de_a() {
+        let bytes = &mut [0x00, 0x00];
+        let ram = &mut Ram::new(bytes);
+
+        let z80 = &mut Z80::new();
+        z80.a = 0xFF;
+        z80.d = 0x00;
+        z80.e = 0x01;
+        let t_states = z80.ld_de_a(ram);
+
+        assert_eq!(7, t_states);
+        assert_eq!(0xFF, ram.read(&1));
+    }
+
+    #[test]
+    fn test_ld_nn_a() {
+        let bytes = &mut [0x32, 0x00, 0x03, 0x00];
+        let ram = &mut Ram::new(bytes);
+
+        let z80 = &mut Z80::new();
+        z80.program_counter = 1;
+        z80.a = 0xFF;
+        let t_states = z80.ld_nn_a(ram);
+
+        assert_eq!(13, t_states);
+        assert_eq!(0xFF, ram.read(&3));
     }
 }

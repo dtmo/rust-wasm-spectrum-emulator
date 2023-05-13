@@ -14,11 +14,12 @@ pub trait MemoryAccessor {
     fn write(&mut self, address: &u16, data: &u8);
 }
 
-const MAIN_FUNCTIONS: [fn(&mut Z80, &mut dyn MemoryAccessor) -> u8; 76] = [
+const MAIN_FUNCTIONS: [fn(&mut Z80, &mut dyn MemoryAccessor) -> u8; 79] = [
     // 0b00000000 NOP
     |_, _| Z80::nop(),
     // 0b00000001
-    // 0b00000010
+    // 0b00000010 LD (BC), A
+    Z80::ld_bc_a,
     // 0b00000011
     // 0b00000100
     // 0b00000101
@@ -37,7 +38,8 @@ const MAIN_FUNCTIONS: [fn(&mut Z80, &mut dyn MemoryAccessor) -> u8; 76] = [
     // 0b00001111
     // 0b00010000
     // 0b00010001
-    // 0b00010010
+    // 0b00010010 LD (DE), A
+    Z80::ld_de_a,
     // 0b00010011
     // 0b00010100
     // 0b00010101
@@ -75,7 +77,8 @@ const MAIN_FUNCTIONS: [fn(&mut Z80, &mut dyn MemoryAccessor) -> u8; 76] = [
     // 0b00101111
     // 0b00110000
     // 0b00110001
-    // 0b00110010
+    // 0b00110010 LD (nn), A
+    Z80::ld_nn_a,
     // 0b00110011
     // 0b00110100
     // 0b00110101
@@ -85,7 +88,7 @@ const MAIN_FUNCTIONS: [fn(&mut Z80, &mut dyn MemoryAccessor) -> u8; 76] = [
     // 0b00111000
     // 0b00111001
     // 0b00111010 LD A, (nn)
-    | z80, memory_accessor | z80.ld_a_nn(memory_accessor),
+    |z80, memory_accessor| z80.ld_a_nn(memory_accessor),
     // 0b00111011
     // 0b00111100
     // 0b00111101
@@ -1184,7 +1187,7 @@ mod tests {
             // 0x26, // LD H, n
             // Until all instructions are populated, the opcode array will have
             // LD H, n at the wrong location.
-            0x07, // LD H, n
+            0x09, // LD H, n
             0xDD,
         ];
 
