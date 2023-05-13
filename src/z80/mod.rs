@@ -14,7 +14,7 @@ pub trait MemoryAccessor {
     fn write(&mut self, address: &u16, data: &u8);
 }
 
-const MAIN_FUNCTIONS: [fn(&mut Z80, &mut dyn MemoryAccessor) -> u8; 73] = [
+const MAIN_FUNCTIONS: [fn(&mut Z80, &mut dyn MemoryAccessor) -> u8; 76] = [
     // 0b00000000 NOP
     |_, _| Z80::nop(),
     // 0b00000001
@@ -27,7 +27,8 @@ const MAIN_FUNCTIONS: [fn(&mut Z80, &mut dyn MemoryAccessor) -> u8; 73] = [
     // 0b00000111
     // 0b00001000
     // 0b00001001
-    // 0b00001010
+    // 0b00001010 LA A, (BC)
+    |z80, memory_accessor| z80.ld_a_bc(memory_accessor),
     // 0b00001011
     // 0b00001100
     // 0b00001101
@@ -45,7 +46,8 @@ const MAIN_FUNCTIONS: [fn(&mut Z80, &mut dyn MemoryAccessor) -> u8; 73] = [
     // 0b00010111
     // 0b00011000
     // 0b00011001
-    // 0b00011010
+    // 0b00011010 LA A, (DE)
+    |z80, memory_accessor| z80.ld_a_de(memory_accessor),
     // 0b00011011
     // 0b00011100
     // 0b00011101
@@ -82,7 +84,8 @@ const MAIN_FUNCTIONS: [fn(&mut Z80, &mut dyn MemoryAccessor) -> u8; 73] = [
     // 0b00110111
     // 0b00111000
     // 0b00111001
-    // 0b00111010
+    // 0b00111010 LD A, (nn)
+    | z80, memory_accessor | z80.ld_a_nn(memory_accessor),
     // 0b00111011
     // 0b00111100
     // 0b00111101
@@ -1179,7 +1182,9 @@ mod tests {
     fn test_process_next_instruction() {
         let mut bytes = [
             // 0x26, // LD H, n
-            0x05, // LD H, n
+            // Until all instructions are populated, the opcode array will have
+            // LD H, n at the wrong location.
+            0x07, // LD H, n
             0xDD,
         ];
 
