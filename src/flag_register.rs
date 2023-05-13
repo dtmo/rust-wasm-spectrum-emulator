@@ -1,3 +1,5 @@
+use std::ops::Not;
+
 /// Set if the 2-complement value is negative. It’s simply a copy of the
 /// most significant bit.
 pub const S_FLAG_BITMASK: u8 = 0b10000000;
@@ -32,7 +34,7 @@ fn flags_set(flag_bitmask: &u8, register: &u8) -> bool {
 }
 
 fn unset_flags(flag_bitmask: &u8, register: &mut u8) {
-    *register = *register & flag_bitmask.reverse_bits();
+    *register = *register & flag_bitmask.not();
 }
 
 fn set_flags(flag_bitmask: &u8, register: &mut u8) {
@@ -138,6 +140,15 @@ pub fn unset_c_flag(register: &mut u8) {
 
 mod tests {
     use super::*;
+
+    #[test]
+    fn test_unset_flags() {
+        let flag_register = &mut 0b11111111;
+
+        unset_flags(&S_FLAG_BITMASK, flag_register);
+
+        assert_eq!(&0b01111111, flag_register);
+    }
 
     #[test]
     fn test_s_flag() {
