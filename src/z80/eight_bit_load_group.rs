@@ -1,8 +1,9 @@
-use crate::flag_register::{
-    s_flag_set, set_p_flag_with, set_s_flag_with, set_z_flag_with, unset_h_flag, unset_n_flag,
+use super::{
+    flag_register::{
+        s_flag_set, set_p_flag_with, set_s_flag_with, set_z_flag_with, unset_h_flag, unset_n_flag,
+    },
+    MemoryAccessor, Z80,
 };
-
-use super::{MemoryAccessor, Z80};
 
 impl Z80 {
     // 8-Bit Load Group
@@ -1438,12 +1439,12 @@ impl Z80 {
 }
 
 mod tests {
-    use crate::{
-        flag_register::{h_flag_set, n_flag_set, p_flag_set, z_flag_set},
-        z80::tests::Ram,
-    };
-
     use super::*;
+
+    use crate::z80::{
+        flag_register::{h_flag_set, n_flag_set, p_flag_set, z_flag_set},
+        tests::Ram,
+    };
 
     #[test]
     fn test_ld_r_rp() {

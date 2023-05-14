@@ -1,13 +1,12 @@
 mod eight_bit_load_group;
+mod flag_register;
+mod sixteen_bit_load_group;
+
+use self::flag_register::*;
 
 // Official Z80 documentation: https://www.zilog.com/docs/z80/um0080.pdf
 // Unofficial undocumented functionality documentation: http://www.z80.info/zip/z80-documented.pdf
 // Integration test suites: https://mdfs.net/Software/Z80/Exerciser/Spectrum/
-
-use crate::flag_register::{
-    c_flag_set, h_flag_set, n_flag_set, set_c_flag, set_h_flag, set_z_flag, unset_c_flag,
-    unset_h_flag,
-};
 
 pub trait MemoryAccessor {
     fn read(&self, address: &u16) -> u8;
