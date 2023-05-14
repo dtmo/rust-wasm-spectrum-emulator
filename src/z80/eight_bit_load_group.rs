@@ -1114,8 +1114,8 @@ impl Z80 {
     /// the execution of an LD A, (nn) instruction, the 04h byte is in the
     /// Accumulator.
     pub fn ld_a_nn(&mut self, memory_accessor: &dyn MemoryAccessor) -> u8 {
-        let nh = self.fetch_next_opcode(memory_accessor);
         let nl = self.fetch_next_opcode(memory_accessor);
+        let nh = self.fetch_next_opcode(memory_accessor);
 
         let address = ((nh as u16) << 8) | nl as u16;
         self.a = memory_accessor.read(&address);
@@ -1243,8 +1243,8 @@ impl Z80 {
     /// If the Accumulator contains byte D7h, then executing an LD (3141h), AD7h
     /// instruction results in memory location 3141h.
     pub fn ld_nn_a(&mut self, memory_accessor: &mut dyn MemoryAccessor) -> u8 {
-        let nh = self.fetch_next_opcode(memory_accessor);
         let nl = self.fetch_next_opcode(memory_accessor);
+        let nh = self.fetch_next_opcode(memory_accessor);
         let address = ((nh as u16) << 8) | nl as u16;
         memory_accessor.write(&address, &self.a);
 
@@ -1814,7 +1814,7 @@ mod tests {
 
     #[test]
     fn test_ld_a_nn() {
-        let bytes = &mut [0x3A, 0x00, 0x03, 0xFF];
+        let bytes = &mut [0x3A, 0x03, 0x00, 0xFF];
         let ram = &Ram::new(bytes);
 
         let z80 = &mut Z80::new();
@@ -1857,7 +1857,7 @@ mod tests {
 
     #[test]
     fn test_ld_nn_a() {
-        let bytes = &mut [0x32, 0x00, 0x03, 0x00];
+        let bytes = &mut [0x32, 0x03, 0x00, 0x00];
         let ram = &mut Ram::new(bytes);
 
         let z80 = &mut Z80::new();
