@@ -13,10 +13,11 @@ pub trait MemoryAccessor {
     fn write(&mut self, address: &u16, data: &u8);
 }
 
-const MAIN_FUNCTIONS: [fn(&mut Z80, &mut dyn MemoryAccessor) -> u8; 79] = [
+const MAIN_FUNCTIONS: [fn(&mut Z80, &mut dyn MemoryAccessor) -> u8; 83] = [
     // 00000000 NOP
     |_, _| Z80::nop(),
-    // 00000001
+    // 00000001 LD BC nn
+    |z80, memory_accessor | z80.ld_bc_nn(memory_accessor),
     // 00000010 LD (BC), A
     Z80::ld_bc_a,
     // 00000011
@@ -36,7 +37,8 @@ const MAIN_FUNCTIONS: [fn(&mut Z80, &mut dyn MemoryAccessor) -> u8; 79] = [
     Z80::ld_c_n,
     // 00001111
     // 00010000
-    // 00010001
+    // 00010001 LD DE nn
+    |z80, memory_accessor | z80.ld_de_nn(memory_accessor),
     // 00010010 LD (DE), A
     Z80::ld_de_a,
     // 00010011
@@ -56,7 +58,8 @@ const MAIN_FUNCTIONS: [fn(&mut Z80, &mut dyn MemoryAccessor) -> u8; 79] = [
     Z80::ld_e_n,
     // 00011111
     // 00100000
-    // 00100001
+    // 00100001 LD HL nn
+    |z80, memory_accessor | z80.ld_hl_nn(memory_accessor),
     // 00100010
     // 00100011
     // 00100100
@@ -75,7 +78,8 @@ const MAIN_FUNCTIONS: [fn(&mut Z80, &mut dyn MemoryAccessor) -> u8; 79] = [
     Z80::ld_l_n,
     // 00101111
     // 00110000
-    // 00110001
+    // 00110001 LD SP nn
+    |z80, memory_accessor | z80.ld_sp_nn(memory_accessor),
     // 00110010 LD (nn), A
     Z80::ld_nn_a,
     // 00110011
@@ -1215,7 +1219,7 @@ mod tests {
             // 0x26, // LD H, n
             // Until all instructions are populated, the opcode array will have
             // LD H, n at the wrong location.
-            0x09, // LD H, n
+            12, // LD H, n
             0xDD,
         ];
 
