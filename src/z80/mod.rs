@@ -71,7 +71,7 @@ const MAIN_FUNCTIONS: [fn(&mut Z80, &mut dyn MemoryAccessor) -> u8; 84] = [
     // 00101000
     // 00101001
     // 00101010 LD HL, (nn)
-    |z80, mem | z80.ld_hl_mem_nn(mem),
+    |z80, mem| z80.ld_hl_mem_nn(mem),
     // 00101011
     // 00101100
     // 00101101
@@ -1153,7 +1153,7 @@ const IX_BIT_INSTRUCTIONS: [fn(&mut Z80, &mut dyn MemoryAccessor) -> u8; 0] = [
     ];
 
 // ED prefix
-const MISC_INSTRUCTIONS: [fn(&mut Z80, &mut dyn MemoryAccessor) -> u8; 4] = [
+const MISC_INSTRUCTIONS: [fn(&mut Z80, &mut dyn MemoryAccessor) -> u8; 8] = [
     // 00000000
     // 00000001
     // 00000010
@@ -1230,7 +1230,8 @@ const MISC_INSTRUCTIONS: [fn(&mut Z80, &mut dyn MemoryAccessor) -> u8; 4] = [
     // 01001000
     // 01001001
     // 01001010
-    // 01001011
+    // 01001011 LD BC, (nn)
+    |z80, mem| z80.ld_ddbc_mem_nn(mem),
     // 01001100
     // 01001101
     // 01001110
@@ -1248,7 +1249,8 @@ const MISC_INSTRUCTIONS: [fn(&mut Z80, &mut dyn MemoryAccessor) -> u8; 4] = [
     // 01011000
     // 01011001
     // 01011010
-    // 01011011
+    // 01011011 LD DE, (nn)
+    |z80, mem| z80.ld_ddde_mem_nn(mem),
     // 01011100
     // 01011101
     // 01011110
@@ -1265,7 +1267,8 @@ const MISC_INSTRUCTIONS: [fn(&mut Z80, &mut dyn MemoryAccessor) -> u8; 4] = [
     // 01101000
     // 01101001
     // 01101010
-    // 01101011
+    // 01101011 LD HL, (nn)
+    |z80, mem| z80.ld_ddhl_mem_nn(mem),
     // 01101100
     // 01101101
     // 01101110
@@ -1281,7 +1284,8 @@ const MISC_INSTRUCTIONS: [fn(&mut Z80, &mut dyn MemoryAccessor) -> u8; 4] = [
     // 01111000
     // 01111001
     // 01111010
-    // 01111011
+    // 01111011 LD SP, (nn)
+    |z80, mem| z80.ld_ddsp_mem_nn(mem),
     // 01111100
     // 01111101
     // 01111110
