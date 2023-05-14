@@ -70,7 +70,8 @@ const MAIN_FUNCTIONS: [fn(&mut Z80, &mut dyn MemoryAccessor) -> u8; 84] = [
     |z80, _| z80.daa(),
     // 00101000
     // 00101001
-    // 00101010
+    // 00101010 LD HL, (nn)
+    |z80, mem | z80.ld_hl_mem_nn(mem),
     // 00101011
     // 00101100
     // 00101101
