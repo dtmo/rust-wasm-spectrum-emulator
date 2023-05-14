@@ -46,32 +46,32 @@ impl Z80 {
     /// Upon the execution of an LD HL, 5000h instruction, the HL register pair
     /// contains 5000h.
     pub fn ld_bc_nn(&mut self, memory_accessor: &dyn MemoryAccessor) -> u8 {
-        self.b = self.fetch_next_opcode(memory_accessor);
         self.c = self.fetch_next_opcode(memory_accessor);
+        self.b = self.fetch_next_opcode(memory_accessor);
 
         // T states
         10
     }
 
     pub fn ld_de_nn(&mut self, memory_accessor: &dyn MemoryAccessor) -> u8 {
-        self.d = self.fetch_next_opcode(memory_accessor);
         self.e = self.fetch_next_opcode(memory_accessor);
+        self.d = self.fetch_next_opcode(memory_accessor);
 
         // T states
         10
     }
 
     pub fn ld_hl_nn(&mut self, memory_accessor: &dyn MemoryAccessor) -> u8 {
-        self.h = self.fetch_next_opcode(memory_accessor);
         self.l = self.fetch_next_opcode(memory_accessor);
+        self.h = self.fetch_next_opcode(memory_accessor);
 
         // T states
         10
     }
 
     pub fn ld_sp_nn(&mut self, memory_accessor: &dyn MemoryAccessor) -> u8 {
-        let high_n = self.fetch_next_opcode(memory_accessor);
         let low_n = self.fetch_next_opcode(memory_accessor);
+        let high_n = self.fetch_next_opcode(memory_accessor);
 
         self.stack_pointer = ((high_n as u16) << 8) | low_n as u16;
 
@@ -85,7 +85,7 @@ mod tests {
 
     #[test]
     fn test_ld_bc_nn() {
-        let bytes = &mut [0x01, 0x02];
+        let bytes = &mut [0x02, 0x01];
         let ram = &mut Ram::new(bytes);
         let z80 = &mut Z80::new();
 
@@ -98,7 +98,7 @@ mod tests {
 
     #[test]
     fn test_ld_de_nn() {
-        let bytes = &mut [0x01, 0x02];
+        let bytes = &mut [0x02, 0x01];
         let ram = &mut Ram::new(bytes);
         let z80 = &mut Z80::new();
 
@@ -111,7 +111,7 @@ mod tests {
 
     #[test]
     fn test_ld_hl_nn() {
-        let bytes = &mut [0x01, 0x02];
+        let bytes = &mut [0x02, 0x01];
         let ram = &mut Ram::new(bytes);
         let z80 = &mut Z80::new();
 
@@ -124,7 +124,7 @@ mod tests {
 
     #[test]
     fn test_ld_sp_nn() {
-        let bytes = &mut [0x01, 0x02];
+        let bytes = &mut [0x02, 0x01];
         let ram = &mut Ram::new(bytes);
         let z80 = &mut Z80::new();
 
