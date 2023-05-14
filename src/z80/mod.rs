@@ -13,13 +13,13 @@ pub trait MemoryAccessor {
     fn write(&mut self, address: &u16, data: &u8);
 }
 
-const MAIN_FUNCTIONS: [fn(&mut Z80, &mut dyn MemoryAccessor) -> u8; 83] = [
+const MAIN_FUNCTIONS: [fn(&mut Z80, &mut dyn MemoryAccessor) -> u8; 84] = [
     // 00000000 NOP
     |_, _| Z80::nop(),
     // 00000001 LD BC nn
-    |z80, memory_accessor | z80.ld_bc_nn(memory_accessor),
+    |z80, mem| z80.ld_bc_nn(mem),
     // 00000010 LD (BC), A
-    Z80::ld_bc_a,
+    Z80::ld_mem_bc_a,
     // 00000011
     // 00000100
     // 00000101
@@ -29,7 +29,7 @@ const MAIN_FUNCTIONS: [fn(&mut Z80, &mut dyn MemoryAccessor) -> u8; 83] = [
     // 00001000
     // 00001001
     // 00001010 LA A, (BC)
-    |z80, memory_accessor| z80.ld_a_bc(memory_accessor),
+    |z80, mem| z80.ld_a_mem_bc(mem),
     // 00001011
     // 00001100
     // 00001101
@@ -38,9 +38,9 @@ const MAIN_FUNCTIONS: [fn(&mut Z80, &mut dyn MemoryAccessor) -> u8; 83] = [
     // 00001111
     // 00010000
     // 00010001 LD DE nn
-    |z80, memory_accessor | z80.ld_de_nn(memory_accessor),
+    |z80, mem| z80.ld_de_nn(mem),
     // 00010010 LD (DE), A
-    Z80::ld_de_a,
+    Z80::ld_mem_de_a,
     // 00010011
     // 00010100
     // 00010101
@@ -50,7 +50,7 @@ const MAIN_FUNCTIONS: [fn(&mut Z80, &mut dyn MemoryAccessor) -> u8; 83] = [
     // 00011000
     // 00011001
     // 00011010 LA A, (DE)
-    |z80, memory_accessor| z80.ld_a_de(memory_accessor),
+    |z80, mem| z80.ld_a_mem_de(mem),
     // 00011011
     // 00011100
     // 00011101
@@ -59,7 +59,7 @@ const MAIN_FUNCTIONS: [fn(&mut Z80, &mut dyn MemoryAccessor) -> u8; 83] = [
     // 00011111
     // 00100000
     // 00100001 LD HL nn
-    |z80, memory_accessor | z80.ld_hl_nn(memory_accessor),
+    |z80, mem| z80.ld_hl_nn(mem),
     // 00100010
     // 00100011
     // 00100100
@@ -79,19 +79,19 @@ const MAIN_FUNCTIONS: [fn(&mut Z80, &mut dyn MemoryAccessor) -> u8; 83] = [
     // 00101111
     // 00110000
     // 00110001 LD SP nn
-    |z80, memory_accessor | z80.ld_sp_nn(memory_accessor),
+    |z80, mem| z80.ld_sp_nn(mem),
     // 00110010 LD (nn), A
-    Z80::ld_nn_a,
+    Z80::ld_mem_nn_a,
     // 00110011
     // 00110100
     // 00110101
     // 00110110 LD (HL), n
-    |z80, memory_accessor| z80.ld_hl_n(memory_accessor),
+    |z80, mem| z80.ld_mem_hl_n(mem),
     // 00110111
     // 00111000
     // 00111001
     // 00111010 LD A, (nn)
-    |z80, memory_accessor| z80.ld_a_nn(memory_accessor),
+    |z80, mem| z80.ld_a_mem_nn(mem),
     // 00111011
     // 00111100
     // 00111101
@@ -111,7 +111,7 @@ const MAIN_FUNCTIONS: [fn(&mut Z80, &mut dyn MemoryAccessor) -> u8; 83] = [
     // 01000101 LD B, L
     |z80, _| z80.ld_b_l(),
     // 01000110 LD B, (HL)
-    |z80, memory_accessor| z80.ld_b_hl(memory_accessor),
+    |z80, mem| z80.ld_b_mem_hl(mem),
     // 01000111 LD B, A
     |z80, _| z80.ld_b_a(),
     // 01001000 LD C, B
@@ -127,7 +127,7 @@ const MAIN_FUNCTIONS: [fn(&mut Z80, &mut dyn MemoryAccessor) -> u8; 83] = [
     // 01001101 LD C, L
     |z80, _| z80.ld_c_l(),
     // 01001110 LD C, (HL)
-    |z80, memory_accessor| z80.ld_c_hl(memory_accessor),
+    |z80, mem| z80.ld_c_mem_hl(mem),
     // 01001111 LD C, A
     |z80, _| z80.ld_c_a(),
     // 01010000 LD D, B
@@ -143,7 +143,7 @@ const MAIN_FUNCTIONS: [fn(&mut Z80, &mut dyn MemoryAccessor) -> u8; 83] = [
     // 01010101 LD D, L
     |z80, _| z80.ld_d_l(),
     // 01010110 LD D, (HL)
-    |z80, memory_accessor| z80.ld_d_hl(memory_accessor),
+    |z80, mem| z80.ld_d_mem_hl(mem),
     // 01010111 LD D, A
     |z80, _| z80.ld_d_a(),
     // 01011000 LD E, B
@@ -159,7 +159,7 @@ const MAIN_FUNCTIONS: [fn(&mut Z80, &mut dyn MemoryAccessor) -> u8; 83] = [
     // 01011101 LD E, L
     |z80, _| z80.ld_e_l(),
     // 01011110 LD E, (HL)
-    |z80, memory_accessor| z80.ld_e_hl(memory_accessor),
+    |z80, mem| z80.ld_e_mem_hl(mem),
     // 01011111 LD E, A
     |z80, _| z80.ld_e_a(),
     // 01100000 LD H, B
@@ -175,7 +175,7 @@ const MAIN_FUNCTIONS: [fn(&mut Z80, &mut dyn MemoryAccessor) -> u8; 83] = [
     // 01100101 LD H, L
     |z80, _| z80.ld_h_l(),
     // 01100110 LD H, (HL)
-    |z80, memory_accessor| z80.ld_h_hl(memory_accessor),
+    |z80, mem| z80.ld_h_mem_hl(mem),
     // 01100111 LD H, A
     |z80, _| z80.ld_h_a(),
     // 01101000 LD L, B
@@ -191,24 +191,24 @@ const MAIN_FUNCTIONS: [fn(&mut Z80, &mut dyn MemoryAccessor) -> u8; 83] = [
     // 01101101 LD L, L
     |z80, _| z80.ld_l_l(),
     // 01101110 LD L, (HL)
-    |z80, memory_accessor| z80.ld_l_hl(memory_accessor),
+    |z80, mem| z80.ld_l_mem_hl(mem),
     // 01101111 LD L, A
     |z80, _| z80.ld_l_a(),
     // 01110000 LD (HL), B
-    |z80, memory_accessor| z80.ld_hl_b(memory_accessor),
+    |z80, mem| z80.ld_mem_hl_b(mem),
     // 01110001 LD (HL), C
-    |z80, memory_accessor| z80.ld_hl_c(memory_accessor),
+    |z80, mem| z80.ld_mem_hl_c(mem),
     // 01110010 LD (HL), D
-    |z80, memory_accessor| z80.ld_hl_d(memory_accessor),
+    |z80, mem| z80.ld_mem_hl_d(mem),
     // 01110011 LD (HL), E
-    |z80, memory_accessor| z80.ld_hl_e(memory_accessor),
+    |z80, mem| z80.ld_mem_hl_e(mem),
     // 01110100 LD (HL), H
-    |z80, memory_accessor| z80.ld_hl_h(memory_accessor),
+    |z80, mem| z80.ld_mem_hl_h(mem),
     // 01110101 LD (HL), L
-    |z80, memory_accessor| z80.ld_hl_l(memory_accessor),
+    |z80, mem| z80.ld_mem_hl_l(mem),
     // 01110110
     // 01110111 LD (HL), A
-    |z80, memory_accessor| z80.ld_hl_a(memory_accessor),
+    |z80, mem| z80.ld_mem_hl_a(mem),
     // 01111000 LD A, B
     |z80, _| z80.ld_a_b(),
     // 01111001 LD A, C
@@ -222,7 +222,7 @@ const MAIN_FUNCTIONS: [fn(&mut Z80, &mut dyn MemoryAccessor) -> u8; 83] = [
     // 01111101 LD A, L
     |z80, _| z80.ld_a_l(),
     // 01111110 LD A, (HL)
-    |z80, memory_accessor| z80.ld_a_hl(memory_accessor),
+    |z80, mem| z80.ld_a_mem_hl(mem),
     // 01111111 LD A, A
     |z80, _| z80.ld_a_a(),
     // 10000000
@@ -651,7 +651,7 @@ const IX_FUNCTIONS: [fn(&mut Z80, &mut dyn MemoryAccessor) -> u8; 16] = [
     // 00011111
     // 00100000
     // 00100001 LD IX, nn
-    | z80, memory_accessor | z80.ld_ix_nn(memory_accessor),
+    |z80, mem| z80.ld_ix_nn(mem),
     // 00100010
     // 00100011
     // 00100100
@@ -673,7 +673,7 @@ const IX_FUNCTIONS: [fn(&mut Z80, &mut dyn MemoryAccessor) -> u8; 16] = [
     // 00110100
     // 00110101
     // 00110110 LD (IX+d), n
-    |z80, memory_accessor| z80.ld_ixd_n(memory_accessor),
+    |z80, mem| z80.ld_mem_ixd_n(mem),
     // 00110111
     // 00111000
     // 00111001
@@ -690,7 +690,7 @@ const IX_FUNCTIONS: [fn(&mut Z80, &mut dyn MemoryAccessor) -> u8; 16] = [
     // 01000100
     // 01000101
     // 01000110 LD B, (IX+d)
-    |z80, memory_accessor| z80.ld_b_ixd(memory_accessor),
+    |z80, mem| z80.ld_b_mem_ixd(mem),
     // 01000111
     // 01001000
     // 01001001
@@ -699,7 +699,7 @@ const IX_FUNCTIONS: [fn(&mut Z80, &mut dyn MemoryAccessor) -> u8; 16] = [
     // 01001100
     // 01001101
     // 01001110 LD C, (IX+d)
-    |z80, memory_accessor| z80.ld_c_ixd(memory_accessor),
+    |z80, mem| z80.ld_c_ixd(mem),
     // 01001111
     // 01010000
     // 01010001
@@ -708,7 +708,7 @@ const IX_FUNCTIONS: [fn(&mut Z80, &mut dyn MemoryAccessor) -> u8; 16] = [
     // 01010100
     // 01010101
     // 01010110 LD D, (IX+d)
-    |z80, memory_accessor| z80.ld_d_ixd(memory_accessor),
+    |z80, mem| z80.ld_d_mem_ixd(mem),
     // 01010111
     // 01011000
     // 01011001
@@ -717,7 +717,7 @@ const IX_FUNCTIONS: [fn(&mut Z80, &mut dyn MemoryAccessor) -> u8; 16] = [
     // 01011100
     // 01011101
     // 01011110 LD E, (IX+d)
-    |z80, memory_accessor| z80.ld_e_ixd(memory_accessor),
+    |z80, mem| z80.ld_e_mem_ixd(mem),
     // 01011111
     // 01100000
     // 01100001
@@ -726,7 +726,7 @@ const IX_FUNCTIONS: [fn(&mut Z80, &mut dyn MemoryAccessor) -> u8; 16] = [
     // 01100100
     // 01100101
     // 01100110 LD H, (IX+d)
-    |z80, memory_accessor| z80.ld_h_ixd(memory_accessor),
+    |z80, mem| z80.ld_h_mem_ixd(mem),
     // 01100111
     // 01101000
     // 01101001
@@ -735,23 +735,23 @@ const IX_FUNCTIONS: [fn(&mut Z80, &mut dyn MemoryAccessor) -> u8; 16] = [
     // 01101100
     // 01101101
     // 01101110 LD L, (IX+d)
-    |z80, memory_accessor| z80.ld_l_ixd(memory_accessor),
+    |z80, mem| z80.ld_l_mem_ixd(mem),
     // 01101111
     // 01110000 LD (IX+d), B
-    |z80, memory_accessor| z80.ld_ixd_b(memory_accessor),
+    |z80, mem| z80.ld_mem_ixd_b(mem),
     // 01110001 LD (IX+d), C
-    |z80, memory_accessor| z80.ld_ixd_c(memory_accessor),
+    |z80, mem| z80.ld_mem_ixd_c(mem),
     // 01110010 LD (IX+d), D
-    |z80, memory_accessor| z80.ld_ixd_d(memory_accessor),
+    |z80, mem| z80.ld_mem_ixd_d(mem),
     // 01110011 LD (IX+d), E
-    |z80, memory_accessor| z80.ld_ixd_e(memory_accessor),
+    |z80, mem| z80.ld_mem_ixd_e(mem),
     // 01110100 LD (IX+d), H
-    |z80, memory_accessor| z80.ld_ixd_h(memory_accessor),
+    |z80, mem| z80.ld_mem_ixd_h(mem),
     // 01110101 LD (IX+d), L
-    |z80, memory_accessor| z80.ld_ixd_l(memory_accessor),
+    |z80, mem| z80.ld_mem_ixd_l(mem),
     // 01110110
     // 01110111 LD (IX+d), A
-    |z80, memory_accessor| z80.ld_ixd_a(memory_accessor),
+    |z80, mem| z80.ld_mem_ixd_a(mem),
     // 01111000
     // 01111001
     // 01111010
@@ -759,7 +759,7 @@ const IX_FUNCTIONS: [fn(&mut Z80, &mut dyn MemoryAccessor) -> u8; 16] = [
     // 01111100
     // 01111101
     // 01111110 LD A, (IX+d)
-    |z80, memory_accessor| z80.ld_a_ixd(memory_accessor),
+    |z80, mem| z80.ld_a_mem_ixd(mem),
     // 01111111
     // 10000000
     // 10000001
@@ -1451,7 +1451,7 @@ const IY_FUNCTIONS: [fn(&mut Z80, &mut dyn MemoryAccessor) -> u8; 16] = [
     // 00011111
     // 00100000
     // 00100001 LD IY, nn
-    | z80, memory_accessor | z80.ld_iy_nn(memory_accessor),
+    |z80, mem| z80.ld_iy_nn(mem),
     // 00100010
     // 00100011
     // 00100100
@@ -1473,7 +1473,7 @@ const IY_FUNCTIONS: [fn(&mut Z80, &mut dyn MemoryAccessor) -> u8; 16] = [
     // 00110100
     // 00110101
     // 00110110 LD (IY+d), n
-    |z80, memory_accessor| z80.ld_iyd_n(memory_accessor),
+    |z80, mem| z80.ld_mem_iyd_n(mem),
     // 00110111
     // 00111000
     // 00111001
@@ -1490,7 +1490,7 @@ const IY_FUNCTIONS: [fn(&mut Z80, &mut dyn MemoryAccessor) -> u8; 16] = [
     // 01000100
     // 01000101
     // 01000110 LD B, (IY+d)
-    |z80, memory_accessor| z80.ld_b_iyd(memory_accessor),
+    |z80, mem| z80.ld_b_mem_iyd(mem),
     // 01000111
     // 01001000
     // 01001001
@@ -1499,7 +1499,7 @@ const IY_FUNCTIONS: [fn(&mut Z80, &mut dyn MemoryAccessor) -> u8; 16] = [
     // 01001100
     // 01001101
     // 01001110 LD C, (IY+d)
-    |z80, memory_accessor| z80.ld_c_iyd(memory_accessor),
+    |z80, mem| z80.ld_c_mem_iyd(mem),
     // 01001111
     // 01010000
     // 01010001
@@ -1508,7 +1508,7 @@ const IY_FUNCTIONS: [fn(&mut Z80, &mut dyn MemoryAccessor) -> u8; 16] = [
     // 01010100
     // 01010101
     // 01010110 LD D, (IY+d)
-    |z80, memory_accessor| z80.ld_d_iyd(memory_accessor),
+    |z80, mem| z80.ld_d_mem_iyd(mem),
     // 01010111
     // 01011000
     // 01011001
@@ -1517,7 +1517,7 @@ const IY_FUNCTIONS: [fn(&mut Z80, &mut dyn MemoryAccessor) -> u8; 16] = [
     // 01011100
     // 01011101
     // 01011110 LD E, (IY+d)
-    |z80, memory_accessor| z80.ld_e_iyd(memory_accessor),
+    |z80, mem| z80.ld_e_mem_iyd(mem),
     // 01011111
     // 01100000
     // 01100001
@@ -1526,7 +1526,7 @@ const IY_FUNCTIONS: [fn(&mut Z80, &mut dyn MemoryAccessor) -> u8; 16] = [
     // 01100100
     // 01100101
     // 01100110 LD H, (IY+d)
-    |z80, memory_accessor| z80.ld_h_iyd(memory_accessor),
+    |z80, mem| z80.ld_h_mem_iyd(mem),
     // 01100111
     // 01101000
     // 01101001
@@ -1535,23 +1535,23 @@ const IY_FUNCTIONS: [fn(&mut Z80, &mut dyn MemoryAccessor) -> u8; 16] = [
     // 01101100
     // 01101101
     // 01101110 LD L, (IY+d)
-    |z80, memory_accessor| z80.ld_l_iyd(memory_accessor),
+    |z80, mem| z80.ld_l_mem_iyd(mem),
     // 01101111
     // 01110000 LD (IY+d), B
-    |z80, memory_accessor| z80.ld_iyd_b(memory_accessor),
+    |z80, mem| z80.ld_mem_iyd_b(mem),
     // 01110001 LD (IY+d), C
-    |z80, memory_accessor| z80.ld_iyd_c(memory_accessor),
+    |z80, mem| z80.ld_mem_iyd_c(mem),
     // 01110010 LD (IY+d), D
-    |z80, memory_accessor| z80.ld_iyd_d(memory_accessor),
+    |z80, mem| z80.ld_mem_iyd_d(mem),
     // 01110011 LD (IY+d), E
-    |z80, memory_accessor| z80.ld_iyd_e(memory_accessor),
+    |z80, mem| z80.ld_mem_iyd_e(mem),
     // 01110100 LD (IY+d), H
-    |z80, memory_accessor| z80.ld_iyd_h(memory_accessor),
+    |z80, mem| z80.ld_mem_iyd_h(mem),
     // 01110101 LD (IY+d), L
-    |z80, memory_accessor| z80.ld_iyd_l(memory_accessor),
+    |z80, mem| z80.ld_mem_iyd_l(mem),
     // 01110110
     // 01110111 LD (IY+d), A
-    |z80, memory_accessor| z80.ld_iyd_a(memory_accessor),
+    |z80, mem| z80.ld_mem_iyd_a(mem),
     // 01111000
     // 01111001
     // 01111010
@@ -1559,7 +1559,7 @@ const IY_FUNCTIONS: [fn(&mut Z80, &mut dyn MemoryAccessor) -> u8; 16] = [
     // 01111100
     // 01111101
     // 01111110 LD A, (IY+d)
-    |z80, memory_accessor| z80.ld_a_iyd(memory_accessor),
+    |z80, mem| z80.ld_a_mem_iyd(mem),
     // 01111111
     // 10000000
     // 10000001
@@ -2022,21 +2022,21 @@ impl Z80 {
         }
     }
 
-    pub fn fetch_next_opcode(&mut self, memory_accessor: &dyn MemoryAccessor) -> u8 {
-        let opcode = memory_accessor.read(&self.program_counter);
+    pub fn fetch_next_opcode(&mut self, mem: &dyn MemoryAccessor) -> u8 {
+        let opcode = mem.read(&self.program_counter);
         self.program_counter += 1;
         opcode
     }
 
-    pub fn process_next_instruction(&mut self, memory_accessor: &mut dyn MemoryAccessor) -> u8 {
+    pub fn process_next_instruction(&mut self, mem: &mut dyn MemoryAccessor) -> u8 {
         let mut t_states: u8 = 0;
 
         // Spend 4 ticks fetching the next instruction
-        let opcode = self.fetch_next_opcode(memory_accessor);
+        let opcode = self.fetch_next_opcode(mem);
         t_states += 4;
 
         let opcode_function = MAIN_FUNCTIONS[opcode as usize];
-        t_states += opcode_function(self, memory_accessor);
+        t_states += opcode_function(self, mem);
 
         return t_states;
     }
