@@ -316,10 +316,165 @@ impl Z80 {
         // T states
         20
     }
+
+    /// ## LD IX, (nn)
+    ///
+    /// ### Operation
+    ///
+    /// IXh ← (nn + 1), IXI ← (nn)
+    ///
+    /// ### Op Code
+    ///
+    /// LD
+    ///
+    /// ### Operands
+    ///
+    /// IX, (nn)
+    /// `1 1 0 1 1 1 0 1` (DD)
+    /// `0 0 1 0 1 0 1 0` (2A)
+    /// `n n n n n n n n`
+    /// `n n n n n n n n`
+    ///
+    /// ### Description
+    ///
+    /// The contents of the address (nn) are loaded to the low-order portion of
+    /// Index Register IX, and the contents of the next highest memory address
+    /// (nn + 1) are loaded to the high-order portion of IX. The first n operand
+    /// after the op code is the low-order byte of nn.
+    ///
+    /// | M Cycles | T States 4            | MHz E.T. |
+    /// | -------- | --------------------- | -------- |
+    /// | 6        | 20 (4, 4, 3, 3, 3, 3) | 5.00     |
+    ///
+    /// ### Condition Bits Affected
+    ///
+    /// None.
+    ///
+    /// ### Example
+    ///
+    /// If address 6666h contains 92h, and address 6667h contains DAh, then upon
+    /// the execution of an LD IX, (6666h) instruction, Index Register IX
+    /// contains DA92h.
+    pub fn ld_ix_mem_nn(&mut self, mem: &dyn MemoryAccessor) -> u8 {
+        let low_n = self.fetch_next_opcode(mem);
+        let high_n = self.fetch_next_opcode(mem);
+
+        let address = ((high_n as u16) << 8) | low_n as u16;
+        let val_low = mem.read(&address);
+        let val_high = mem.read(&(address + 1));
+
+        self.ix = ((val_high as u16) << 8) | val_low as u16;
+
+        // T states
+        20
+    }
+
+    /// ## LD IY, (nn)
+    ///
+    /// ### Operation
+    ///
+    /// IYh ← (nn + 1), IYI ← (nn)
+    ///
+    /// ### Op Code
+    ///
+    /// LD
+    ///
+    /// ### Operands
+    ///
+    /// IY, (nn)
+    /// `1 1 1 1 1 1 0 1` (FD)
+    /// `0 0 1 0 1 0 1 0` (2A)
+    /// `n n n n n n n n`
+    /// `n n n n n n n n`
+    ///
+    /// ### Description
+    ///
+    /// The contents of the address (nn) are loaded to the low-order portion of
+    /// Index Register IY, and the contents of the next highest memory address
+    /// (nn + 1) are loaded to the high-order portion of IY. The first n operand
+    /// after the op code is the low-order byte of nn.
+    ///
+    /// | M Cycles | T States 4            | MHz E.T. |
+    /// | -------- | --------------------- | -------- |
+    /// | 6        | 20 (4, 4, 3, 3, 3, 3) | 5.00     |
+    ///
+    /// ### Condition Bits Affected
+    ///
+    /// None.
+    ///
+    /// ### Example
+    ///
+    /// If address 6666h contains 92h, and address 6667h contains DAh, then upon
+    /// the execution of an LD IY, (6666h) instruction, Index Register IY
+    /// contains DA92h.
+    pub fn ld_iy_mem_nn(&mut self, mem: &dyn MemoryAccessor) -> u8 {
+        let low_n = self.fetch_next_opcode(mem);
+        let high_n = self.fetch_next_opcode(mem);
+
+        let address = ((high_n as u16) << 8) | low_n as u16;
+        let val_low = mem.read(&address);
+        let val_high = mem.read(&(address + 1));
+
+        self.iy = ((val_high as u16) << 8) | val_low as u16;
+
+        // T states
+        20
+    }
+
+    /// ## LD (nn), HL
+    ///
+    /// ### Operation
+    ///
+    /// (nn + 1) ← H, (nn) ← L
+    ///
+    /// ### Op Code
+    ///
+    /// LD
+    ///
+    /// ### Operands
+    ///
+    /// (nn), HL
+    /// `0 0 1 0 0 0 1 0` (22)
+    /// `n n n n n n n n`
+    /// `n n n n n n n n`
+    ///
+    /// ### Description
+    ///
+    /// The contents of the low-order portion of register pair HL (Register L)
+    /// are loaded to memory address (nn), and the contents of the high-order
+    /// portion of HL (Register H) are loaded to the next highest memory address
+    /// (nn + 1). The first n operand after the op code is the low-order byte of
+    /// nn.
+    ///
+    /// | M Cycles | T States           | 4 MHz E.T. |
+    /// | -------- | ------------------ | ---------- |
+    /// | 5        | 16 (4, 3, 3, 3, 3) | 4.00       |
+    ///
+    /// ### Condition Bits Affected
+    ///
+    /// None.
+    ///
+    /// ### Example
+    ///
+    /// If register pair HL contains 483Ah, then upon the execution of an LD
+    /// (B2291 – 1), HL instruction, address B229h contains 3Ah and address
+    /// B22Ah contains 48h.
+    pub fn ld_mem_nn_hl(&mut self, mem: &mut dyn MemoryAccessor) -> u8 {
+        let low_n = self.fetch_next_opcode(mem);
+        let high_n = self.fetch_next_opcode(mem);
+
+        let address = ((high_n as u16) << 8) | low_n as u16;
+
+        mem.write(&address, &self.l);
+        mem.write(&(address + 1), &self.h);
+
+        // T states
+        16
+    }
 }
 
 mod tests {
-    use crate::z80::{tests::Ram, Z80};
+    use crate::z80::{tests::Ram, MemoryAccessor, Z80};
 
     #[test]
     fn test_ld_bc_nn() {
@@ -463,5 +618,47 @@ mod tests {
         assert_eq!(20, t_states);
 
         assert_eq!(0xF00F, z80.stack_pointer);
+    }
+
+    #[test]
+    fn test_ld_ix_mem_nn() {
+        let bytes = &mut [0xDD, 0x2A, 0x04, 0x00, 0x0F, 0xF0];
+        let ram = &mut Ram::new(bytes);
+        let z80 = &mut Z80::new();
+        z80.program_counter = 2;
+
+        let t_states = z80.ld_ix_mem_nn(ram);
+        assert_eq!(20, t_states);
+
+        assert_eq!(0xF00F, z80.ix);
+    }
+
+    #[test]
+    fn test_ld_iy_mem_nn() {
+        let bytes = &mut [0xFD, 0x2A, 0x04, 0x00, 0x0F, 0xF0];
+        let ram = &mut Ram::new(bytes);
+        let z80 = &mut Z80::new();
+        z80.program_counter = 2;
+
+        let t_states = z80.ld_iy_mem_nn(ram);
+        assert_eq!(20, t_states);
+
+        assert_eq!(0xF00F, z80.iy);
+    }
+
+    #[test]
+    fn test_ld_mem_nn_hl() {
+        let bytes = &mut [0x22, 0x03, 0x00, 0x00, 0x00];
+        let ram = &mut Ram::new(bytes);
+        let z80 = &mut Z80::new();
+        z80.program_counter = 1;
+        z80.h = 0x0F;
+        z80.l = 0xF0;
+
+        let t_states = z80.ld_mem_nn_hl(ram);
+        assert_eq!(16, t_states);
+
+        assert_eq!(z80.l, ram.read(&3));
+        assert_eq!(z80.h, ram.read(&4));
     }
 }

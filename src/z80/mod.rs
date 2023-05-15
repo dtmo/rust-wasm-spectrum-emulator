@@ -13,7 +13,7 @@ pub trait MemoryAccessor {
     fn write(&mut self, address: &u16, data: &u8);
 }
 
-const MAIN_FUNCTIONS: [fn(&mut Z80, &mut dyn MemoryAccessor) -> u8; 84] = [
+const MAIN_FUNCTIONS: [fn(&mut Z80, &mut dyn MemoryAccessor) -> u8; 85] = [
     // 00000000 NOP
     |_, _| Z80::nop(),
     // 00000001 LD BC nn
@@ -60,7 +60,8 @@ const MAIN_FUNCTIONS: [fn(&mut Z80, &mut dyn MemoryAccessor) -> u8; 84] = [
     // 00100000
     // 00100001 LD HL nn
     |z80, mem| z80.ld_hl_nn(mem),
-    // 00100010
+    // 00100010 LD (nn), HL
+    Z80::ld_mem_nn_hl,
     // 00100011
     // 00100100
     // 00100101
@@ -617,7 +618,7 @@ const BIT_INSTRUCTIONS: [fn(&mut Z80, &mut dyn MemoryAccessor) -> u8; 0] = [
 ];
 
 // DD prefix
-const IX_FUNCTIONS: [fn(&mut Z80, &mut dyn MemoryAccessor) -> u8; 16] = [
+const IX_FUNCTIONS: [fn(&mut Z80, &mut dyn MemoryAccessor) -> u8; 17] = [
     // 00000000
     // 00000001
     // 00000010
@@ -661,7 +662,8 @@ const IX_FUNCTIONS: [fn(&mut Z80, &mut dyn MemoryAccessor) -> u8; 16] = [
     // 00100111
     // 00101000
     // 00101001
-    // 00101010
+    // 00101010 LD IX, (nn)
+    |z80, mem| z80.ld_ix_mem_nn(mem),
     // 00101011
     // 00101100
     // 00101101
@@ -1421,7 +1423,7 @@ const MISC_INSTRUCTIONS: [fn(&mut Z80, &mut dyn MemoryAccessor) -> u8; 8] = [
 ];
 
 // FD prefix
-const IY_FUNCTIONS: [fn(&mut Z80, &mut dyn MemoryAccessor) -> u8; 16] = [
+const IY_FUNCTIONS: [fn(&mut Z80, &mut dyn MemoryAccessor) -> u8; 17] = [
     // 00000000
     // 00000001
     // 00000010
@@ -1465,7 +1467,8 @@ const IY_FUNCTIONS: [fn(&mut Z80, &mut dyn MemoryAccessor) -> u8; 16] = [
     // 00100111
     // 00101000
     // 00101001
-    // 00101010
+    // 00101010 LD IY, (nn)
+    |z80, mem| z80.ld_iy_mem_nn(mem),
     // 00101011
     // 00101100
     // 00101101
@@ -2249,7 +2252,7 @@ mod tests {
             // 0x26, // LD H, n
             // Until all instructions are populated, the opcode array will have
             // LD H, n at the wrong location.
-            12, // LD H, n
+            13, // LD H, n
             0xDD,
         ];
 
