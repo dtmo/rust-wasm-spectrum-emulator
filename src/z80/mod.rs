@@ -14,7 +14,7 @@ pub trait Z80Memory {
     fn write(&mut self, address: &u16, data: &u8);
 }
 
-const MAIN_FUNCTIONS: [fn(&mut Z80, &mut dyn Z80Memory) -> u8; 95] = [
+const MAIN_FUNCTIONS: [fn(&mut Z80, &mut dyn Z80Memory) -> u8; 96] = [
     // 00000000 NOP
     |_, _| Z80::nop(),
     // 00000001 LD BC nn
@@ -27,7 +27,8 @@ const MAIN_FUNCTIONS: [fn(&mut Z80, &mut dyn Z80Memory) -> u8; 95] = [
     // 00000110 LD B, n
     Z80::ld_b_n,
     // 00000111
-    // 00001000
+    // 00001000 LD AF, AF'
+    |z80, _| z80.ex_af_afp(),
     // 00001001
     // 00001010 LA A, (BC)
     |z80, mem| z80.ld_a_mem_bc(mem),
@@ -2275,7 +2276,7 @@ mod tests {
             // 0x26, // LD H, n
             // Until all instructions are populated, the opcode array will have
             // LD H, n at the wrong location.
-            13, // LD H, n
+            14, // LD H, n
             0xDD,
         ];
 
