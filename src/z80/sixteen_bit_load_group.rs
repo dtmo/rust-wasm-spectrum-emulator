@@ -678,6 +678,45 @@ impl Z80 {
         // T states
         20
     }
+
+    /// ## LD SP, HL
+    ///
+    /// ### Operation
+    ///
+    /// SP ← HL
+    ///
+    /// ### Op Code
+    ///
+    /// LD
+    ///
+    /// ### Operands
+    ///
+    /// SP, HL
+    /// `1 1 1 1 1 0 0 1` (F9)
+    ///
+    /// ### Description
+    ///
+    /// The contents of the register pair HL are loaded to the Stack Pointer
+    /// (SP).
+    ///
+    /// | M Cycles | T States | 4 MHz E.T. |
+    /// | -------- | -------- | ---------- |
+    /// | 1        | 6        | 1.5        |
+    ///
+    /// ### Condition Bits Affected
+    ///
+    /// None.
+    ///
+    /// ### Example
+    ///
+    /// If the register pair HL contains 442Eh, then upon the execution of an LD
+    /// SP, HL instruction, the Stack Pointer also contains 442Eh.
+    pub fn ld_sp_hl(&mut self) -> u8 {
+        self.stack_pointer = ((self.h as u16) << 8) | self.l as u16;
+
+        // T states
+        6
+    }
 }
 
 mod tests {
@@ -960,5 +999,17 @@ mod tests {
 
         assert_eq!(0xFF, ram.read(&4));
         assert_eq!(0xEE, ram.read(&5));
+    }
+
+    #[test]
+    fn test_ld_sp_hl() {
+        let z80 = &mut Z80::new();
+        z80.h = 0x44;
+        z80.l = 0x2E;
+
+        let t_states = z80.ld_sp_hl();
+        assert_eq!(6, t_states);
+
+        assert_eq!(0x442E, z80.stack_pointer);
     }
 }

@@ -13,7 +13,7 @@ pub trait Z80Memory {
     fn write(&mut self, address: &u16, data: &u8);
 }
 
-const MAIN_FUNCTIONS: [fn(&mut Z80, &mut dyn Z80Memory) -> u8; 85] = [
+const MAIN_FUNCTIONS: [fn(&mut Z80, &mut dyn Z80Memory) -> u8; 86] = [
     // 00000000 NOP
     |_, _| Z80::nop(),
     // 00000001 LD BC nn
@@ -348,7 +348,8 @@ const MAIN_FUNCTIONS: [fn(&mut Z80, &mut dyn Z80Memory) -> u8; 85] = [
     // 11110110
     // 11110111
     // 11111000
-    // 11111001
+    // 11111001 LD SP, HL
+    |z80, _| z80.ld_sp_hl(),
     // 11111010
     // 11111011
     // 11111100
