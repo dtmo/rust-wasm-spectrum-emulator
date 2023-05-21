@@ -13,7 +13,7 @@ pub trait Z80Memory {
     fn write(&mut self, address: &u16, data: &u8);
 }
 
-const MAIN_FUNCTIONS: [fn(&mut Z80, &mut dyn Z80Memory) -> u8; 90] = [
+const MAIN_FUNCTIONS: [fn(&mut Z80, &mut dyn Z80Memory) -> u8; 94] = [
     // 00000000 NOP
     |_, _| Z80::nop(),
     // 00000001 LD BC nn
@@ -292,7 +292,8 @@ const MAIN_FUNCTIONS: [fn(&mut Z80, &mut dyn Z80Memory) -> u8; 90] = [
     // 10111110
     // 10111111
     // 11000000
-    // 11000001
+    // 11000001 POP BC
+    |z80, mem| z80.pop_qqbc(mem),
     // 11000010
     // 11000011
     // 11000100
@@ -309,7 +310,8 @@ const MAIN_FUNCTIONS: [fn(&mut Z80, &mut dyn Z80Memory) -> u8; 90] = [
     // 11001110
     // 11001111
     // 11010000
-    // 11010001
+    // 11010001 POP DE
+    |z80, mem| z80.pop_qqde(mem),
     // 11010010
     // 11010011
     // 11010100
@@ -326,7 +328,8 @@ const MAIN_FUNCTIONS: [fn(&mut Z80, &mut dyn Z80Memory) -> u8; 90] = [
     // 11011110
     // 11011111
     // 11100000
-    // 11100001
+    // 11100001 POP HL
+    |z80, mem| z80.pop_qqhl(mem),
     // 11100010
     // 11100011
     // 11100100
@@ -343,7 +346,8 @@ const MAIN_FUNCTIONS: [fn(&mut Z80, &mut dyn Z80Memory) -> u8; 90] = [
     // 11101110
     // 11101111
     // 11110000
-    // 11110001
+    // 11110001 POP AF
+    |z80, mem| z80.pop_qqaf(mem),
     // 11110010
     // 11110011
     // 11110100

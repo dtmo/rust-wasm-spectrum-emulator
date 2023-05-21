@@ -943,6 +943,84 @@ impl Z80 {
         // T states
         15
     }
+
+    /// ## POP qq
+    /// ### Operation
+    /// qqH ← (SP+1), qqL ← (SP)
+    /// ### Op Code
+    /// POP
+    /// ### Operand
+    /// qq
+    /// `1 1 q q 0 0 0 1`
+    /// ### Description
+    /// The top two bytes of the external memory last-in, first-out (LIFO) stack
+    /// are popped to register pair qq. The Stack Pointer (SP) Register pair
+    /// holds the 16-bit address of the current top of the Stack. This
+    /// instruction first loads to the low-order portion of qq, the byte at the
+    /// memory location corresponding to the contents of SP; then SP is
+    /// incremented and the contents of the corresponding adjacent memory
+    /// location are loaded to the high-order portion of qq and the SP is now
+    /// incremented again. The operand qq identifies register pair BC, DE, HL,
+    /// or AF, assembled as follows in the object code:
+    ///
+    /// | Pair | r  |
+    /// | ---- | -- |
+    /// | BC   | 00 |
+    /// | DE   | 01 |
+    /// | HL   | 10 |
+    /// | AF   | 11 |
+    ///
+    /// | M Cycles | T States     | 4 MHz E.T. |
+    /// | -------- | ------------ | ---------- |
+    /// | 3        | 10 (4, 3, 3) | 2.50       |
+    ///
+    /// ### Condition Bits Affected
+    /// None.
+    /// ### Example
+    /// If the Stack Pointer contains 1000h, memory location 1000h contains 55h,
+    /// and location 1001h contains 33h, the instruction POP HL results in
+    /// register pair HL containing 3355h, and the Stack Pointer containing
+    /// 1002h.
+    pub fn pop_qqbc(&mut self, mem: &dyn Z80Memory) -> u8 {
+        self.c = mem.read(&self.stack_pointer);
+        self.stack_pointer += 1;
+
+        self.b = mem.read(&self.stack_pointer);
+        self.stack_pointer += 1;
+
+        // T states
+        10
+    }
+    pub fn pop_qqde(&mut self, mem: &dyn Z80Memory) -> u8 {
+        self.e = mem.read(&self.stack_pointer);
+        self.stack_pointer += 1;
+
+        self.d = mem.read(&self.stack_pointer);
+        self.stack_pointer += 1;
+
+        // T states
+        10
+    }
+    pub fn pop_qqhl(&mut self, mem: &dyn Z80Memory) -> u8 {
+        self.l = mem.read(&self.stack_pointer);
+        self.stack_pointer += 1;
+
+        self.h = mem.read(&self.stack_pointer);
+        self.stack_pointer += 1;
+
+        // T states
+        10
+    }
+    pub fn pop_qqaf(&mut self, mem: &dyn Z80Memory) -> u8 {
+        self.f = mem.read(&self.stack_pointer);
+        self.stack_pointer += 1;
+
+        self.a = mem.read(&self.stack_pointer);
+        self.stack_pointer += 1;
+
+        // T states
+        10
+    }
 }
 
 mod tests {
@@ -1359,5 +1437,65 @@ mod tests {
         assert_eq!(0x22, ram.read(&3));
         assert_eq!(0x33, ram.read(&2));
         assert_eq!(2, z80.stack_pointer);
+    }
+
+    #[test]
+    fn test_pop_qqbc() {
+        let bytes = &mut [0xC1, 0x55, 0x33];
+        let ram = &mut Ram::new(bytes);
+        let z80 = &mut Z80::new();
+        z80.stack_pointer = 1;
+
+        let t_states = z80.pop_qqbc(ram);
+        assert_eq!(10, t_states);
+
+        assert_eq!(3, z80.stack_pointer);
+        assert_eq!(0x33, z80.b);
+        assert_eq!(0x55, z80.c);
+    }
+
+    #[test]
+    fn test_pop_qqde() {
+        let bytes = &mut [0xD1, 0x55, 0x33];
+        let ram = &mut Ram::new(bytes);
+        let z80 = &mut Z80::new();
+        z80.stack_pointer = 1;
+
+        let t_states = z80.pop_qqde(ram);
+        assert_eq!(10, t_states);
+
+        assert_eq!(3, z80.stack_pointer);
+        assert_eq!(0x33, z80.d);
+        assert_eq!(0x55, z80.e);
+    }
+
+    #[test]
+    fn test_pop_qqhl() {
+        let bytes = &mut [0xE1, 0x55, 0x33];
+        let ram = &mut Ram::new(bytes);
+        let z80 = &mut Z80::new();
+        z80.stack_pointer = 1;
+
+        let t_states = z80.pop_qqhl(ram);
+        assert_eq!(10, t_states);
+
+        assert_eq!(3, z80.stack_pointer);
+        assert_eq!(0x33, z80.h);
+        assert_eq!(0x55, z80.l);
+    }
+
+    #[test]
+    fn test_pop_qqaf() {
+        let bytes = &mut [0xF1, 0x55, 0x33];
+        let ram = &mut Ram::new(bytes);
+        let z80 = &mut Z80::new();
+        z80.stack_pointer = 1;
+
+        let t_states = z80.pop_qqaf(ram);
+        assert_eq!(10, t_states);
+
+        assert_eq!(3, z80.stack_pointer);
+        assert_eq!(0x33, z80.a);
+        assert_eq!(0x55, z80.f);
     }
 }
