@@ -1,21 +1,21 @@
-use crate::z80::{MemoryAccessor, Z80};
+use crate::z80::{Z80Memory, Z80};
 
 static ROM_48: &[u8; 0x4000] = include_bytes!("48.rom");
 // static ROM_128_0: [u8] = include_bytes!("128-0.rom");
 // static ROM_128_1: [u8] = include_bytes!("128-1.rom");
 
-struct Memory {
+struct ZxSpectrumMemory {
     rom: &'static [u8; 0x4000],
     ram: [u8; 0x8000],
 }
 
-impl Memory {
-    fn new(rom: &'static [u8; 0x4000], ram: [u8; 0x8000]) -> Memory {
-        Memory { rom, ram }
+impl ZxSpectrumMemory {
+    fn new(rom: &'static [u8; 0x4000], ram: [u8; 0x8000]) -> ZxSpectrumMemory {
+        ZxSpectrumMemory { rom, ram }
     }
 }
 
-impl MemoryAccessor for Memory {
+impl Z80Memory for ZxSpectrumMemory {
     fn read(&self, address: &u16) -> u8 {
         let index = *address as usize;
         if index < self.rom.len() {
@@ -34,14 +34,14 @@ impl MemoryAccessor for Memory {
 }
 
 pub struct ZxSpectrum {
-    memory: Memory,
+    memory: ZxSpectrumMemory,
     processor: Z80,
 }
 
 impl ZxSpectrum {
     pub fn new() -> ZxSpectrum {
         ZxSpectrum {
-            memory: Memory::new(ROM_48, [0; 0x8000]),
+            memory: ZxSpectrumMemory::new(ROM_48, [0; 0x8000]),
             processor: Z80::new(),
         }
     }

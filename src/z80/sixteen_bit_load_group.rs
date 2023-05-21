@@ -1,4 +1,4 @@
-use super::{MemoryAccessor, Z80};
+use super::{Z80Memory, Z80};
 
 impl Z80 {
     /// ## LD dd, nn
@@ -45,7 +45,7 @@ impl Z80 {
     ///
     /// Upon the execution of an LD HL, 5000h instruction, the HL register pair
     /// contains 5000h.
-    pub fn ld_bc_nn(&mut self, mem: &dyn MemoryAccessor) -> u8 {
+    pub fn ld_bc_nn(&mut self, mem: &dyn Z80Memory) -> u8 {
         self.c = self.fetch_next_opcode(mem);
         self.b = self.fetch_next_opcode(mem);
 
@@ -53,7 +53,7 @@ impl Z80 {
         10
     }
 
-    pub fn ld_de_nn(&mut self, mem: &dyn MemoryAccessor) -> u8 {
+    pub fn ld_de_nn(&mut self, mem: &dyn Z80Memory) -> u8 {
         self.e = self.fetch_next_opcode(mem);
         self.d = self.fetch_next_opcode(mem);
 
@@ -61,7 +61,7 @@ impl Z80 {
         10
     }
 
-    pub fn ld_hl_nn(&mut self, mem: &dyn MemoryAccessor) -> u8 {
+    pub fn ld_hl_nn(&mut self, mem: &dyn Z80Memory) -> u8 {
         self.l = self.fetch_next_opcode(mem);
         self.h = self.fetch_next_opcode(mem);
 
@@ -69,7 +69,7 @@ impl Z80 {
         10
     }
 
-    pub fn ld_sp_nn(&mut self, mem: &dyn MemoryAccessor) -> u8 {
+    pub fn ld_sp_nn(&mut self, mem: &dyn Z80Memory) -> u8 {
         let low_n = self.fetch_next_opcode(mem);
         let high_n = self.fetch_next_opcode(mem);
 
@@ -114,7 +114,7 @@ impl Z80 {
     ///
     /// Upon the execution of an LD IX, 45A2h instruction, the index register
     /// contains integer 45A2h.
-    pub fn ld_ix_nn(&mut self, mem: &dyn MemoryAccessor) -> u8 {
+    pub fn ld_ix_nn(&mut self, mem: &dyn Z80Memory) -> u8 {
         let low_n = self.fetch_next_opcode(mem);
         let high_n = self.fetch_next_opcode(mem);
 
@@ -159,7 +159,7 @@ impl Z80 {
     ///
     /// Upon the execution of an LD IY, 7733h instruction, Index Register IY
     /// contains the integer 7733h.
-    pub fn ld_iy_nn(&mut self, mem: &dyn MemoryAccessor) -> u8 {
+    pub fn ld_iy_nn(&mut self, mem: &dyn Z80Memory) -> u8 {
         let low_n = self.fetch_next_opcode(mem);
         let high_n = self.fetch_next_opcode(mem);
 
@@ -207,7 +207,7 @@ impl Z80 {
     /// If address 4545h contains 37h and address 4546h contains A1h, then upon
     /// the execution of an LD HL, (4545h) instruction, the HL register pair
     /// contains A137h.
-    pub fn ld_hl_mem_nn(&mut self, mem: &dyn MemoryAccessor) -> u8 {
+    pub fn ld_hl_mem_nn(&mut self, mem: &dyn Z80Memory) -> u8 {
         let nl = self.fetch_next_opcode(mem);
         let nh = self.fetch_next_opcode(mem);
 
@@ -267,7 +267,7 @@ impl Z80 {
     /// If Address 2130h contains 65h and address 2131h contains 78h, then upon
     /// the execution of an LD BC, (2130h) instruction, the BC register pair
     /// contains 7865h.
-    pub fn ld_ddbc_mem_nn(&mut self, mem: &dyn MemoryAccessor) -> u8 {
+    pub fn ld_ddbc_mem_nn(&mut self, mem: &dyn Z80Memory) -> u8 {
         let low_n = self.fetch_next_opcode(mem);
         let high_n = self.fetch_next_opcode(mem);
 
@@ -279,7 +279,7 @@ impl Z80 {
         20
     }
 
-    pub fn ld_ddde_mem_nn(&mut self, mem: &dyn MemoryAccessor) -> u8 {
+    pub fn ld_ddde_mem_nn(&mut self, mem: &dyn Z80Memory) -> u8 {
         let low_n = self.fetch_next_opcode(mem);
         let high_n = self.fetch_next_opcode(mem);
 
@@ -291,7 +291,7 @@ impl Z80 {
         20
     }
 
-    pub fn ld_ddhl_mem_nn(&mut self, mem: &dyn MemoryAccessor) -> u8 {
+    pub fn ld_ddhl_mem_nn(&mut self, mem: &dyn Z80Memory) -> u8 {
         let low_n = self.fetch_next_opcode(mem);
         let high_n = self.fetch_next_opcode(mem);
 
@@ -303,7 +303,7 @@ impl Z80 {
         20
     }
 
-    pub fn ld_ddsp_mem_nn(&mut self, mem: &dyn MemoryAccessor) -> u8 {
+    pub fn ld_ddsp_mem_nn(&mut self, mem: &dyn Z80Memory) -> u8 {
         let low_n = self.fetch_next_opcode(mem);
         let high_n = self.fetch_next_opcode(mem);
 
@@ -355,7 +355,7 @@ impl Z80 {
     /// If address 6666h contains 92h, and address 6667h contains DAh, then upon
     /// the execution of an LD IX, (6666h) instruction, Index Register IX
     /// contains DA92h.
-    pub fn ld_ix_mem_nn(&mut self, mem: &dyn MemoryAccessor) -> u8 {
+    pub fn ld_ix_mem_nn(&mut self, mem: &dyn Z80Memory) -> u8 {
         let low_n = self.fetch_next_opcode(mem);
         let high_n = self.fetch_next_opcode(mem);
 
@@ -407,7 +407,7 @@ impl Z80 {
     /// If address 6666h contains 92h, and address 6667h contains DAh, then upon
     /// the execution of an LD IY, (6666h) instruction, Index Register IY
     /// contains DA92h.
-    pub fn ld_iy_mem_nn(&mut self, mem: &dyn MemoryAccessor) -> u8 {
+    pub fn ld_iy_mem_nn(&mut self, mem: &dyn Z80Memory) -> u8 {
         let low_n = self.fetch_next_opcode(mem);
         let high_n = self.fetch_next_opcode(mem);
 
@@ -459,7 +459,7 @@ impl Z80 {
     /// If register pair HL contains 483Ah, then upon the execution of an LD
     /// (B2291 – 1), HL instruction, address B229h contains 3Ah and address
     /// B22Ah contains 48h.
-    pub fn ld_mem_nn_hl(&mut self, mem: &mut dyn MemoryAccessor) -> u8 {
+    pub fn ld_mem_nn_hl(&mut self, mem: &mut dyn Z80Memory) -> u8 {
         let low_n = self.fetch_next_opcode(mem);
         let high_n = self.fetch_next_opcode(mem);
 
@@ -474,7 +474,7 @@ impl Z80 {
 }
 
 mod tests {
-    use crate::z80::{tests::Ram, MemoryAccessor, Z80};
+    use crate::z80::{tests::Ram, Z80Memory, Z80};
 
     #[test]
     fn test_ld_bc_nn() {

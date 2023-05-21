@@ -8,12 +8,12 @@ use self::flag_register::*;
 // Unofficial undocumented functionality documentation: http://www.z80.info/zip/z80-documented.pdf
 // Integration test suites: https://mdfs.net/Software/Z80/Exerciser/Spectrum/
 
-pub trait MemoryAccessor {
+pub trait Z80Memory {
     fn read(&self, address: &u16) -> u8;
     fn write(&mut self, address: &u16, data: &u8);
 }
 
-const MAIN_FUNCTIONS: [fn(&mut Z80, &mut dyn MemoryAccessor) -> u8; 85] = [
+const MAIN_FUNCTIONS: [fn(&mut Z80, &mut dyn Z80Memory) -> u8; 85] = [
     // 00000000 NOP
     |_, _| Z80::nop(),
     // 00000001 LD BC nn
@@ -358,7 +358,7 @@ const MAIN_FUNCTIONS: [fn(&mut Z80, &mut dyn MemoryAccessor) -> u8; 85] = [
 ];
 
 // CB prefix
-const BIT_INSTRUCTIONS: [fn(&mut Z80, &mut dyn MemoryAccessor) -> u8; 0] = [
+const BIT_INSTRUCTIONS: [fn(&mut Z80, &mut dyn Z80Memory) -> u8; 0] = [
     // 00000000
     // 00000001
     // 00000010
@@ -618,7 +618,7 @@ const BIT_INSTRUCTIONS: [fn(&mut Z80, &mut dyn MemoryAccessor) -> u8; 0] = [
 ];
 
 // DD prefix
-const IX_FUNCTIONS: [fn(&mut Z80, &mut dyn MemoryAccessor) -> u8; 17] = [
+const IX_FUNCTIONS: [fn(&mut Z80, &mut dyn Z80Memory) -> u8; 17] = [
     // 00000000
     // 00000001
     // 00000010
@@ -895,7 +895,7 @@ const IX_FUNCTIONS: [fn(&mut Z80, &mut dyn MemoryAccessor) -> u8; 17] = [
 ];
 
 // DDCB prefix
-const IX_BIT_INSTRUCTIONS: [fn(&mut Z80, &mut dyn MemoryAccessor) -> u8; 0] = [
+const IX_BIT_INSTRUCTIONS: [fn(&mut Z80, &mut dyn Z80Memory) -> u8; 0] = [
     // 00000000
     // 00000001
     // 00000010
@@ -1155,7 +1155,7 @@ const IX_BIT_INSTRUCTIONS: [fn(&mut Z80, &mut dyn MemoryAccessor) -> u8; 0] = [
     ];
 
 // ED prefix
-const MISC_INSTRUCTIONS: [fn(&mut Z80, &mut dyn MemoryAccessor) -> u8; 8] = [
+const MISC_INSTRUCTIONS: [fn(&mut Z80, &mut dyn Z80Memory) -> u8; 8] = [
     // 00000000
     // 00000001
     // 00000010
@@ -1423,7 +1423,7 @@ const MISC_INSTRUCTIONS: [fn(&mut Z80, &mut dyn MemoryAccessor) -> u8; 8] = [
 ];
 
 // FD prefix
-const IY_FUNCTIONS: [fn(&mut Z80, &mut dyn MemoryAccessor) -> u8; 17] = [
+const IY_FUNCTIONS: [fn(&mut Z80, &mut dyn Z80Memory) -> u8; 17] = [
     // 00000000
     // 00000001
     // 00000010
@@ -1700,7 +1700,7 @@ const IY_FUNCTIONS: [fn(&mut Z80, &mut dyn MemoryAccessor) -> u8; 17] = [
 ];
 
 // FDCB prefix
-const IY_BIT_INSTRUCTIONS: [fn(&mut Z80, &mut dyn MemoryAccessor) -> u8; 0] = [
+const IY_BIT_INSTRUCTIONS: [fn(&mut Z80, &mut dyn Z80Memory) -> u8; 0] = [
     // 00000000
     // 00000001
     // 00000010
@@ -2030,13 +2030,13 @@ impl Z80 {
         }
     }
 
-    pub fn fetch_next_opcode(&mut self, mem: &dyn MemoryAccessor) -> u8 {
+    pub fn fetch_next_opcode(&mut self, mem: &dyn Z80Memory) -> u8 {
         let opcode = mem.read(&self.program_counter);
         self.program_counter += 1;
         opcode
     }
 
-    pub fn process_next_instruction(&mut self, mem: &mut dyn MemoryAccessor) -> u8 {
+    pub fn process_next_instruction(&mut self, mem: &mut dyn Z80Memory) -> u8 {
         let mut t_states: u8 = 0;
 
         // Spend 4 ticks fetching the next instruction
@@ -2213,7 +2213,7 @@ mod tests {
         }
     }
 
-    impl<'a> MemoryAccessor for Ram<'a> {
+    impl<'a> Z80Memory for Ram<'a> {
         fn read(&self, address: &u16) -> u8 {
             self.bytes[*address as usize]
         }
