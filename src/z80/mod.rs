@@ -1,4 +1,5 @@
 mod eight_bit_load_group;
+mod exchange_block_transfer;
 mod flag_register;
 mod sixteen_bit_load_group;
 
@@ -13,7 +14,7 @@ pub trait Z80Memory {
     fn write(&mut self, address: &u16, data: &u8);
 }
 
-const MAIN_FUNCTIONS: [fn(&mut Z80, &mut dyn Z80Memory) -> u8; 94] = [
+const MAIN_FUNCTIONS: [fn(&mut Z80, &mut dyn Z80Memory) -> u8; 95] = [
     // 00000000 NOP
     |_, _| Z80::nop(),
     // 00000001 LD BC nn
@@ -340,7 +341,8 @@ const MAIN_FUNCTIONS: [fn(&mut Z80, &mut dyn Z80Memory) -> u8; 94] = [
     // 11101000
     // 11101001
     // 11101010
-    // 11101011
+    // 11101011 EX DE, HL
+    |z80, _| z80.ex_de_hl(),
     // 11101100
     // 11101101
     // 11101110
