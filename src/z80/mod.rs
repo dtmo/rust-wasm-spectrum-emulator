@@ -1155,7 +1155,7 @@ const IX_BIT_INSTRUCTIONS: [fn(&mut Z80, &mut dyn Z80Memory) -> u8; 0] = [
     ];
 
 // ED prefix
-const MISC_INSTRUCTIONS: [fn(&mut Z80, &mut dyn Z80Memory) -> u8; 8] = [
+const MISC_INSTRUCTIONS: [fn(&mut Z80, &mut dyn Z80Memory) -> u8; 12] = [
     // 00000000
     // 00000001
     // 00000010
@@ -1223,7 +1223,8 @@ const MISC_INSTRUCTIONS: [fn(&mut Z80, &mut dyn Z80Memory) -> u8; 8] = [
     // 01000000
     // 01000001
     // 01000010
-    // 01000011
+    // 01000011 LD (nn), BC
+    Z80::ld_mem_nn_ddbc,
     // 01000100
     // 01000101
     // 01000110
@@ -1242,7 +1243,8 @@ const MISC_INSTRUCTIONS: [fn(&mut Z80, &mut dyn Z80Memory) -> u8; 8] = [
     // 01010000
     // 01010001
     // 01010010
-    // 01010011
+    // 01010011 LD (nn), DE
+    Z80::ld_mem_nn_ddde,
     // 01010100
     // 01010101
     // 01010110
@@ -1261,7 +1263,8 @@ const MISC_INSTRUCTIONS: [fn(&mut Z80, &mut dyn Z80Memory) -> u8; 8] = [
     // 01100000
     // 01100001
     // 01100010
-    // 01100011
+    // 01100011 LD (nn), HL
+    Z80::ld_mem_nn_ddhl,
     // 01100100
     // 01100101
     // 01100110
@@ -1278,7 +1281,8 @@ const MISC_INSTRUCTIONS: [fn(&mut Z80, &mut dyn Z80Memory) -> u8; 8] = [
     // 01110000
     // 01110001
     // 01110010
-    // 01110011
+    // 01110011 LD (nn), SP
+    Z80::ld_mem_nn_ddsp,
     // 01110100
     // 01110101
     // 01110110
