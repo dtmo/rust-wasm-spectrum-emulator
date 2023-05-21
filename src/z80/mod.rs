@@ -627,7 +627,7 @@ const BIT_INSTRUCTIONS: [fn(&mut Z80, &mut dyn Z80Memory) -> u8; 0] = [
 ];
 
 // DD prefix
-const IX_FUNCTIONS: [fn(&mut Z80, &mut dyn Z80Memory) -> u8; 20] = [
+const IX_FUNCTIONS: [fn(&mut Z80, &mut dyn Z80Memory) -> u8; 21] = [
     // 00000000
     // 00000001
     // 00000010
@@ -871,7 +871,8 @@ const IX_FUNCTIONS: [fn(&mut Z80, &mut dyn Z80Memory) -> u8; 20] = [
     // 11011110
     // 11011111
     // 11100000
-    // 11100001
+    // 11100001 POP IX
+    |z80, mem| z80.pop_ix(mem),
     // 11100010
     // 11100011
     // 11100100
@@ -1439,7 +1440,7 @@ const MISC_INSTRUCTIONS: [fn(&mut Z80, &mut dyn Z80Memory) -> u8; 12] = [
 ];
 
 // FD prefix
-const IY_FUNCTIONS: [fn(&mut Z80, &mut dyn Z80Memory) -> u8; 20] = [
+const IY_FUNCTIONS: [fn(&mut Z80, &mut dyn Z80Memory) -> u8; 21] = [
     // 00000000
     // 00000001
     // 00000010
@@ -1683,7 +1684,8 @@ const IY_FUNCTIONS: [fn(&mut Z80, &mut dyn Z80Memory) -> u8; 20] = [
     // 11011110
     // 11011111
     // 11100000
-    // 11100001
+    // 11100001 POP IY
+    |z80, mem| z80.pop_iy(mem),
     // 11100010
     // 11100011
     // 11100100
