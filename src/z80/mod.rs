@@ -13,7 +13,7 @@ pub trait Z80Memory {
     fn write(&mut self, address: &u16, data: &u8);
 }
 
-const MAIN_FUNCTIONS: [fn(&mut Z80, &mut dyn Z80Memory) -> u8; 86] = [
+const MAIN_FUNCTIONS: [fn(&mut Z80, &mut dyn Z80Memory) -> u8; 90] = [
     // 00000000 NOP
     |_, _| Z80::nop(),
     // 00000001 LD BC nn
@@ -296,7 +296,8 @@ const MAIN_FUNCTIONS: [fn(&mut Z80, &mut dyn Z80Memory) -> u8; 86] = [
     // 11000010
     // 11000011
     // 11000100
-    // 11000101
+    // 11000101 PUSH BC
+    Z80::push_qqbc,
     // 11000110
     // 11000111
     // 11001000
@@ -312,7 +313,8 @@ const MAIN_FUNCTIONS: [fn(&mut Z80, &mut dyn Z80Memory) -> u8; 86] = [
     // 11010010
     // 11010011
     // 11010100
-    // 11010101
+    // 11010101 PUSH DE
+    Z80::push_qqde,
     // 11010110
     // 11010111
     // 11011000
@@ -328,7 +330,8 @@ const MAIN_FUNCTIONS: [fn(&mut Z80, &mut dyn Z80Memory) -> u8; 86] = [
     // 11100010
     // 11100011
     // 11100100
-    // 11100101
+    // 11100101 PUSH HL
+    Z80::push_qqhl,
     // 11100110
     // 11100111
     // 11101000
@@ -344,7 +347,8 @@ const MAIN_FUNCTIONS: [fn(&mut Z80, &mut dyn Z80Memory) -> u8; 86] = [
     // 11110010
     // 11110011
     // 11110100
-    // 11110101
+    // 11110101 PUSH AF
+    Z80::push_qqaf,
     // 11110110
     // 11110111
     // 11111000
@@ -619,7 +623,7 @@ const BIT_INSTRUCTIONS: [fn(&mut Z80, &mut dyn Z80Memory) -> u8; 0] = [
 ];
 
 // DD prefix
-const IX_FUNCTIONS: [fn(&mut Z80, &mut dyn Z80Memory) -> u8; 19] = [
+const IX_FUNCTIONS: [fn(&mut Z80, &mut dyn Z80Memory) -> u8; 20] = [
     // 00000000
     // 00000001
     // 00000010
@@ -867,7 +871,8 @@ const IX_FUNCTIONS: [fn(&mut Z80, &mut dyn Z80Memory) -> u8; 19] = [
     // 11100010
     // 11100011
     // 11100100
-    // 11100101
+    // 11100101 PUSH IX
+    Z80::push_ix,
     // 11100110
     // 11100111
     // 11101000
@@ -1430,7 +1435,7 @@ const MISC_INSTRUCTIONS: [fn(&mut Z80, &mut dyn Z80Memory) -> u8; 12] = [
 ];
 
 // FD prefix
-const IY_FUNCTIONS: [fn(&mut Z80, &mut dyn Z80Memory) -> u8; 19] = [
+const IY_FUNCTIONS: [fn(&mut Z80, &mut dyn Z80Memory) -> u8; 20] = [
     // 00000000
     // 00000001
     // 00000010
@@ -1678,7 +1683,8 @@ const IY_FUNCTIONS: [fn(&mut Z80, &mut dyn Z80Memory) -> u8; 19] = [
     // 11100010
     // 11100011
     // 11100100
-    // 11100101
+    // 11100101 PUSH IY
+    Z80::push_iy,
     // 11100110
     // 11100111
     // 11101000
