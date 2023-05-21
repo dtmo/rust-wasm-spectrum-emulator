@@ -59,6 +59,63 @@ impl Z80 {
         // T states
         4
     }
+
+    /// ## EXX
+    /// ### Operation
+    /// (BC) ↔ (BC′), (DE) ↔ (DE'), (HL) ↔ (HL′)
+    /// ### Op Code
+    /// EXX
+    /// ### Operands
+    /// None.
+    /// `1 1 0 1 1 0 0 1` (D9)
+    /// ### Description
+    /// Each 2-byte value in register pairs BC, DE, and HL is exchanged with the
+    /// 2-byte value in BC', DE', and HL', respectively.
+    ///
+    /// | M Cycles | T States | 4 MHz E.T. |
+    /// | -------- | -------- | ---------- |
+    /// | 1        | 4        | 1.00       |
+    ///
+    /// ### Condition Bits Affected
+    /// None.
+    /// ### Example
+    /// If register pairs BC, DE, and HL contain 445Ah, 3DA2h, and 8859h,
+    /// respectively, and register pairs BC’, DE’, and HL’ contain 0988h, 9300h,
+    /// and 00E7h, respectively, then upon the execution of an EXX instruction,
+    /// BC contains 0988h; DE contains 9300h; HL contains 00E7h; BC’ contains
+    /// 445Ah; DE’ contains 3DA2h; and HL’ contains 8859h.
+    pub fn exx(&mut self) -> u8 {
+        (
+            self.b,
+            self.c,
+            self.b_prime,
+            self.c_prime,
+            self.d,
+            self.e,
+            self.d_prime,
+            self.e_prime,
+            self.h,
+            self.l,
+            self.h_prime,
+            self.l_prime,
+        ) = (
+            self.b_prime,
+            self.c_prime,
+            self.b,
+            self.c,
+            self.d_prime,
+            self.e_prime,
+            self.d,
+            self.e,
+            self.h_prime,
+            self.l_prime,
+            self.h,
+            self.l,
+        );
+
+        // T states
+        4
+    }
 }
 
 mod tests {
@@ -92,9 +149,46 @@ mod tests {
         let t_states = z80.ex_af_afp();
 
         assert_eq!(4, t_states);
+
         assert_eq!(0x59, z80.a);
         assert_eq!(0x44, z80.f);
         assert_eq!(0x99, z80.a_prime);
         assert_eq!(0x00, z80.f_prime)
+    }
+
+    #[test]
+    fn test_exx() {
+        let mut z80 = Z80::new();
+        z80.b = 0x44;
+        z80.c = 0x5A;
+        z80.d = 0x3D;
+        z80.e = 0xA2;
+        z80.h = 0x88;
+        z80.l = 0x59;
+
+        z80.b_prime = 0x09;
+        z80.c_prime = 0x88;
+        z80.d_prime = 0x93;
+        z80.e_prime = 0x00;
+        z80.h_prime = 0x00;
+        z80.l_prime = 0xE7;
+
+        let t_states = z80.exx();
+
+        assert_eq!(4, t_states);
+
+        assert_eq!(0x09, z80.b);
+        assert_eq!(0x88, z80.c);
+        assert_eq!(0x93, z80.d);
+        assert_eq!(0x00, z80.e);
+        assert_eq!(0x00, z80.h);
+        assert_eq!(0xE7, z80.l);
+
+        assert_eq!(0x44, z80.b_prime);
+        assert_eq!(0x5A, z80.c_prime);
+        assert_eq!(0x3D, z80.d_prime);
+        assert_eq!(0xA2, z80.e_prime);
+        assert_eq!(0x88, z80.h_prime);
+        assert_eq!(0x59, z80.l_prime);
     }
 }
