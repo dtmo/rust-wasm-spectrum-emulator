@@ -717,6 +717,66 @@ impl Z80 {
         // T states
         6
     }
+
+    /// ## LD SP, IX
+    /// ### Operation
+    /// SP ← IX
+    /// ### Op Code
+    /// LD
+    /// ### Operands
+    /// SP, IX
+    /// `1 1 0 1 1 1 0 1` (DD)
+    /// `1 1 1 1 1 0 0 1` (F9)
+    ///
+    /// ### Description
+    /// The 2-byte contents of Index Register IX are loaded to the Stack Pointer
+    /// (SP).
+    ///
+    /// | M Cycles | T States  | 4 MHz E.T. |
+    /// | -------- | --------- | ---------- |
+    /// | 2        | 10 (4, 6) | 2.50       |
+    ///
+    /// ### Condition Bits Affected
+    /// None.
+    /// ### Example
+    /// If Index Register IX contains 98DAh, then upon the execution of an LD
+    /// SP, IX instruction, the Stack Pointer also contains 98DAh.
+    pub fn ld_sp_ix(&mut self) -> u8 {
+        self.stack_pointer = self.ix;
+
+        // T states
+        10
+    }
+
+    /// ## LD SP, IY
+    /// ### Operation
+    /// SP ← IY
+    /// ### Op Code
+    /// LD
+    /// ### Operands
+    /// SP, IY
+    /// `1 1 0 1 1 1 0 1` (FD)
+    /// `1 1 1 1 1 0 0 1` (F9)
+    ///
+    /// ### Description
+    /// The 2-byte contents of Index Register IY are loaded to the Stack Pointer
+    /// (SP).
+    ///
+    /// | M Cycles | T States  | 4 MHz E.T. |
+    /// | -------- | --------- | ---------- |
+    /// | 2        | 10 (4, 6) | 2.50       |
+    ///
+    /// ### Condition Bits Affected
+    /// None.
+    /// ### Example
+    /// If Index Register IY contains A227h, then upon the execution of an LD
+    /// SP, IY instruction, the Stack Pointer also contains A227h.
+    pub fn ld_sp_iy(&mut self) -> u8 {
+        self.stack_pointer = self.iy;
+
+        // T states
+        10
+    }
 }
 
 mod tests {
@@ -1011,5 +1071,27 @@ mod tests {
         assert_eq!(6, t_states);
 
         assert_eq!(0x442E, z80.stack_pointer);
+    }
+
+    #[test]
+    fn test_ld_sp_ix() {
+        let z80 = &mut Z80::new();
+        z80.iy = 0x98DA;
+
+        let t_states = z80.ld_sp_ix();
+        assert_eq!(10, t_states);
+
+        assert_eq!(z80.ix, z80.stack_pointer);
+    }
+
+    #[test]
+    fn test_ld_sp_iy() {
+        let z80 = &mut Z80::new();
+        z80.iy = 0xA227;
+
+        let t_states = z80.ld_sp_iy();
+        assert_eq!(10, t_states);
+
+        assert_eq!(z80.iy, z80.stack_pointer);
     }
 }
