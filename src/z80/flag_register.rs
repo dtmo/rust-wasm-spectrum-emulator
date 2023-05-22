@@ -43,7 +43,7 @@ fn set_flags(flag_bitmask: &u8, register: &mut u8) {
 }
 
 fn set_flags_with(flag_bitmask: &u8, register: &mut u8, value: bool) {
-    if (value) {
+    if value {
         set_flags(flag_bitmask, register);
     } else {
         unset_flags(flag_bitmask, register);
