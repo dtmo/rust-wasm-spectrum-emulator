@@ -10,8 +10,8 @@ use self::flag_register::*;
 // Integration test suites: https://mdfs.net/Software/Z80/Exerciser/Spectrum/
 
 pub trait Z80Memory {
-    fn read(&self, address: &u16) -> u8;
-    fn write(&mut self, address: &u16, data: &u8);
+    fn read(&self, address: u16) -> u8;
+    fn write(&mut self, address: u16, data: u8);
 }
 
 const MAIN_FUNCTIONS: [fn(&mut Z80, &mut dyn Z80Memory) -> u8; 97] = [
@@ -2056,7 +2056,7 @@ impl Z80 {
     }
 
     pub fn fetch_next_opcode(&mut self, mem: &dyn Z80Memory) -> u8 {
-        let opcode = mem.read(&self.program_counter);
+        let opcode = mem.read(self.program_counter);
         self.program_counter += 1;
         opcode
     }
@@ -2239,12 +2239,12 @@ mod tests {
     }
 
     impl<'a> Z80Memory for Ram<'a> {
-        fn read(&self, address: &u16) -> u8 {
-            self.bytes[*address as usize]
+        fn read(&self, address: u16) -> u8 {
+            self.bytes[address as usize]
         }
 
-        fn write(&mut self, address: &u16, data: &u8) {
-            self.bytes[*address as usize] = *data;
+        fn write(&mut self, address: u16, data: u8) {
+            self.bytes[address as usize] = data;
         }
     }
 

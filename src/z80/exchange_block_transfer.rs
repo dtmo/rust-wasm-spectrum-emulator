@@ -1,4 +1,4 @@
-use super::Z80;
+use super::{Z80Memory, Z80};
 
 impl Z80 {
     // Exchange, Block Trabsfer, and Search Group
@@ -88,27 +88,27 @@ impl Z80 {
         (
             self.b,
             self.c,
-            self.b_prime,
-            self.c_prime,
             self.d,
             self.e,
-            self.d_prime,
-            self.e_prime,
             self.h,
             self.l,
+            self.b_prime,
+            self.c_prime,
+            self.d_prime,
+            self.e_prime,
             self.h_prime,
             self.l_prime,
         ) = (
             self.b_prime,
             self.c_prime,
-            self.b,
-            self.c,
             self.d_prime,
             self.e_prime,
-            self.d,
-            self.e,
             self.h_prime,
             self.l_prime,
+            self.b,
+            self.c,
+            self.d,
+            self.e,
             self.h,
             self.l,
         );
