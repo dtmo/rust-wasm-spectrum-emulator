@@ -156,6 +156,94 @@ impl Z80 {
         // T states
         19
     }
+
+    /// ## EX (SP), IX
+    /// ### Operation
+    /// IXH ↔ (SP+1), IXL ↔ (SP)
+    /// ### Op Code
+    /// EX
+    /// ### Operands
+    /// (SP), IX
+    /// `1 1 0 1 1 1 0 1` (DD)
+    /// `1 1 1 0 0 0 1 1` (E3)
+    /// ### Description
+    /// The low-order byte contained in register IX is exchanged with the
+    /// contents of the memory address specified by the contents of register
+    /// pair SP (Stack Pointer), and the high-order byte of IX is exchanged with
+    /// the next highest memory address (SP+1).
+    ///
+    /// | M Cycles | T States              | 4 MHz E.T. |
+    /// | -------- | --------------------- | ---------- |
+    /// | 6        | 23 (4, 4, 3, 4, 3, 5) | 5.75       |
+    ///
+    /// ### Condition Bits Affected
+    /// None.
+    /// ### Example
+    /// If Index Register IX contains 3988h, the SP register pair Contains
+    /// 0100h, memory location 0100h contains byte 90h, and memory location
+    /// 0101h contains byte 48h, then the instruction EX (SP), IX results in the
+    /// IX register pair containing number 4890h, memory location 0100h
+    /// containing 88h, memory location 0101h containing 39h, and the Stack
+    /// Pointer containing 0100h.
+    pub fn ex_mem_sp_ix(&mut self, mem: &mut dyn Z80Memory) -> u8 {
+        let ixl = self.ix as u8;
+        let ixh = (self.ix >> 8) as u8;
+
+        let mem_spl = mem.read(self.stack_pointer);
+        let mem_sph = mem.read(self.stack_pointer + 1);
+
+        mem.write(self.stack_pointer, ixl);
+        mem.write(self.stack_pointer + 1, ixh);
+
+        self.ix = (mem_sph as u16) << 8 | mem_spl as u16;
+
+        // T states
+        23
+    }
+
+    /// ## EX (SP), IY
+    /// ### Operation
+    /// IYH ↔ (SP+1), IYL ↔ (SP)
+    /// ### Op Code
+    /// EX
+    /// ### Operands
+    /// (SP), IY
+    /// `1 1 1 1 1 1 0 1` (FD)
+    /// `1 1 1 0 0 0 1 1` (E3)
+    /// ### Description
+    /// The low-order byte contained in register IY is exchanged with the
+    /// contents of the memory address specified by the contents of register
+    /// pair SP (Stack Pointer), and the high-order byte of IY is exchanged with
+    /// the next highest memory address (SP+1).
+    ///
+    /// | M Cycles | T States              | 4 MHz E.T. |
+    /// | -------- | --------------------- | ---------- |
+    /// | 6        | 23 (4, 4, 3, 4, 3, 5) | 5.75       |
+    ///
+    /// ### Condition Bits Affected
+    /// None.
+    /// ### Example
+    /// If Index Register IY contains 3988h, the SP register pair Contains
+    /// 0100h, memory location 0100h contains byte 90h, and memory location
+    /// 0101h contains byte 48h, then the instruction EX (SP), IY results in the
+    /// IY register pair containing number 4890h, memory location 0100h
+    /// containing 88h, memory location 0101h containing 39h, and the Stack
+    /// Pointer containing 0100h.
+    pub fn ex_mem_sp_iy(&mut self, mem: &mut dyn Z80Memory) -> u8 {
+        let iyl = self.iy as u8;
+        let iyh = (self.iy >> 8) as u8;
+
+        let mem_spl = mem.read(self.stack_pointer);
+        let mem_sph = mem.read(self.stack_pointer + 1);
+
+        mem.write(self.stack_pointer, iyl);
+        mem.write(self.stack_pointer + 1, iyh);
+
+        self.iy = (mem_sph as u16) << 8 | mem_spl as u16;
+
+        // T states
+        23
+    }
 }
 
 mod tests {
@@ -250,5 +338,37 @@ mod tests {
         assert_eq!(0x11, z80.l);
         assert_eq!(0x12, ram.read(1));
         assert_eq!(0x70, ram.read(2));
+    }
+
+    #[test]
+    fn test_ex_mem_sp_ix() {
+        let bytes = &mut [0xDD, 0xE3, 0x90, 0x48];
+        let mut ram = Ram::new(bytes);
+        let mut z80 = Z80::new();
+        z80.stack_pointer = 2;
+        z80.ix = 0x3988;
+
+        let t_states = z80.ex_mem_sp_ix(&mut ram);
+        assert_eq!(23, t_states);
+
+        assert_eq!(0x4890, z80.ix);
+        assert_eq!(0x88, ram.read(2));
+        assert_eq!(0x39, ram.read(3));
+    }
+
+    #[test]
+    fn test_ex_mem_sp_iy() {
+        let bytes = &mut [0xDD, 0xE3, 0x90, 0x48];
+        let mut ram = Ram::new(bytes);
+        let mut z80 = Z80::new();
+        z80.stack_pointer = 2;
+        z80.iy = 0x3988;
+
+        let t_states = z80.ex_mem_sp_iy(&mut ram);
+        assert_eq!(23, t_states);
+
+        assert_eq!(0x4890, z80.iy);
+        assert_eq!(0x88, ram.read(2));
+        assert_eq!(0x39, ram.read(3));
     }
 }
