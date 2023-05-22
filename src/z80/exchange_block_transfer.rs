@@ -1,4 +1,7 @@
-use super::{Z80Memory, Z80};
+use super::{
+    flag_register::{set_p_flag_with, unset_h_flag, unset_n_flag},
+    Z80Memory, Z80,
+};
 
 impl Z80 {
     // Exchange, Block Trabsfer, and Search Group
@@ -244,10 +247,78 @@ impl Z80 {
         // T states
         23
     }
+
+    /// ## LDI
+    /// ### Operation
+    /// (DE) ← (HL), DE ← DE + 1, HL ← HL + 1, BC ← BC – 1
+    /// ### Op Code
+    /// LDI
+    /// ### Operands
+    /// None
+    /// `1 1 1 0 1 1 0 1` (ED)
+    /// `1 0 1 0 0 0 0 0` (A0)
+    /// ### Description
+    /// A byte of data is transferred from the memory location addressed, by the
+    /// contents of the HL register pair to the memory location addressed by the
+    /// contents of the DE register pair. Then both these register pairs are
+    /// incremented and the Byte Counter (BC) Register pair is decremented.
+    ///
+    /// | M Cycles | T States        | 4 MHz E.T. |
+    /// | -------- | --------------- | ---------- |
+    /// | 4        | 16 (4, 4, 3, 5) | 4.00       |
+    ///
+    /// ### Condition Bits Affected
+    /// S is not affected.
+    /// Z is not affected.
+    /// H is reset.
+    /// P/V is set if BC – 1 ≠ 0; otherwise, it is reset.
+    /// N is reset.
+    /// C is not affected.
+    /// ### Example
+    /// If the HL register pair contains 1111h, memory location 1111h contains
+    /// byte 88h, the DE register pair contains 2222h, the memory location 2222h
+    /// contains byte 66h, and the BC register pair contains 7h, then the
+    /// instruction LDI results in the following contents in register pairs and
+    /// memory addresses:
+    /// HL contains 1112h
+    /// (1111h) contains 88h
+    /// DE contains 2223h
+    /// (2222h) contains 88h
+    /// BC contains 6H
+    pub fn ldi(&mut self, mem: &mut dyn Z80Memory) -> u8 {
+        let mut hl_address = (self.h as u16) << 8 | self.l as u16;
+        let data = mem.read(hl_address);
+
+        let mut de_address = (self.d as u16) << 8 | self.e as u16;
+        mem.write(de_address, data);
+
+        hl_address += 1;
+        self.h = (hl_address >> 8) as u8;
+        self.l = hl_address as u8;
+
+        de_address += 1;
+        self.d = (de_address >> 8) as u8;
+        self.e = de_address as u8;
+
+        let mut bc = (self.b as u16) << 8 | self.c as u16;
+        bc -= 1;
+        self.b = (bc >> 8) as u8;
+        self.c = bc as u8;
+
+        unset_h_flag(&mut self.f);
+        set_p_flag_with(&mut self.f, (bc - 1) != 0);
+        unset_n_flag(&mut self.f);
+
+        // T states
+        16
+    }
 }
 
 mod tests {
-    use crate::z80::tests::Ram;
+    use crate::z80::{
+        flag_register::{h_flag_set, n_flag_set, p_flag_set},
+        tests::Ram,
+    };
 
     use super::*;
 
@@ -370,5 +441,55 @@ mod tests {
         assert_eq!(0x4890, z80.iy);
         assert_eq!(0x88, ram.read(2));
         assert_eq!(0x39, ram.read(3));
+    }
+
+    #[test]
+    fn test_ldi() {
+        let bytes = &mut [0xED, 0xA0, 0xFF, 0x00];
+        let mut ram = Ram::new(bytes);
+        let mut z80 = Z80::new();
+        z80.stack_pointer = 3;
+        z80.h = 0x00;
+        z80.l = 0x02;
+        z80.d = 0x00;
+        z80.e = 0x03;
+        z80.b = 0x01;
+        z80.c = 0x00;
+
+        let t_states = z80.ldi(&mut ram);
+        assert_eq!(16, t_states);
+
+        assert_eq!(ram.read(2), ram.read(3));
+        assert_eq!(0x00, z80.b);
+        assert_eq!(0xFF, z80.c);
+
+        assert!(!h_flag_set(&z80.f));
+        assert!(p_flag_set(&z80.f));
+        assert!(!n_flag_set(&z80.f));
+    }
+
+    #[test]
+    fn test_ldi_bc_result_1() {
+        let bytes = &mut [0xED, 0xA0, 0xFF, 0x00];
+        let mut ram = Ram::new(bytes);
+        let mut z80 = Z80::new();
+        z80.stack_pointer = 3;
+        z80.h = 0x00;
+        z80.l = 0x02;
+        z80.d = 0x00;
+        z80.e = 0x03;
+        z80.b = 0x00;
+        z80.c = 0x02;
+
+        let t_states = z80.ldi(&mut ram);
+        assert_eq!(16, t_states);
+
+        assert_eq!(ram.read(2), ram.read(3));
+        assert_eq!(0x00, z80.b);
+        assert_eq!(0x01, z80.c);
+
+        assert!(!h_flag_set(&z80.f));
+        assert!(!p_flag_set(&z80.f));
+        assert!(!n_flag_set(&z80.f));
     }
 }
