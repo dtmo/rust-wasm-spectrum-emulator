@@ -14,7 +14,7 @@ pub trait Z80Memory {
     fn write(&mut self, address: u16, data: u8);
 }
 
-const MAIN_FUNCTIONS: [fn(&mut Z80, &mut dyn Z80Memory) -> u8; 97] = [
+const MAIN_FUNCTIONS: [fn(&mut Z80, &mut dyn Z80Memory) -> u8; 98] = [
     // 00000000 NOP
     |_, _| Z80::nop(),
     // 00000001 LD BC nn
@@ -334,7 +334,8 @@ const MAIN_FUNCTIONS: [fn(&mut Z80, &mut dyn Z80Memory) -> u8; 97] = [
     // 11100001 POP HL
     |z80, mem| z80.pop_qqhl(mem),
     // 11100010
-    // 11100011
+    // 11100011 EX (SP), HL
+    Z80::ex_mem_sp_hl,
     // 11100100
     // 11100101 PUSH HL
     Z80::push_qqhl,
