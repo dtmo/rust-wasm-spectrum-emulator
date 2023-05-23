@@ -286,24 +286,19 @@ impl Z80 {
     /// (2222h) contains 88h
     /// BC contains 6H
     pub fn ldi(&mut self, mem: &mut dyn Z80Memory) -> u8 {
-        let mut hl_address = (self.h as u16) << 8 | self.l as u16;
-        let data = mem.read(hl_address);
+        // Read mem at HL then increment HL
+        let hl = self.hl();
+        let data = mem.read(hl);
+        self.set_hl(hl + 1);
 
-        let mut de_address = (self.d as u16) << 8 | self.e as u16;
-        mem.write(de_address, data);
+        // Read mem at DE then increment DE
+        let de = self.de();
+        mem.write(de, data);
+        self.set_de(de + 1);
 
-        hl_address += 1;
-        self.h = (hl_address >> 8) as u8;
-        self.l = hl_address as u8;
-
-        de_address += 1;
-        self.d = (de_address >> 8) as u8;
-        self.e = de_address as u8;
-
-        let mut bc = (self.b as u16) << 8 | self.c as u16;
-        bc -= 1;
-        self.b = (bc >> 8) as u8;
-        self.c = bc as u8;
+        // Read and decrement BC
+        let bc = self.bc() - 1;
+        self.set_bc(bc);
 
         unset_h_flag(&mut self.f);
         set_p_flag_with(&mut self.f, (bc - 1) != 0);
@@ -449,19 +444,15 @@ mod tests {
         let mut ram = Ram::new(bytes);
         let mut z80 = Z80::new();
         z80.stack_pointer = 3;
-        z80.h = 0x00;
-        z80.l = 0x02;
-        z80.d = 0x00;
-        z80.e = 0x03;
-        z80.b = 0x01;
-        z80.c = 0x00;
+        z80.set_hl(0x0002);
+        z80.set_de(0x0003);
+        z80.set_bc(0x0100);
 
         let t_states = z80.ldi(&mut ram);
         assert_eq!(16, t_states);
 
         assert_eq!(ram.read(2), ram.read(3));
-        assert_eq!(0x00, z80.b);
-        assert_eq!(0xFF, z80.c);
+        assert_eq!(0x00FF, z80.bc());
 
         assert!(!h_flag_set(&z80.f));
         assert!(p_flag_set(&z80.f));
@@ -474,19 +465,15 @@ mod tests {
         let mut ram = Ram::new(bytes);
         let mut z80 = Z80::new();
         z80.stack_pointer = 3;
-        z80.h = 0x00;
-        z80.l = 0x02;
-        z80.d = 0x00;
-        z80.e = 0x03;
-        z80.b = 0x00;
-        z80.c = 0x02;
+        z80.set_hl(0x0002);
+        z80.set_de(0x0003);
+        z80.set_bc(0x0002);
 
         let t_states = z80.ldi(&mut ram);
         assert_eq!(16, t_states);
 
         assert_eq!(ram.read(2), ram.read(3));
-        assert_eq!(0x00, z80.b);
-        assert_eq!(0x01, z80.c);
+        assert_eq!(0x0001, z80.bc());
 
         assert!(!h_flag_set(&z80.f));
         assert!(!p_flag_set(&z80.f));

@@ -2059,6 +2059,39 @@ impl Z80 {
         }
     }
 
+    fn load_register_pair(high: &mut u8, low: &mut u8, value: u16) {
+        *high = (value >> 8) as u8;
+        *low = value as u8;
+    }
+
+    pub fn set_bc(&mut self, value: u16) {
+        Z80::load_register_pair(&mut self.b, &mut self.c, value);
+    }
+
+    pub fn set_de(&mut self, value: u16) {
+        Z80::load_register_pair(&mut self.d, &mut self.e, value);
+    }
+
+    pub fn set_hl(&mut self, value: u16) {
+        Z80::load_register_pair(&mut self.h, &mut self.l, value);
+    }
+
+    fn read_register_pair(high: u8, low: u8) -> u16 {
+        (high as u16) << 8 | low as u16
+    }
+
+    pub fn bc(&self) -> u16 {
+        Z80::read_register_pair(self.b, self.c)
+    }
+
+    pub fn de(&self) -> u16 {
+        Z80::read_register_pair(self.d, self.e)
+    }
+
+    pub fn hl(&self) -> u16 {
+        Z80::read_register_pair(self.h, self.l)
+    }
+
     pub fn fetch_next_opcode(&mut self, mem: &dyn Z80Memory) -> u8 {
         let opcode = mem.read(self.program_counter);
         self.program_counter += 1;
