@@ -1,8 +1,8 @@
 use super::{
-    flag_register::{
+    register_flags::{
         s_flag_set, set_p_flag_with, set_s_flag_with, set_z_flag_with, unset_h_flag, unset_n_flag,
     },
-    Z80Memory, Z80,
+    Register, Z80Memory, Z80,
 };
 
 impl Z80 {
@@ -47,214 +47,214 @@ impl Z80 {
     /// If the H Register contains the number 8Ah, and the E register contains 10h, the instruction
     /// LD H, E results in both registers containing 10h.
     ///
-    fn ld_r_rp(r: &mut u8, r_prime: &u8) -> u8 {
-        *r = *r_prime;
+    fn ld_r_rp(r: &mut Register, r_prime: u8) -> u8 {
+        r.set_value(r_prime);
 
         // T states
         4
     }
 
     pub fn ld_b_b(&mut self) -> u8 {
-        let b = self.b;
-        Z80::ld_r_rp(&mut self.b, &b)
+        let b = self.b.value();
+        Z80::ld_r_rp(&mut self.b, b)
     }
 
     pub fn ld_b_c(&mut self) -> u8 {
-        Z80::ld_r_rp(&mut self.b, &self.c)
+        Z80::ld_r_rp(&mut self.b, self.c.value())
     }
 
     pub fn ld_b_d(&mut self) -> u8 {
-        Z80::ld_r_rp(&mut self.b, &self.d)
+        Z80::ld_r_rp(&mut self.b, self.d.value())
     }
 
     pub fn ld_b_e(&mut self) -> u8 {
-        Z80::ld_r_rp(&mut self.b, &self.e)
+        Z80::ld_r_rp(&mut self.b, self.e.value())
     }
 
     pub fn ld_b_h(&mut self) -> u8 {
-        Z80::ld_r_rp(&mut self.b, &self.h)
+        Z80::ld_r_rp(&mut self.b, self.h.value())
     }
 
     pub fn ld_b_l(&mut self) -> u8 {
-        Z80::ld_r_rp(&mut self.b, &self.l)
+        Z80::ld_r_rp(&mut self.b, self.l.value())
     }
 
     pub fn ld_b_a(&mut self) -> u8 {
-        Z80::ld_r_rp(&mut self.b, &self.a)
+        Z80::ld_r_rp(&mut self.b, self.a.value())
     }
 
     pub fn ld_c_b(&mut self) -> u8 {
-        Z80::ld_r_rp(&mut self.c, &self.b)
+        Z80::ld_r_rp(&mut self.c, self.b.value())
     }
 
     pub fn ld_c_c(&mut self) -> u8 {
-        let c = self.c;
-        Z80::ld_r_rp(&mut self.c, &c)
+        let c = self.c.value();
+        Z80::ld_r_rp(&mut self.c, c)
     }
 
     pub fn ld_c_d(&mut self) -> u8 {
-        Z80::ld_r_rp(&mut self.c, &self.d)
+        Z80::ld_r_rp(&mut self.c, self.d.value())
     }
 
     pub fn ld_c_e(&mut self) -> u8 {
-        Z80::ld_r_rp(&mut self.c, &self.e)
+        Z80::ld_r_rp(&mut self.c, self.e.value())
     }
 
     pub fn ld_c_h(&mut self) -> u8 {
-        Z80::ld_r_rp(&mut self.c, &self.h)
+        Z80::ld_r_rp(&mut self.c, self.h.value())
     }
 
     pub fn ld_c_l(&mut self) -> u8 {
-        Z80::ld_r_rp(&mut self.c, &self.l)
+        Z80::ld_r_rp(&mut self.c, self.l.value())
     }
 
     pub fn ld_c_a(&mut self) -> u8 {
-        Z80::ld_r_rp(&mut self.c, &self.a)
+        Z80::ld_r_rp(&mut self.c, self.a.value())
     }
 
     pub fn ld_d_b(&mut self) -> u8 {
-        Z80::ld_r_rp(&mut self.d, &self.b)
+        Z80::ld_r_rp(&mut self.d, self.b.value())
     }
 
     pub fn ld_d_c(&mut self) -> u8 {
-        Z80::ld_r_rp(&mut self.d, &self.c)
+        Z80::ld_r_rp(&mut self.d, self.c.value())
     }
 
     pub fn ld_d_d(&mut self) -> u8 {
-        let d = self.d;
-        Z80::ld_r_rp(&mut self.d, &d)
+        let d = self.d.value();
+        Z80::ld_r_rp(&mut self.d, d)
     }
 
     pub fn ld_d_e(&mut self) -> u8 {
-        Z80::ld_r_rp(&mut self.d, &self.e)
+        Z80::ld_r_rp(&mut self.d, self.e.value())
     }
 
     pub fn ld_d_h(&mut self) -> u8 {
-        Z80::ld_r_rp(&mut self.d, &self.h)
+        Z80::ld_r_rp(&mut self.d, self.h.value())
     }
 
     pub fn ld_d_l(&mut self) -> u8 {
-        Z80::ld_r_rp(&mut self.d, &self.l)
+        Z80::ld_r_rp(&mut self.d, self.l.value())
     }
 
     pub fn ld_d_a(&mut self) -> u8 {
-        Z80::ld_r_rp(&mut self.d, &self.a)
+        Z80::ld_r_rp(&mut self.d, self.a.value())
     }
 
     pub fn ld_e_b(&mut self) -> u8 {
-        Z80::ld_r_rp(&mut self.e, &self.b)
+        Z80::ld_r_rp(&mut self.e, self.b.value())
     }
 
     pub fn ld_e_c(&mut self) -> u8 {
-        Z80::ld_r_rp(&mut self.e, &self.c)
+        Z80::ld_r_rp(&mut self.e, self.c.value())
     }
 
     pub fn ld_e_d(&mut self) -> u8 {
-        Z80::ld_r_rp(&mut self.e, &self.d)
+        Z80::ld_r_rp(&mut self.e, self.d.value())
     }
 
     pub fn ld_e_e(&mut self) -> u8 {
-        let e = self.e;
-        Z80::ld_r_rp(&mut self.e, &e)
+        let e = self.e.value();
+        Z80::ld_r_rp(&mut self.e, e)
     }
 
     pub fn ld_e_h(&mut self) -> u8 {
-        Z80::ld_r_rp(&mut self.e, &self.h)
+        Z80::ld_r_rp(&mut self.e, self.h.value())
     }
 
     pub fn ld_e_l(&mut self) -> u8 {
-        Z80::ld_r_rp(&mut self.e, &self.l)
+        Z80::ld_r_rp(&mut self.e, self.l.value())
     }
 
     pub fn ld_e_a(&mut self) -> u8 {
-        Z80::ld_r_rp(&mut self.e, &self.a)
+        Z80::ld_r_rp(&mut self.e, self.a.value())
     }
 
     pub fn ld_h_b(&mut self) -> u8 {
-        Z80::ld_r_rp(&mut self.h, &self.b)
+        Z80::ld_r_rp(&mut self.h, self.b.value())
     }
 
     pub fn ld_h_c(&mut self) -> u8 {
-        Z80::ld_r_rp(&mut self.h, &self.c)
+        Z80::ld_r_rp(&mut self.h, self.c.value())
     }
 
     pub fn ld_h_d(&mut self) -> u8 {
-        Z80::ld_r_rp(&mut self.h, &self.d)
+        Z80::ld_r_rp(&mut self.h, self.d.value())
     }
 
     pub fn ld_h_e(&mut self) -> u8 {
-        Z80::ld_r_rp(&mut self.h, &self.e)
+        Z80::ld_r_rp(&mut self.h, self.e.value())
     }
 
     pub fn ld_h_h(&mut self) -> u8 {
-        let h = self.h;
-        Z80::ld_r_rp(&mut self.h, &h)
+        let h = self.h.value();
+        Z80::ld_r_rp(&mut self.h, h)
     }
 
     pub fn ld_h_l(&mut self) -> u8 {
-        Z80::ld_r_rp(&mut self.h, &self.l)
+        Z80::ld_r_rp(&mut self.h, self.l.value())
     }
 
     pub fn ld_h_a(&mut self) -> u8 {
-        Z80::ld_r_rp(&mut self.h, &self.a)
+        Z80::ld_r_rp(&mut self.h, self.a.value())
     }
 
     pub fn ld_l_b(&mut self) -> u8 {
-        Z80::ld_r_rp(&mut self.l, &self.b)
+        Z80::ld_r_rp(&mut self.l, self.b.value())
     }
 
     pub fn ld_l_c(&mut self) -> u8 {
-        Z80::ld_r_rp(&mut self.l, &self.c)
+        Z80::ld_r_rp(&mut self.l, self.c.value())
     }
 
     pub fn ld_l_d(&mut self) -> u8 {
-        Z80::ld_r_rp(&mut self.l, &self.d)
+        Z80::ld_r_rp(&mut self.l, self.d.value())
     }
 
     pub fn ld_l_e(&mut self) -> u8 {
-        Z80::ld_r_rp(&mut self.l, &self.e)
+        Z80::ld_r_rp(&mut self.l, self.e.value())
     }
 
     pub fn ld_l_h(&mut self) -> u8 {
-        Z80::ld_r_rp(&mut self.l, &self.h)
+        Z80::ld_r_rp(&mut self.l, self.h.value())
     }
 
     pub fn ld_l_l(&mut self) -> u8 {
-        let l = self.l;
-        Z80::ld_r_rp(&mut self.l, &l)
+        let l = self.l.value();
+        Z80::ld_r_rp(&mut self.l, l)
     }
 
     pub fn ld_l_a(&mut self) -> u8 {
-        Z80::ld_r_rp(&mut self.l, &self.a)
+        Z80::ld_r_rp(&mut self.l, self.a.value())
     }
 
     pub fn ld_a_b(&mut self) -> u8 {
-        Z80::ld_r_rp(&mut self.a, &self.b)
+        Z80::ld_r_rp(&mut self.a, self.b.value())
     }
 
     pub fn ld_a_c(&mut self) -> u8 {
-        Z80::ld_r_rp(&mut self.a, &self.c)
+        Z80::ld_r_rp(&mut self.a, self.c.value())
     }
 
     pub fn ld_a_d(&mut self) -> u8 {
-        Z80::ld_r_rp(&mut self.a, &self.d)
+        Z80::ld_r_rp(&mut self.a, self.d.value())
     }
 
     pub fn ld_a_e(&mut self) -> u8 {
-        Z80::ld_r_rp(&mut self.a, &self.e)
+        Z80::ld_r_rp(&mut self.a, self.e.value())
     }
 
     pub fn ld_a_h(&mut self) -> u8 {
-        Z80::ld_r_rp(&mut self.a, &self.h)
+        Z80::ld_r_rp(&mut self.a, self.h.value())
     }
 
     pub fn ld_a_l(&mut self) -> u8 {
-        Z80::ld_r_rp(&mut self.a, &self.l)
+        Z80::ld_r_rp(&mut self.a, self.l.value())
     }
 
     pub fn ld_a_a(&mut self) -> u8 {
-        let a = self.a;
-        Z80::ld_r_rp(&mut self.a, &a)
+        let a = self.a.value();
+        Z80::ld_r_rp(&mut self.a, a)
     }
 
     /// ## LD r,n
@@ -292,8 +292,8 @@ impl Z80 {
     ///
     /// None.
 
-    fn ld_r_n(r: &mut u8, n: &u8) -> u8 {
-        *r = *n;
+    fn ld_r_n(r: &mut Register, n: u8) -> u8 {
+        r.set_value(n);
 
         // T states
         7
@@ -301,37 +301,37 @@ impl Z80 {
 
     pub fn ld_a_n(&mut self, mem: &mut dyn Z80Memory) -> u8 {
         let n = self.fetch_next_opcode(mem);
-        Z80::ld_r_n(&mut self.a, &n)
+        Z80::ld_r_n(&mut self.a, n)
     }
 
     pub fn ld_b_n(&mut self, mem: &mut dyn Z80Memory) -> u8 {
         let n = self.fetch_next_opcode(mem);
-        Z80::ld_r_n(&mut self.b, &n)
+        Z80::ld_r_n(&mut self.b, n)
     }
 
     pub fn ld_c_n(&mut self, mem: &mut dyn Z80Memory) -> u8 {
         let n = self.fetch_next_opcode(mem);
-        Z80::ld_r_n(&mut self.c, &n)
+        Z80::ld_r_n(&mut self.c, n)
     }
 
     pub fn ld_d_n(&mut self, mem: &mut dyn Z80Memory) -> u8 {
         let n = self.fetch_next_opcode(mem);
-        Z80::ld_r_n(&mut self.d, &n)
+        Z80::ld_r_n(&mut self.d, n)
     }
 
     pub fn ld_e_n(&mut self, mem: &mut dyn Z80Memory) -> u8 {
         let n = self.fetch_next_opcode(mem);
-        Z80::ld_r_n(&mut self.e, &n)
+        Z80::ld_r_n(&mut self.e, n)
     }
 
     pub fn ld_h_n(&mut self, mem: &mut dyn Z80Memory) -> u8 {
         let n = self.fetch_next_opcode(mem);
-        Z80::ld_r_n(&mut self.h, &n)
+        Z80::ld_r_n(&mut self.h, n)
     }
 
     pub fn ld_l_n(&mut self, mem: &mut dyn Z80Memory) -> u8 {
         let n = self.fetch_next_opcode(mem);
-        Z80::ld_r_n(&mut self.l, &n)
+        Z80::ld_r_n(&mut self.l, n)
     }
 
     /// ## LD r, (HL)
@@ -373,44 +373,47 @@ impl Z80 {
     /// If register pair HL contains the number 75A1h, and memory address 75A1h
     /// contains byte 58h, the execution of LD C, (HL) results in 58h in
     /// Register C.
-    fn ld_r_mem_hl(r: &mut u8, h: &u8, l: &u8, mem: &dyn Z80Memory) -> u8 {
-        let address = ((*h as u16) << 8) | *l as u16;
-        let data = mem.read(address);
-
-        *r = data;
+    fn ld_r_mem_hl(r: &mut Register, hl: u16, mem: &dyn Z80Memory) -> u8 {
+        let data = mem.read(hl);
+        r.set_value(data);
 
         // T states
         7
     }
 
     pub fn ld_a_mem_hl(&mut self, mem: &dyn Z80Memory) -> u8 {
-        Z80::ld_r_mem_hl(&mut self.a, &self.h, &self.l, mem)
+        let hl = self.hl();
+        Z80::ld_r_mem_hl(&mut self.a, hl, mem)
     }
 
     pub fn ld_b_mem_hl(&mut self, mem: &dyn Z80Memory) -> u8 {
-        Z80::ld_r_mem_hl(&mut self.b, &self.h, &self.l, mem)
+        let hl = self.hl();
+        Z80::ld_r_mem_hl(&mut self.b, hl, mem)
     }
 
     pub fn ld_c_mem_hl(&mut self, mem: &dyn Z80Memory) -> u8 {
-        Z80::ld_r_mem_hl(&mut self.c, &self.h, &self.l, mem)
+        let hl = self.hl();
+        Z80::ld_r_mem_hl(&mut self.c, hl, mem)
     }
 
     pub fn ld_d_mem_hl(&mut self, mem: &dyn Z80Memory) -> u8 {
-        Z80::ld_r_mem_hl(&mut self.d, &self.h, &self.l, mem)
+        let hl = self.hl();
+        Z80::ld_r_mem_hl(&mut self.d, hl, mem)
     }
 
     pub fn ld_e_mem_hl(&mut self, mem: &dyn Z80Memory) -> u8 {
-        Z80::ld_r_mem_hl(&mut self.e, &self.h, &self.l, mem)
+        let hl = self.hl();
+        Z80::ld_r_mem_hl(&mut self.e, hl, mem)
     }
 
     pub fn ld_h_mem_hl(&mut self, mem: &dyn Z80Memory) -> u8 {
-        let h = self.h;
-        Z80::ld_r_mem_hl(&mut self.h, &h, &self.l, mem)
+        let hl = self.hl();
+        Z80::ld_r_mem_hl(&mut self.h, hl, mem)
     }
 
     pub fn ld_l_mem_hl(&mut self, mem: &dyn Z80Memory) -> u8 {
-        let l = self.l;
-        Z80::ld_r_mem_hl(&mut self.l, &self.h, &l, mem)
+        let hl = self.hl();
+        Z80::ld_r_mem_hl(&mut self.l, hl, mem)
     }
 
     /// ## LD r, (IX+d)
@@ -461,11 +464,11 @@ impl Z80 {
     /// (IX+19h) allows the calculation of the sum 25AFh + 19h, which points to
     /// memory location 25C8h. If this address contains byte 39h, the
     /// instruction results in Register B also containing 39h.
-    fn ld_r_mem_ixd(r: &mut u8, ix: &u16, d: u8, mem: &dyn Z80Memory) -> u8 {
+    fn ld_r_mem_ixd(r: &mut Register, ix: &u16, d: u8, mem: &dyn Z80Memory) -> u8 {
         let displacement = i8::from_ne_bytes(d.to_ne_bytes());
         let address = ix.wrapping_add_signed(displacement as i16);
         let data = mem.read(address);
-        *r = data;
+        r.set_value(data);
 
         // T states
         19
@@ -554,11 +557,11 @@ impl Z80 {
     /// (IY+19h) allows the calculation of the sum 25AFh + 19h, which points to
     /// memory location 25C8h. If this address contains byte 39h, the
     /// instruction results in Register B also containing 39h.
-    fn ld_r_mem_iyd(r: &mut u8, iy: &u16, d: u8, mem: &dyn Z80Memory) -> u8 {
+    fn ld_r_mem_iyd(r: &mut Register, iy: &u16, d: u8, mem: &dyn Z80Memory) -> u8 {
         let displacement = i8::from_ne_bytes(d.to_ne_bytes());
         let address = iy.wrapping_add_signed(displacement as i16);
         let data = mem.read(address);
-        *r = data;
+        r.set_value(data);
 
         // T states
         19
@@ -644,40 +647,39 @@ impl Z80 {
     /// If the contents of register pair HL specify memory location 2146h and
     /// Register B contains byte 29h, then upon the execution of an LD (HL), B
     /// instruction, memory address 2146h also contains 29h.
-    fn ld_mem_hl_r(h: u8, l: u8, r: u8, mem: &mut dyn Z80Memory) -> u8 {
-        let address = ((h as u16) << 8) | l as u16;
-        mem.write(address, r);
+    fn ld_mem_hl_r(hl: u16, r: &Register, mem: &mut dyn Z80Memory) -> u8 {
+        mem.write(hl, r.value());
 
         // T states
         7
     }
 
     pub fn ld_mem_hl_a(&self, mem: &mut dyn Z80Memory) -> u8 {
-        Z80::ld_mem_hl_r(self.h, self.l, self.a, mem)
+        Z80::ld_mem_hl_r(self.hl(), &self.a, mem)
     }
 
     pub fn ld_mem_hl_b(&self, mem: &mut dyn Z80Memory) -> u8 {
-        Z80::ld_mem_hl_r(self.h, self.l, self.b, mem)
+        Z80::ld_mem_hl_r(self.hl(), &self.b, mem)
     }
 
     pub fn ld_mem_hl_c(&self, mem: &mut dyn Z80Memory) -> u8 {
-        Z80::ld_mem_hl_r(self.h, self.l, self.c, mem)
+        Z80::ld_mem_hl_r(self.hl(), &self.c, mem)
     }
 
     pub fn ld_mem_hl_d(&self, mem: &mut dyn Z80Memory) -> u8 {
-        Z80::ld_mem_hl_r(self.h, self.l, self.d, mem)
+        Z80::ld_mem_hl_r(self.hl(), &self.d, mem)
     }
 
     pub fn ld_mem_hl_e(&self, mem: &mut dyn Z80Memory) -> u8 {
-        Z80::ld_mem_hl_r(self.h, self.l, self.e, mem)
+        Z80::ld_mem_hl_r(self.hl(), &self.e, mem)
     }
 
     pub fn ld_mem_hl_h(&self, mem: &mut dyn Z80Memory) -> u8 {
-        Z80::ld_mem_hl_r(self.h, self.l, self.h, mem)
+        Z80::ld_mem_hl_r(self.hl(), &self.h, mem)
     }
 
     pub fn ld_mem_hl_l(&self, mem: &mut dyn Z80Memory) -> u8 {
-        Z80::ld_mem_hl_r(self.h, self.l, self.l, mem)
+        Z80::ld_mem_hl_r(self.hl(), &self.l, mem)
     }
 
     /// ## LD (IX+d), r
@@ -727,10 +729,10 @@ impl Z80 {
     /// If the C register contains byte 1Ch, and Index Register IX contains
     /// 3100h, then the instruction LID (IX + 6h), C performs the sum 3100h + 6h
     /// and loads 1Ch to memory location 3106h.
-    fn ld_mem_ixd_r(ix: u16, d: u8, r: u8, mem: &mut dyn Z80Memory) -> u8 {
+    fn ld_mem_ixd_r(ix: u16, d: u8, r: &Register, mem: &mut dyn Z80Memory) -> u8 {
         let displacement = i8::from_ne_bytes(d.to_ne_bytes());
         let address = ix.wrapping_add_signed(displacement as i16);
-        mem.write(address, r);
+        mem.write(address, r.value());
 
         // T states
         19
@@ -738,37 +740,37 @@ impl Z80 {
 
     pub fn ld_mem_ixd_a(&mut self, mem: &mut dyn Z80Memory) -> u8 {
         let d = self.fetch_next_opcode(mem);
-        Z80::ld_mem_ixd_r(self.ix, d, self.a, mem)
+        Z80::ld_mem_ixd_r(self.ix, d, &self.a, mem)
     }
 
     pub fn ld_mem_ixd_b(&mut self, mem: &mut dyn Z80Memory) -> u8 {
         let d = self.fetch_next_opcode(mem);
-        Z80::ld_mem_ixd_r(self.ix, d, self.b, mem)
+        Z80::ld_mem_ixd_r(self.ix, d, &self.b, mem)
     }
 
     pub fn ld_mem_ixd_c(&mut self, mem: &mut dyn Z80Memory) -> u8 {
         let d = self.fetch_next_opcode(mem);
-        Z80::ld_mem_ixd_r(self.ix, d, self.c, mem)
+        Z80::ld_mem_ixd_r(self.ix, d, &self.c, mem)
     }
 
     pub fn ld_mem_ixd_d(&mut self, mem: &mut dyn Z80Memory) -> u8 {
         let d = self.fetch_next_opcode(mem);
-        Z80::ld_mem_ixd_r(self.ix, d, self.d, mem)
+        Z80::ld_mem_ixd_r(self.ix, d, &self.d, mem)
     }
 
     pub fn ld_mem_ixd_e(&mut self, mem: &mut dyn Z80Memory) -> u8 {
         let d = self.fetch_next_opcode(mem);
-        Z80::ld_mem_ixd_r(self.ix, d, self.e, mem)
+        Z80::ld_mem_ixd_r(self.ix, d, &self.e, mem)
     }
 
     pub fn ld_mem_ixd_h(&mut self, mem: &mut dyn Z80Memory) -> u8 {
         let d = self.fetch_next_opcode(mem);
-        Z80::ld_mem_ixd_r(self.ix, d, self.h, mem)
+        Z80::ld_mem_ixd_r(self.ix, d, &self.h, mem)
     }
 
     pub fn ld_mem_ixd_l(&mut self, mem: &mut dyn Z80Memory) -> u8 {
         let d = self.fetch_next_opcode(mem);
-        Z80::ld_mem_ixd_r(self.ix, d, self.l, mem)
+        Z80::ld_mem_ixd_r(self.ix, d, &self.l, mem)
     }
 
     /// ## LD (IY+d), r
@@ -818,10 +820,10 @@ impl Z80 {
     /// If the C register contains byte 1Ch, and Index Register IY contains
     /// 3100h, then the instruction LID (IY + 6h), C performs the sum 3100h + 6h
     /// and loads 1Ch to memory location 3106h.
-    fn ld_mem_iyd_r(iy: u16, d: u8, r: u8, mem: &mut dyn Z80Memory) -> u8 {
+    fn ld_mem_iyd_r(iy: u16, d: u8, r: &Register, mem: &mut dyn Z80Memory) -> u8 {
         let displacement = i8::from_ne_bytes(d.to_ne_bytes());
         let address = iy.wrapping_add_signed(displacement as i16);
-        mem.write(address, r);
+        mem.write(address, r.value());
 
         // T states
         19
@@ -829,37 +831,37 @@ impl Z80 {
 
     pub fn ld_mem_iyd_a(&mut self, mem: &mut dyn Z80Memory) -> u8 {
         let d = self.fetch_next_opcode(mem);
-        Z80::ld_mem_iyd_r(self.iy, d, self.a, mem)
+        Z80::ld_mem_iyd_r(self.iy, d, &self.a, mem)
     }
 
     pub fn ld_mem_iyd_b(&mut self, mem: &mut dyn Z80Memory) -> u8 {
         let d = self.fetch_next_opcode(mem);
-        Z80::ld_mem_iyd_r(self.iy, d, self.b, mem)
+        Z80::ld_mem_iyd_r(self.iy, d, &self.b, mem)
     }
 
     pub fn ld_mem_iyd_c(&mut self, mem: &mut dyn Z80Memory) -> u8 {
         let d = self.fetch_next_opcode(mem);
-        Z80::ld_mem_iyd_r(self.iy, d, self.c, mem)
+        Z80::ld_mem_iyd_r(self.iy, d, &self.c, mem)
     }
 
     pub fn ld_mem_iyd_d(&mut self, mem: &mut dyn Z80Memory) -> u8 {
         let d = self.fetch_next_opcode(mem);
-        Z80::ld_mem_iyd_r(self.iy, d, self.d, mem)
+        Z80::ld_mem_iyd_r(self.iy, d, &self.d, mem)
     }
 
     pub fn ld_mem_iyd_e(&mut self, mem: &mut dyn Z80Memory) -> u8 {
         let d = self.fetch_next_opcode(mem);
-        Z80::ld_mem_iyd_r(self.iy, d, self.e, mem)
+        Z80::ld_mem_iyd_r(self.iy, d, &self.e, mem)
     }
 
     pub fn ld_mem_iyd_h(&mut self, mem: &mut dyn Z80Memory) -> u8 {
         let d = self.fetch_next_opcode(mem);
-        Z80::ld_mem_iyd_r(self.iy, d, self.h, mem)
+        Z80::ld_mem_iyd_r(self.iy, d, &self.h, mem)
     }
 
     pub fn ld_mem_iyd_l(&mut self, mem: &mut dyn Z80Memory) -> u8 {
         let d = self.fetch_next_opcode(mem);
-        Z80::ld_mem_iyd_r(self.iy, d, self.l, mem)
+        Z80::ld_mem_iyd_r(self.iy, d, &self.l, mem)
     }
 
     /// ## LD (HL), n
@@ -896,9 +898,8 @@ impl Z80 {
     /// If the HL register pair contains 4444h, the instruction LD (HL), 28h
     /// results in the memory location 4444h containing byte 28h.
     pub fn ld_mem_hl_n(&mut self, mem: &mut dyn Z80Memory) -> u8 {
-        let address = ((self.h as u16) << 8) | self.l as u16;
         let n = self.fetch_next_opcode(mem);
-        mem.write(address, n);
+        mem.write(self.hl(), n);
 
         // T states
         3
@@ -1030,8 +1031,7 @@ impl Z80 {
     /// 4747h contains byte 12h, then the instruction LD A, (BC) results in byte
     /// 12h in Register A.
     pub fn ld_a_mem_bc(&mut self, mem: &dyn Z80Memory) -> u8 {
-        let address = ((self.b as u16) << 8) | self.c as u16;
-        self.a = mem.read(address);
+        self.a.set_value(mem.read(self.bc()));
 
         // T states
         7
@@ -1071,8 +1071,7 @@ impl Z80 {
     /// 30A2h contains byte 22h, then the instruction LD A, (DE) results in byte
     /// 22h in Register A.
     pub fn ld_a_mem_de(&mut self, mem: &dyn Z80Memory) -> u8 {
-        let address = ((self.d as u16) << 8) | self.e as u16;
-        self.a = mem.read(address);
+        self.a.set_value(mem.read(self.de()));
 
         // T states
         7
@@ -1118,7 +1117,7 @@ impl Z80 {
         let nh = self.fetch_next_opcode(mem);
 
         let address = ((nh as u16) << 8) | nl as u16;
-        self.a = mem.read(address);
+        self.a.set_value(mem.read(address));
 
         // T states
         13
@@ -1157,9 +1156,7 @@ impl Z80 {
     /// If the Accumulator contains 7Ah and the BC register pair contains 1212h
     /// the instruction LD (BC), A results in 7Ah in memory location 1212h.
     pub fn ld_mem_bc_a(&mut self, mem: &mut dyn Z80Memory) -> u8 {
-        let address = ((self.b as u16) << 8) | self.c as u16;
-
-        mem.write(address, self.a);
+        mem.write(self.bc(), self.a.value());
 
         // T states
         7
@@ -1199,9 +1196,7 @@ impl Z80 {
     /// A0h, then the execution of a LD (DE), A instruction results in A0h being
     /// stored in memory location 1128h.
     pub fn ld_mem_de_a(&mut self, mem: &mut dyn Z80Memory) -> u8 {
-        let address = ((self.d as u16) << 8) | self.e as u16;
-
-        mem.write(address, self.a);
+        mem.write(self.de(), self.a.value());
 
         // T states
         7
@@ -1246,7 +1241,7 @@ impl Z80 {
         let nl = self.fetch_next_opcode(mem);
         let nh = self.fetch_next_opcode(mem);
         let address = ((nh as u16) << 8) | nl as u16;
-        mem.write(address, self.a);
+        mem.write(address, self.a.value());
 
         // T states
         13
@@ -1286,13 +1281,13 @@ impl Z80 {
     /// C is not affected.
     /// If an interrupt occurs during execution of this instruction, the Parity flag contains a 0.
     pub fn ld_a_i(&mut self) -> u8 {
-        self.a = self.i;
+        self.a.set_value(self.i.value());
 
         // S is set if the I Register is negative; otherwise, it is reset.
         set_s_flag_with(&mut self.f, s_flag_set(&self.i));
 
         // Z is set if the I Register is 0; otherwise, it is reset.
-        set_z_flag_with(&mut self.f, self.i == 0);
+        set_z_flag_with(&mut self.f, self.i.value() == 0);
 
         // H is reset.
         unset_h_flag(&mut self.f);
@@ -1345,13 +1340,13 @@ impl Z80 {
     /// If an interrupt occurs during execution of this instruction, the parity
     /// contains a 0.
     pub fn ld_a_r(&mut self) -> u8 {
-        self.a = self.r;
+        self.a.set_value(self.r.value());
 
         // S is set if the R-Register is negative; otherwise, it is reset.
         set_s_flag_with(&mut self.f, s_flag_set(&self.r));
 
         // Z is set if the R Register is 0; otherwise, it is reset.
-        set_z_flag_with(&mut self.f, self.r == 0);
+        set_z_flag_with(&mut self.f, self.r.value() == 0);
 
         // H is reset.
         unset_h_flag(&mut self.f);
@@ -1398,7 +1393,8 @@ impl Z80 {
     ///
     /// None.
     pub fn ld_i_a(&mut self) -> u8 {
-        self.i = self.a;
+        self.i.set_value(self.a.value());
+
         // T states
         9
     }
@@ -1432,7 +1428,8 @@ impl Z80 {
     ///
     /// None.
     pub fn ld_r_a(&mut self) -> u8 {
-        self.r = self.a;
+        self.r.set_value(self.a.value());
+
         // T states
         9
     }
@@ -1442,7 +1439,7 @@ mod tests {
     use super::*;
 
     use crate::z80::{
-        flag_register::{h_flag_set, n_flag_set, p_flag_set, z_flag_set},
+        register_flags::{h_flag_set, n_flag_set, p_flag_set, z_flag_set},
         tests::Ram,
     };
 
@@ -1451,8 +1448,8 @@ mod tests {
         #[rustfmt::skip]
         let scenarios: [(
             fn(&mut Z80) -> u8,
-            fn(&mut Z80) -> &mut u8,
-            fn(&mut Z80) -> &mut u8,
+            fn(&mut Z80) -> &mut Register,
+            fn(&mut Z80) -> &mut Register,
         ); 49] = [
             (Z80::ld_a_a, |z80: &mut Z80| &mut z80.a, |z80: &mut Z80| &mut z80.a),
             (Z80::ld_a_b, |z80: &mut Z80| &mut z80.a, |z80: &mut Z80| &mut z80.b),
@@ -1508,19 +1505,22 @@ mod tests {
         for (opcode, r_supplier, r_prime_supplier) in scenarios {
             let z80 = &mut Z80::new();
 
-            *r_prime_supplier(z80) = 0xDD;
+            r_prime_supplier(z80).set_value(0xDD);
 
             let t_states = opcode(z80);
             assert_eq!(4, t_states);
 
             let r = r_supplier(z80);
-            assert_eq!(0xDD, *r);
+            assert_eq!(0xDD, r.value());
         }
     }
 
     #[test]
     fn test_ld_r_hl() {
-        let scenarios: [(fn(&mut Z80, &dyn Z80Memory) -> u8, fn(&mut Z80) -> &mut u8); 7] = [
+        let scenarios: [(
+            fn(&mut Z80, &dyn Z80Memory) -> u8,
+            fn(&mut Z80) -> &mut Register,
+        ); 7] = [
             (Z80::ld_a_mem_hl, |z80: &mut Z80| &mut z80.a),
             (Z80::ld_b_mem_hl, |z80: &mut Z80| &mut z80.b),
             (Z80::ld_c_mem_hl, |z80: &mut Z80| &mut z80.c),
@@ -1535,20 +1535,22 @@ mod tests {
 
         for (opcode, register_supplier) in scenarios {
             let mut z80 = Z80::new();
-            z80.h = 0x00;
-            z80.l = 0x02;
+            z80.set_hl(0x0002);
 
             let t_states = opcode(&mut z80, &ram);
             assert_eq!(7, t_states);
 
             let register = register_supplier(&mut z80);
-            assert_eq!(ram.read(2), *register);
+            assert_eq!(ram.read(2), register.value());
         }
     }
 
     #[test]
     fn test_ld_r_ixd() {
-        let scenarios: [(fn(&mut Z80, &dyn Z80Memory) -> u8, fn(&mut Z80) -> &mut u8); 7] = [
+        let scenarios: [(
+            fn(&mut Z80, &dyn Z80Memory) -> u8,
+            fn(&mut Z80) -> &mut Register,
+        ); 7] = [
             (Z80::ld_a_mem_ixd, |z80: &mut Z80| &mut z80.a),
             (Z80::ld_b_mem_ixd, |z80: &mut Z80| &mut z80.b),
             (Z80::ld_c_ixd, |z80: &mut Z80| &mut z80.c),
@@ -1570,13 +1572,16 @@ mod tests {
             assert_eq!(19, t_states);
 
             let register = register_supplier(z80);
-            assert_eq!(0xCC, *register);
+            assert_eq!(0xCC, register.value());
         }
     }
 
     #[test]
     fn test_ld_r_iyd() {
-        let scenarios: [(fn(&mut Z80, &dyn Z80Memory) -> u8, fn(&mut Z80) -> &mut u8); 7] = [
+        let scenarios: [(
+            fn(&mut Z80, &dyn Z80Memory) -> u8,
+            fn(&mut Z80) -> &mut Register,
+        ); 7] = [
             (Z80::ld_a_mem_iyd, |z80: &mut Z80| &mut z80.a),
             (Z80::ld_b_mem_iyd, |z80: &mut Z80| &mut z80.b),
             (Z80::ld_c_mem_iyd, |z80: &mut Z80| &mut z80.c),
@@ -1598,13 +1603,16 @@ mod tests {
             assert_eq!(19, t_states);
 
             let register = register_supplier(z80);
-            assert_eq!(0xCC, *register);
+            assert_eq!(0xCC, register.value());
         }
     }
 
     #[test]
     fn test_ld_hl_r() {
-        let scenarios: [(fn(&Z80, &mut dyn Z80Memory) -> u8, fn(&mut Z80) -> &mut u8); 5] = [
+        let scenarios: [(
+            fn(&Z80, &mut dyn Z80Memory) -> u8,
+            fn(&mut Z80) -> &mut Register,
+        ); 5] = [
             (Z80::ld_mem_hl_a, |z80: &mut Z80| &mut z80.a),
             (Z80::ld_mem_hl_b, |z80: &mut Z80| &mut z80.b),
             (Z80::ld_mem_hl_c, |z80: &mut Z80| &mut z80.c),
@@ -1619,12 +1627,10 @@ mod tests {
 
         for (opcode, register_supplier) in scenarios {
             let z80 = &mut Z80::new();
-
-            z80.h = 0x00;
-            z80.l = 0x02;
+            z80.set_hl(0x0002);
 
             let register = register_supplier(z80);
-            *register = 0xDD;
+            register.set_value(0xDD);
 
             let t_states = opcode(z80, ram);
             assert_eq!(7, t_states);
@@ -1639,14 +1645,12 @@ mod tests {
         let ram = &mut Ram::new(bytes);
 
         let z80 = &mut Z80::new();
-
-        z80.h = 0x00;
-        z80.l = 0x02;
+        z80.set_hl(0x0002);
 
         let t_states = z80.ld_mem_hl_h(ram);
         assert_eq!(7, t_states);
 
-        assert_eq!(z80.h, ram.read(2));
+        assert_eq!(z80.h.value(), ram.read(2));
     }
 
     #[test]
@@ -1655,21 +1659,19 @@ mod tests {
         let ram = &mut Ram::new(bytes);
 
         let z80 = &mut Z80::new();
-
-        z80.h = 0x00;
-        z80.l = 0x02;
+        z80.set_hl(0x0002);
 
         let t_states = z80.ld_mem_hl_l(ram);
         assert_eq!(7, t_states);
 
-        assert_eq!(z80.l, ram.read(2));
+        assert_eq!(z80.l.value(), ram.read(2));
     }
 
     #[test]
     fn test_ld_ixd_r() {
         let scenarios: [(
             fn(&mut Z80, &mut dyn Z80Memory) -> u8,
-            fn(&mut Z80) -> &mut u8,
+            fn(&mut Z80) -> &mut Register,
         ); 7] = [
             (Z80::ld_mem_ixd_a, |z80: &mut Z80| &mut z80.a),
             (Z80::ld_mem_ixd_b, |z80: &mut Z80| &mut z80.b),
@@ -1687,7 +1689,7 @@ mod tests {
             let z80 = &mut Z80::new();
             z80.program_counter = 2;
             z80.ix = 5;
-            *register_supplier(z80) = 0xFF;
+            register_supplier(z80).set_value(0xFF);
 
             let t_states = opcode(z80, ram);
             assert_eq!(19, t_states);
@@ -1700,7 +1702,7 @@ mod tests {
     fn test_ld_iyd_r() {
         let scenarios: [(
             fn(&mut Z80, &mut dyn Z80Memory) -> u8,
-            fn(&mut Z80) -> &mut u8,
+            fn(&mut Z80) -> &mut Register,
         ); 7] = [
             (Z80::ld_mem_iyd_a, |z80: &mut Z80| &mut z80.a),
             (Z80::ld_mem_iyd_b, |z80: &mut Z80| &mut z80.b),
@@ -1718,7 +1720,7 @@ mod tests {
             let z80 = &mut Z80::new();
             z80.program_counter = 2;
             z80.iy = 5;
-            *register_supplier(z80) = 0xFF;
+            register_supplier(z80).set_value(0xFF);
 
             let t_states = opcode(z80, ram);
             assert_eq!(19, t_states);
@@ -1734,8 +1736,7 @@ mod tests {
 
         let z80 = &mut Z80::new();
         z80.program_counter = 1;
-        z80.h = 0x00;
-        z80.l = 0x02;
+        z80.set_hl(0x0002);
         let t_states = z80.ld_mem_hl_n(ram);
 
         assert_eq!(3, t_states);
@@ -1764,6 +1765,7 @@ mod tests {
         let z80 = &mut Z80::new();
         z80.program_counter = 2;
         z80.iy = 0x02;
+
         let t_states = z80.ld_mem_iyd_n(ram);
 
         assert_eq!(19, t_states);
@@ -1777,12 +1779,12 @@ mod tests {
 
         let z80 = &mut Z80::new();
         z80.program_counter = 1;
-        z80.b = 0;
-        z80.c = 1;
+        z80.set_bc(0x0001);
+
         let t_states = z80.ld_a_mem_bc(ram);
 
         assert_eq!(7, t_states);
-        assert_eq!(0xFF, z80.a);
+        assert_eq!(0xFF, z80.a.value());
     }
 
     #[test]
@@ -1792,12 +1794,12 @@ mod tests {
 
         let z80 = &mut Z80::new();
         z80.program_counter = 1;
-        z80.d = 0;
-        z80.e = 1;
+        z80.set_de(0x0001);
+
         let t_states = z80.ld_a_mem_de(ram);
 
         assert_eq!(7, t_states);
-        assert_eq!(0xFF, z80.a);
+        assert_eq!(0xFF, z80.a.value());
     }
 
     #[test]
@@ -1810,7 +1812,7 @@ mod tests {
         let t_states = z80.ld_a_mem_nn(ram);
 
         assert_eq!(13, t_states);
-        assert_eq!(0xFF, z80.a);
+        assert_eq!(0xFF, z80.a.value());
     }
 
     #[test]
@@ -1819,9 +1821,8 @@ mod tests {
         let ram = &mut Ram::new(bytes);
 
         let z80 = &mut Z80::new();
-        z80.a = 0xFF;
-        z80.b = 0x00;
-        z80.c = 0x01;
+        z80.a.set_value(0xFF);
+        z80.set_bc(0x0001);
         let t_states = z80.ld_mem_bc_a(ram);
 
         assert_eq!(7, t_states);
@@ -1834,9 +1835,8 @@ mod tests {
         let ram = &mut Ram::new(bytes);
 
         let z80 = &mut Z80::new();
-        z80.a = 0xFF;
-        z80.d = 0x00;
-        z80.e = 0x01;
+        z80.a.set_value(0xFF);
+        z80.set_de(0x0001);
         let t_states = z80.ld_mem_de_a(ram);
 
         assert_eq!(7, t_states);
@@ -1850,7 +1850,7 @@ mod tests {
 
         let z80 = &mut Z80::new();
         z80.program_counter = 1;
-        z80.a = 0xFF;
+        z80.a.set_value(0xFF);
         let t_states = z80.ld_mem_nn_a(ram);
 
         assert_eq!(13, t_states);
@@ -1860,7 +1860,7 @@ mod tests {
     #[test]
     fn test_ld_a_i_positive() {
         let z80 = &mut Z80::new();
-        z80.i = 0b01111111;
+        z80.i.set_value(0b01111111);
         let t_states = z80.ld_a_i();
         assert_eq!(9, t_states);
 
@@ -1883,10 +1883,11 @@ mod tests {
 
         // TODO: If an interrupt occurs during execution of this instruction, the Parity flag contains a 0.
     }
+
     #[test]
     fn test_ld_a_i_zero() {
         let z80 = &mut Z80::new();
-        z80.i = 0;
+        z80.i.set_value(0);
         let t_states = z80.ld_a_i();
         assert_eq!(9, t_states);
 
@@ -1909,10 +1910,11 @@ mod tests {
 
         // TODO: If an interrupt occurs during execution of this instruction, the Parity flag contains a 0.
     }
+
     #[test]
     fn test_ld_a_i_negative() {
         let z80 = &mut Z80::new();
-        z80.i = 0b11111111;
+        z80.i.set_value(0b11111111);
         let t_states = z80.ld_a_i();
         assert_eq!(9, t_states);
 
@@ -1939,7 +1941,7 @@ mod tests {
     #[test]
     fn test_ld_a_r_positive() {
         let z80 = &mut Z80::new();
-        z80.r = 0b01111111;
+        z80.r.set_value(0b01111111);
         let t_states = z80.ld_a_r();
         assert_eq!(9, t_states);
 
@@ -1966,7 +1968,7 @@ mod tests {
     #[test]
     fn test_ld_a_r_zero() {
         let z80 = &mut Z80::new();
-        z80.r = 0;
+        z80.r.set_value(0);
         let t_states = z80.ld_a_r();
         assert_eq!(9, t_states);
 
@@ -1993,7 +1995,7 @@ mod tests {
     #[test]
     fn test_ld_a_r_negative() {
         let z80 = &mut Z80::new();
-        z80.r = 0b11111111;
+        z80.r.set_value(0b11111111);
         let t_states = z80.ld_a_r();
         assert_eq!(9, t_states);
 
@@ -2020,22 +2022,22 @@ mod tests {
     #[test]
     fn test_ld_i_a() {
         let z80 = &mut Z80::new();
-        z80.a = 0xFF;
+        z80.a.set_value(0xFF);
 
         let t_states = z80.ld_i_a();
         assert_eq!(9, t_states);
 
-        assert_eq!(0xFF, z80.i);
+        assert_eq!(0xFF, z80.i.value());
     }
 
     #[test]
     fn test_ld_r_a() {
         let z80 = &mut Z80::new();
-        z80.a = 0xFF;
+        z80.a.set_value(0xFF);
 
         let t_states = z80.ld_r_a();
         assert_eq!(9, t_states);
 
-        assert_eq!(0xFF, z80.r);
+        assert_eq!(0xFF, z80.r.value());
     }
 }

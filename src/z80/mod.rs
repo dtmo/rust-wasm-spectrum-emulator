@@ -1,18 +1,13 @@
 mod eight_bit_load_group;
 mod exchange_block_transfer;
-mod flag_register;
+mod register_flags;
 mod sixteen_bit_load_group;
 
-use self::flag_register::*;
+use self::register_flags::*;
 
 // Official Z80 documentation: https://www.zilog.com/docs/z80/um0080.pdf
 // Unofficial undocumented functionality documentation: http://www.z80.info/zip/z80-documented.pdf
 // Integration test suites: https://mdfs.net/Software/Z80/Exerciser/Spectrum/
-
-pub trait Z80Memory {
-    fn read(&self, address: u16) -> u8;
-    fn write(&mut self, address: u16, data: u8);
-}
 
 const MAIN_FUNCTIONS: [fn(&mut Z80, &mut dyn Z80Memory) -> u8; 98] = [
     // 00000000 NOP
@@ -1989,6 +1984,43 @@ const IY_BIT_INSTRUCTIONS: [fn(&mut Z80, &mut dyn Z80Memory) -> u8; 0] = [
     // 11111111
     ];
 
+pub trait Z80Memory {
+    fn read(&self, address: u16) -> u8;
+    fn write(&mut self, address: u16, data: u8);
+}
+
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct Register {
+    value: u8,
+}
+
+impl Register {
+    pub fn new() -> Register {
+        Register { value: 0 }
+    }
+    pub fn from(value: u8) -> Register {
+        Register { value }
+    }
+    pub fn inc(&mut self) {
+        self.value = self.value.wrapping_add(1);
+    }
+    pub fn dec(&mut self) {
+        self.value = self.value.wrapping_sub(1);
+    }
+    pub fn add(&mut self, rhs: u8) {
+        self.value = self.value.wrapping_add(rhs);
+    }
+    pub fn sub(&mut self, rhs: u8) {
+        self.value = self.value.wrapping_sub(rhs);
+    }
+    pub fn value(&self) -> u8 {
+        self.value
+    }
+    pub fn set_value(&mut self, rhs: u8) {
+        self.value = rhs;
+    }
+}
+
 #[derive(Clone, Debug)]
 pub struct Z80 {
     program_counter: u16,
@@ -1997,31 +2029,31 @@ pub struct Z80 {
     ix: u16,
     iy: u16,
     // Interrupt vector
-    i: u8,
+    i: Register,
     // Memory refresh
-    r: u8,
+    r: Register,
     // Main accumulator register
-    a: u8,
+    a: Register,
     // Main flag register
-    f: u8,
+    f: Register,
     // Alternate accumulator register
-    a_prime: u8,
+    a_prime: Register,
     // Alternate flag register
-    f_prime: u8,
+    f_prime: Register,
     // General purpose registers
-    b: u8,
-    c: u8,
-    d: u8,
-    e: u8,
-    h: u8,
-    l: u8,
+    b: Register,
+    c: Register,
+    d: Register,
+    e: Register,
+    h: Register,
+    l: Register,
     // Alternate general purpose registers
-    b_prime: u8,
-    c_prime: u8,
-    d_prime: u8,
-    e_prime: u8,
-    h_prime: u8,
-    l_prime: u8,
+    b_prime: Register,
+    c_prime: Register,
+    d_prime: Register,
+    e_prime: Register,
+    h_prime: Register,
+    l_prime: Register,
 
     /// Interrupt enable flip flop 1
     iff1: bool,
@@ -2037,32 +2069,32 @@ impl Z80 {
             stack_pointer: 0,
             ix: 0,
             iy: 0,
-            i: 0,
-            r: 0,
-            a: 0,
-            a_prime: 0,
-            f: 0,
-            f_prime: 0,
-            b: 0,
-            c: 0,
-            d: 0,
-            e: 0,
-            h: 0,
-            l: 0,
-            b_prime: 0,
-            c_prime: 0,
-            d_prime: 0,
-            e_prime: 0,
-            h_prime: 0,
-            l_prime: 0,
+            i: Register::new(),
+            r: Register::new(),
+            a: Register::new(),
+            a_prime: Register::new(),
+            f: Register::new(),
+            f_prime: Register::new(),
+            b: Register::new(),
+            c: Register::new(),
+            d: Register::new(),
+            e: Register::new(),
+            h: Register::new(),
+            l: Register::new(),
+            b_prime: Register::new(),
+            c_prime: Register::new(),
+            d_prime: Register::new(),
+            e_prime: Register::new(),
+            h_prime: Register::new(),
+            l_prime: Register::new(),
             iff1: true,
             iff2: true,
         }
     }
 
-    fn load_register_pair(high: &mut u8, low: &mut u8, value: u16) {
-        *high = (value >> 8) as u8;
-        *low = value as u8;
+    fn load_register_pair(high: &mut Register, low: &mut Register, value: u16) {
+        high.set_value((value >> 8) as u8);
+        low.set_value(value as u8);
     }
 
     pub fn set_bc(&mut self, value: u16) {
@@ -2077,20 +2109,20 @@ impl Z80 {
         Z80::load_register_pair(&mut self.h, &mut self.l, value);
     }
 
-    fn read_register_pair(high: u8, low: u8) -> u16 {
-        (high as u16) << 8 | low as u16
+    fn read_register_pair(high: &Register, low: &Register) -> u16 {
+        (high.value() as u16) << 8 | low.value() as u16
     }
 
     pub fn bc(&self) -> u16 {
-        Z80::read_register_pair(self.b, self.c)
+        Z80::read_register_pair(&self.b, &self.c)
     }
 
     pub fn de(&self) -> u16 {
-        Z80::read_register_pair(self.d, self.e)
+        Z80::read_register_pair(&self.d, &self.e)
     }
 
     pub fn hl(&self) -> u16 {
-        Z80::read_register_pair(self.h, self.l)
+        Z80::read_register_pair(&self.h, &self.l)
     }
 
     pub fn fetch_next_opcode(&mut self, mem: &dyn Z80Memory) -> u8 {
@@ -2195,8 +2227,8 @@ impl Z80 {
     ///   0100 0010 = 42
     /// ```
     fn daa(&mut self) -> u8 {
-        let a_high = self.a & 0xF0;
-        let a_low = self.a & 0x0F;
+        let a_high = self.a.value() & 0xF0;
+        let a_low = self.a.value() & 0x0F;
         let diff: u8 = match (c_flag_set(&self.f), a_high, h_flag_set(&self.f), a_low) {
             (false, a_high, false, a_low) if a_high <= 0x09 && a_low <= 0x09 => 0x00,
             (false, a_high, true, a_low) if a_high <= 0x09 && a_low <= 0x09 => 0x06,
@@ -2228,7 +2260,7 @@ impl Z80 {
             _ => h_flag_set(&self.f),
         };
 
-        self.a = self.a + diff;
+        self.a.add(diff);
 
         if new_c_flag {
             set_c_flag(&mut self.f);
@@ -2243,10 +2275,11 @@ impl Z80 {
         }
 
         // SF, YF, XF are copies of bit 7,5,3 of the result respectively;
-        self.f = self.f & 0b10101011u8 + self.a & 0b01010100u8;
+        let new_f = (self.f.value() & 0b10101011u8) | (self.a.value() & 0b01010100u8);
+        self.f.set_value(new_f);
 
         // ZF is set according to the result and NF is always unchanged.
-        if self.a == 0 {
+        if self.a.value() == 0 {
             set_z_flag(&mut self.f);
         }
 
@@ -2326,6 +2359,6 @@ mod tests {
         let t_states = z80.process_next_instruction(ram);
 
         assert_eq!(11, t_states);
-        assert_eq!(bytes[1], z80.h);
+        assert_eq!(bytes[1], z80.h.value());
     }
 }

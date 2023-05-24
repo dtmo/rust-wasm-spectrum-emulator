@@ -1,5 +1,5 @@
 use super::{
-    flag_register::{set_p_flag_with, unset_h_flag, unset_n_flag},
+    register_flags::{set_p_flag_with, unset_h_flag, unset_n_flag},
     Z80Memory, Z80,
 };
 
@@ -28,7 +28,15 @@ impl Z80 {
     /// then upon the execution of an EX DE, HL instruction, register pair DE
     /// contains 499Ah and register pair HL contains 2822h.
     pub fn ex_de_hl(&mut self) -> u8 {
-        (self.d, self.e, self.h, self.l) = (self.h, self.l, self.d, self.e);
+        let temp_d = self.d.value();
+        let temp_e = self.e.value();
+        let temp_h = self.h.value();
+        let temp_l = self.l.value();
+
+        self.d.set_value(temp_h);
+        self.e.set_value(temp_l);
+        self.h.set_value(temp_d);
+        self.l.set_value(temp_e);
 
         // T states
         4
@@ -57,7 +65,15 @@ impl Z80 {
     /// the contents of AF are 5944h and the contents of AF′ are 9900h upon
     /// execution of the EX AF, AF′ instruction.
     pub fn ex_af_afp(&mut self) -> u8 {
-        (self.a, self.f, self.a_prime, self.f_prime) = (self.a_prime, self.f_prime, self.a, self.f);
+        let temp_a = self.a.value();
+        let temp_f = self.f.value();
+        let temp_a_prime = self.a_prime.value();
+        let temp_f_prime = self.f_prime.value();
+
+        self.a.set_value(temp_a_prime);
+        self.f.set_value(temp_f_prime);
+        self.a_prime.set_value(temp_a);
+        self.f_prime.set_value(temp_f);
 
         // T states
         4
@@ -88,33 +104,31 @@ impl Z80 {
     /// BC contains 0988h; DE contains 9300h; HL contains 00E7h; BC’ contains
     /// 445Ah; DE’ contains 3DA2h; and HL’ contains 8859h.
     pub fn exx(&mut self) -> u8 {
-        (
-            self.b,
-            self.c,
-            self.d,
-            self.e,
-            self.h,
-            self.l,
-            self.b_prime,
-            self.c_prime,
-            self.d_prime,
-            self.e_prime,
-            self.h_prime,
-            self.l_prime,
-        ) = (
-            self.b_prime,
-            self.c_prime,
-            self.d_prime,
-            self.e_prime,
-            self.h_prime,
-            self.l_prime,
-            self.b,
-            self.c,
-            self.d,
-            self.e,
-            self.h,
-            self.l,
-        );
+        let temp_b = self.b.value();
+        let temp_c = self.c.value();
+        let temp_d = self.d.value();
+        let temp_e = self.e.value();
+        let temp_h = self.h.value();
+        let temp_l = self.l.value();
+        let temp_b_prime = self.b_prime.value();
+        let temp_c_prime = self.c_prime.value();
+        let temp_d_prime = self.d_prime.value();
+        let temp_e_prime = self.e_prime.value();
+        let temp_h_prime = self.h_prime.value();
+        let temp_l_prime = self.l_prime.value();
+
+        self.b_prime.set_value(temp_b);
+        self.c_prime.set_value(temp_c);
+        self.d_prime.set_value(temp_d);
+        self.e_prime.set_value(temp_e);
+        self.h_prime.set_value(temp_h);
+        self.l_prime.set_value(temp_l);
+        self.b.set_value(temp_b_prime);
+        self.c.set_value(temp_c_prime);
+        self.d.set_value(temp_d_prime);
+        self.e.set_value(temp_e_prime);
+        self.h.set_value(temp_h_prime);
+        self.l.set_value(temp_l_prime);
 
         // T states
         4
@@ -149,12 +163,12 @@ impl Z80 {
     /// Pointer containing 8856h.
     pub fn ex_mem_sp_hl(&mut self, mem: &mut dyn Z80Memory) -> u8 {
         let mem_sp = mem.read(self.stack_pointer);
-        mem.write(self.stack_pointer, self.l);
-        self.l = mem_sp;
+        mem.write(self.stack_pointer, self.l.value());
+        self.l.set_value(mem_sp);
 
         let mem_sp = mem.read(self.stack_pointer + 1);
-        mem.write(self.stack_pointer + 1, self.h);
-        self.h = mem_sp;
+        mem.write(self.stack_pointer + 1, self.h.value());
+        self.h.set_value(mem_sp);
 
         // T states
         19
@@ -405,7 +419,7 @@ impl Z80 {
 
 mod tests {
     use crate::z80::{
-        flag_register::{h_flag_set, n_flag_set, p_flag_set},
+        register_flags::{h_flag_set, n_flag_set, p_flag_set},
         tests::Ram,
     };
 
@@ -414,72 +428,68 @@ mod tests {
     #[test]
     fn test_ex_de_hl() {
         let mut z80 = Z80::new();
-        z80.d = 0x28;
-        z80.e = 0x22;
-        z80.h = 0x49;
-        z80.l = 0x9A;
+        z80.set_de(0x2822);
+        z80.set_hl(0x499A);
 
         let t_states = z80.ex_de_hl();
 
         assert_eq!(4, t_states);
-        assert_eq!(0x49, z80.d);
-        assert_eq!(0x9A, z80.e);
-        assert_eq!(0x28, z80.h);
-        assert_eq!(0x22, z80.l)
+        assert_eq!(0x499A, z80.de());
+        assert_eq!(0x2822, z80.hl());
     }
 
     #[test]
     fn test_ex_af_afp() {
         let mut z80 = Z80::new();
-        z80.a = 0x99;
-        z80.f = 0x00;
-        z80.a_prime = 0x59;
-        z80.f_prime = 0x44;
+        z80.a.set_value(0x99);
+        z80.f.set_value(0x00);
+        z80.a_prime.set_value(0x59);
+        z80.f_prime.set_value(0x44);
 
         let t_states = z80.ex_af_afp();
 
         assert_eq!(4, t_states);
 
-        assert_eq!(0x59, z80.a);
-        assert_eq!(0x44, z80.f);
-        assert_eq!(0x99, z80.a_prime);
-        assert_eq!(0x00, z80.f_prime)
+        assert_eq!(0x59, z80.a.value());
+        assert_eq!(0x44, z80.f.value());
+        assert_eq!(0x99, z80.a_prime.value());
+        assert_eq!(0x00, z80.f_prime.value())
     }
 
     #[test]
     fn test_exx() {
         let mut z80 = Z80::new();
-        z80.b = 0x44;
-        z80.c = 0x5A;
-        z80.d = 0x3D;
-        z80.e = 0xA2;
-        z80.h = 0x88;
-        z80.l = 0x59;
+        z80.b.set_value(0x44);
+        z80.c.set_value(0x5A);
+        z80.d.set_value(0x3D);
+        z80.e.set_value(0xA2);
+        z80.h.set_value(0x88);
+        z80.l.set_value(0x59);
 
-        z80.b_prime = 0x09;
-        z80.c_prime = 0x88;
-        z80.d_prime = 0x93;
-        z80.e_prime = 0x00;
-        z80.h_prime = 0x00;
-        z80.l_prime = 0xE7;
+        z80.b_prime.set_value(0x09);
+        z80.c_prime.set_value(0x88);
+        z80.d_prime.set_value(0x93);
+        z80.e_prime.set_value(0x00);
+        z80.h_prime.set_value(0x00);
+        z80.l_prime.set_value(0xE7);
 
         let t_states = z80.exx();
 
         assert_eq!(4, t_states);
 
-        assert_eq!(0x09, z80.b);
-        assert_eq!(0x88, z80.c);
-        assert_eq!(0x93, z80.d);
-        assert_eq!(0x00, z80.e);
-        assert_eq!(0x00, z80.h);
-        assert_eq!(0xE7, z80.l);
+        assert_eq!(0x09, z80.b.value());
+        assert_eq!(0x88, z80.c.value());
+        assert_eq!(0x93, z80.d.value());
+        assert_eq!(0x00, z80.e.value());
+        assert_eq!(0x00, z80.h.value());
+        assert_eq!(0xE7, z80.l.value());
 
-        assert_eq!(0x44, z80.b_prime);
-        assert_eq!(0x5A, z80.c_prime);
-        assert_eq!(0x3D, z80.d_prime);
-        assert_eq!(0xA2, z80.e_prime);
-        assert_eq!(0x88, z80.h_prime);
-        assert_eq!(0x59, z80.l_prime);
+        assert_eq!(0x44, z80.b_prime.value());
+        assert_eq!(0x5A, z80.c_prime.value());
+        assert_eq!(0x3D, z80.d_prime.value());
+        assert_eq!(0xA2, z80.e_prime.value());
+        assert_eq!(0x88, z80.h_prime.value());
+        assert_eq!(0x59, z80.l_prime.value());
     }
 
     #[test]
@@ -488,14 +498,14 @@ mod tests {
         let mut ram = Ram::new(bytes);
         let mut z80 = Z80::new();
         z80.stack_pointer = 1;
-        z80.h = 0x70;
-        z80.l = 0x12;
+        z80.h.set_value(0x70);
+        z80.l.set_value(0x12);
 
         let t_states = z80.ex_mem_sp_hl(&mut ram);
         assert_eq!(19, t_states);
 
-        assert_eq!(0x22, z80.h);
-        assert_eq!(0x11, z80.l);
+        assert_eq!(0x22, z80.h.value());
+        assert_eq!(0x11, z80.l.value());
         assert_eq!(0x12, ram.read(1));
         assert_eq!(0x70, ram.read(2));
     }

@@ -46,24 +46,33 @@ impl Z80 {
     /// Upon the execution of an LD HL, 5000h instruction, the HL register pair
     /// contains 5000h.
     pub fn ld_bc_nn(&mut self, mem: &dyn Z80Memory) -> u8 {
-        self.c = self.fetch_next_opcode(mem);
-        self.b = self.fetch_next_opcode(mem);
+        let cn = self.fetch_next_opcode(mem);
+        self.c.set_value(cn);
+
+        let bn = self.fetch_next_opcode(mem);
+        self.b.set_value(bn);
 
         // T states
         10
     }
 
     pub fn ld_de_nn(&mut self, mem: &dyn Z80Memory) -> u8 {
-        self.e = self.fetch_next_opcode(mem);
-        self.d = self.fetch_next_opcode(mem);
+        let en = self.fetch_next_opcode(mem);
+        self.e.set_value(en);
+
+        let dn = self.fetch_next_opcode(mem);
+        self.d.set_value(dn);
 
         // T states
         10
     }
 
     pub fn ld_hl_nn(&mut self, mem: &dyn Z80Memory) -> u8 {
-        self.l = self.fetch_next_opcode(mem);
-        self.h = self.fetch_next_opcode(mem);
+        let ln = self.fetch_next_opcode(mem);
+        self.l.set_value(ln);
+
+        let hn = self.fetch_next_opcode(mem);
+        self.h.set_value(hn);
 
         // T states
         10
@@ -212,8 +221,8 @@ impl Z80 {
         let nh = self.fetch_next_opcode(mem);
 
         let address = ((nh as u16) << 8) | nl as u16;
-        self.l = mem.read(address);
-        self.h = mem.read(address + 1);
+        self.l.set_value(mem.read(address));
+        self.h.set_value(mem.read(address + 1));
 
         // T states
         16
@@ -272,8 +281,8 @@ impl Z80 {
         let high_n = self.fetch_next_opcode(mem);
 
         let address = ((high_n as u16) << 8) | low_n as u16;
-        self.c = mem.read(address);
-        self.b = mem.read(address + 1);
+        self.c.set_value(mem.read(address));
+        self.b.set_value(mem.read(address + 1));
 
         // T states
         20
@@ -284,8 +293,8 @@ impl Z80 {
         let high_n = self.fetch_next_opcode(mem);
 
         let address = ((high_n as u16) << 8) | low_n as u16;
-        self.e = mem.read(address);
-        self.d = mem.read(address + 1);
+        self.e.set_value(mem.read(address));
+        self.d.set_value(mem.read(address + 1));
 
         // T states
         20
@@ -296,8 +305,8 @@ impl Z80 {
         let high_n = self.fetch_next_opcode(mem);
 
         let address = ((high_n as u16) << 8) | low_n as u16;
-        self.l = mem.read(address);
-        self.h = mem.read(address + 1);
+        self.l.set_value(mem.read(address));
+        self.h.set_value(mem.read(address + 1));
 
         // T states
         20
@@ -465,8 +474,8 @@ impl Z80 {
 
         let address = ((high_n as u16) << 8) | low_n as u16;
 
-        mem.write(address, self.l);
-        mem.write(address + 1, self.h);
+        mem.write(address, self.l.value());
+        mem.write(address + 1, self.h.value());
 
         // T states
         16
@@ -527,8 +536,8 @@ impl Z80 {
 
         let address = ((high_n as u16) << 8) | low_n as u16;
 
-        mem.write(address, self.c);
-        mem.write(address + 1, self.b);
+        mem.write(address, self.c.value());
+        mem.write(address + 1, self.b.value());
 
         // T states
         20
@@ -540,8 +549,8 @@ impl Z80 {
 
         let address = ((high_n as u16) << 8) | low_n as u16;
 
-        mem.write(address, self.e);
-        mem.write(address + 1, self.d);
+        mem.write(address, self.e.value());
+        mem.write(address + 1, self.d.value());
 
         // T states
         20
@@ -553,8 +562,8 @@ impl Z80 {
 
         let address = ((high_n as u16) << 8) | low_n as u16;
 
-        mem.write(address, self.l);
-        mem.write(address + 1, self.h);
+        mem.write(address, self.l.value());
+        mem.write(address + 1, self.h.value());
 
         // T states
         20
@@ -712,7 +721,7 @@ impl Z80 {
     /// If the register pair HL contains 442Eh, then upon the execution of an LD
     /// SP, HL instruction, the Stack Pointer also contains 442Eh.
     pub fn ld_sp_hl(&mut self) -> u8 {
-        self.stack_pointer = ((self.h as u16) << 8) | self.l as u16;
+        self.stack_pointer = ((self.h.value() as u16) << 8) | self.l.value() as u16;
 
         // T states
         6
@@ -818,10 +827,10 @@ impl Z80 {
 
     pub fn push_qqbc(&mut self, mem: &mut dyn Z80Memory) -> u8 {
         self.stack_pointer -= 1;
-        mem.write(self.stack_pointer, self.b);
+        mem.write(self.stack_pointer, self.b.value());
 
         self.stack_pointer -= 1;
-        mem.write(self.stack_pointer, self.c);
+        mem.write(self.stack_pointer, self.c.value());
 
         // T states
         11
@@ -829,10 +838,10 @@ impl Z80 {
 
     pub fn push_qqde(&mut self, mem: &mut dyn Z80Memory) -> u8 {
         self.stack_pointer -= 1;
-        mem.write(self.stack_pointer, self.d);
+        mem.write(self.stack_pointer, self.d.value());
 
         self.stack_pointer -= 1;
-        mem.write(self.stack_pointer, self.e);
+        mem.write(self.stack_pointer, self.e.value());
 
         // T states
         11
@@ -840,10 +849,10 @@ impl Z80 {
 
     pub fn push_qqhl(&mut self, mem: &mut dyn Z80Memory) -> u8 {
         self.stack_pointer -= 1;
-        mem.write(self.stack_pointer, self.h);
+        mem.write(self.stack_pointer, self.h.value());
 
         self.stack_pointer -= 1;
-        mem.write(self.stack_pointer, self.l);
+        mem.write(self.stack_pointer, self.l.value());
 
         // T states
         11
@@ -851,10 +860,10 @@ impl Z80 {
 
     pub fn push_qqaf(&mut self, mem: &mut dyn Z80Memory) -> u8 {
         self.stack_pointer -= 1;
-        mem.write(self.stack_pointer, self.a);
+        mem.write(self.stack_pointer, self.a.value());
 
         self.stack_pointer -= 1;
-        mem.write(self.stack_pointer, self.f);
+        mem.write(self.stack_pointer, self.f.value());
 
         // T states
         11
@@ -982,10 +991,10 @@ impl Z80 {
     /// register pair HL containing 3355h, and the Stack Pointer containing
     /// 1002h.
     pub fn pop_qqbc(&mut self, mem: &dyn Z80Memory) -> u8 {
-        self.c = mem.read(self.stack_pointer);
+        self.c.set_value(mem.read(self.stack_pointer));
         self.stack_pointer += 1;
 
-        self.b = mem.read(self.stack_pointer);
+        self.b.set_value(mem.read(self.stack_pointer));
         self.stack_pointer += 1;
 
         // T states
@@ -993,10 +1002,10 @@ impl Z80 {
     }
 
     pub fn pop_qqde(&mut self, mem: &dyn Z80Memory) -> u8 {
-        self.e = mem.read(self.stack_pointer);
+        self.e.set_value(mem.read(self.stack_pointer));
         self.stack_pointer += 1;
 
-        self.d = mem.read(self.stack_pointer);
+        self.d.set_value(mem.read(self.stack_pointer));
         self.stack_pointer += 1;
 
         // T states
@@ -1004,10 +1013,10 @@ impl Z80 {
     }
 
     pub fn pop_qqhl(&mut self, mem: &dyn Z80Memory) -> u8 {
-        self.l = mem.read(self.stack_pointer);
+        self.l.set_value(mem.read(self.stack_pointer));
         self.stack_pointer += 1;
 
-        self.h = mem.read(self.stack_pointer);
+        self.h.set_value(mem.read(self.stack_pointer));
         self.stack_pointer += 1;
 
         // T states
@@ -1015,10 +1024,10 @@ impl Z80 {
     }
 
     pub fn pop_qqaf(&mut self, mem: &dyn Z80Memory) -> u8 {
-        self.f = mem.read(self.stack_pointer);
+        self.f.set_value(mem.read(self.stack_pointer));
         self.stack_pointer += 1;
 
-        self.a = mem.read(self.stack_pointer);
+        self.a.set_value(mem.read(self.stack_pointer));
         self.stack_pointer += 1;
 
         // T states
@@ -1122,8 +1131,8 @@ mod tests {
         let t_states = z80.ld_bc_nn(ram);
         assert_eq!(10, t_states);
 
-        assert_eq!(0x01, z80.b);
-        assert_eq!(0x02, z80.c);
+        assert_eq!(0x01, z80.b.value());
+        assert_eq!(0x02, z80.c.value());
     }
 
     #[test]
@@ -1135,8 +1144,8 @@ mod tests {
         let t_states = z80.ld_de_nn(ram);
         assert_eq!(10, t_states);
 
-        assert_eq!(0x01, z80.d);
-        assert_eq!(0x02, z80.e);
+        assert_eq!(0x01, z80.d.value());
+        assert_eq!(0x02, z80.e.value());
     }
 
     #[test]
@@ -1148,8 +1157,8 @@ mod tests {
         let t_states = z80.ld_hl_nn(ram);
         assert_eq!(10, t_states);
 
-        assert_eq!(0x01, z80.h);
-        assert_eq!(0x02, z80.l);
+        assert_eq!(0x01, z80.h.value());
+        assert_eq!(0x02, z80.l.value());
     }
 
     #[test]
@@ -1198,8 +1207,8 @@ mod tests {
         let t_states = z80.ld_hl_mem_nn(ram);
         assert_eq!(16, t_states);
 
-        assert_eq!(0xF0, z80.h);
-        assert_eq!(0x0F, z80.l);
+        assert_eq!(0xF0, z80.h.value());
+        assert_eq!(0x0F, z80.l.value());
     }
 
     #[test]
@@ -1212,8 +1221,8 @@ mod tests {
         let t_states = z80.ld_ddbc_mem_nn(ram);
         assert_eq!(20, t_states);
 
-        assert_eq!(0xF0, z80.b);
-        assert_eq!(0x0F, z80.c);
+        assert_eq!(0xF0, z80.b.value());
+        assert_eq!(0x0F, z80.c.value());
     }
 
     #[test]
@@ -1226,8 +1235,8 @@ mod tests {
         let t_states = z80.ld_ddde_mem_nn(ram);
         assert_eq!(20, t_states);
 
-        assert_eq!(0xF0, z80.d);
-        assert_eq!(0x0F, z80.e);
+        assert_eq!(0xF0, z80.d.value());
+        assert_eq!(0x0F, z80.e.value());
     }
 
     #[test]
@@ -1240,8 +1249,8 @@ mod tests {
         let t_states = z80.ld_ddhl_mem_nn(ram);
         assert_eq!(20, t_states);
 
-        assert_eq!(0xF0, z80.h);
-        assert_eq!(0x0F, z80.l);
+        assert_eq!(0xF0, z80.h.value());
+        assert_eq!(0x0F, z80.l.value());
     }
 
     #[test]
@@ -1289,14 +1298,13 @@ mod tests {
         let ram = &mut Ram::new(bytes);
         let z80 = &mut Z80::new();
         z80.program_counter = 1;
-        z80.h = 0x0F;
-        z80.l = 0xF0;
+        z80.set_hl(0x0FF0);
 
         let t_states = z80.ld_mem_nn_hl(ram);
         assert_eq!(16, t_states);
 
-        assert_eq!(z80.l, ram.read(3));
-        assert_eq!(z80.h, ram.read(4));
+        assert_eq!(z80.l.value(), ram.read(3));
+        assert_eq!(z80.h.value(), ram.read(4));
     }
 
     #[test]
@@ -1305,14 +1313,13 @@ mod tests {
         let ram = &mut Ram::new(bytes);
         let z80 = &mut Z80::new();
         z80.program_counter = 2;
-        z80.b = 0xEE;
-        z80.c = 0xFF;
+        z80.set_bc(0xEEFF);
 
         let t_states = z80.ld_mem_nn_ddbc(ram);
         assert_eq!(20, t_states);
 
-        assert_eq!(z80.c, ram.read(4));
-        assert_eq!(z80.b, ram.read(5));
+        assert_eq!(z80.c.value(), ram.read(4));
+        assert_eq!(z80.b.value(), ram.read(5));
     }
 
     #[test]
@@ -1321,14 +1328,13 @@ mod tests {
         let ram = &mut Ram::new(bytes);
         let z80 = &mut Z80::new();
         z80.program_counter = 2;
-        z80.d = 0xEE;
-        z80.e = 0xFF;
+        z80.set_de(0xEEFF);
 
         let t_states = z80.ld_mem_nn_ddde(ram);
         assert_eq!(20, t_states);
 
-        assert_eq!(z80.e, ram.read(4));
-        assert_eq!(z80.d, ram.read(5));
+        assert_eq!(z80.e.value(), ram.read(4));
+        assert_eq!(z80.d.value(), ram.read(5));
     }
 
     #[test]
@@ -1337,14 +1343,13 @@ mod tests {
         let ram = &mut Ram::new(bytes);
         let z80 = &mut Z80::new();
         z80.program_counter = 2;
-        z80.h = 0xEE;
-        z80.l = 0xFF;
+        z80.set_hl(0xEEFF);
 
         let t_states = z80.ld_mem_nn_ddhl(ram);
         assert_eq!(20, t_states);
 
-        assert_eq!(z80.l, ram.read(4));
-        assert_eq!(z80.h, ram.read(5));
+        assert_eq!(z80.l.value(), ram.read(4));
+        assert_eq!(z80.h.value(), ram.read(5));
     }
 
     #[test]
@@ -1395,8 +1400,7 @@ mod tests {
     #[test]
     fn test_ld_sp_hl() {
         let z80 = &mut Z80::new();
-        z80.h = 0x44;
-        z80.l = 0x2E;
+        z80.set_hl(0x442E);
 
         let t_states = z80.ld_sp_hl();
         assert_eq!(6, t_states);
@@ -1432,8 +1436,7 @@ mod tests {
         let ram = &mut Ram::new(bytes);
         let z80 = &mut Z80::new();
         z80.stack_pointer = 3;
-        z80.b = 0x22;
-        z80.c = 0x33;
+        z80.set_bc(0x2233);
 
         let t_states = z80.push_qqbc(ram);
         assert_eq!(11, t_states);
@@ -1449,8 +1452,7 @@ mod tests {
         let ram = &mut Ram::new(bytes);
         let z80 = &mut Z80::new();
         z80.stack_pointer = 3;
-        z80.d = 0x22;
-        z80.e = 0x33;
+        z80.set_de(0x2233);
 
         let t_states = z80.push_qqde(ram);
         assert_eq!(11, t_states);
@@ -1466,8 +1468,7 @@ mod tests {
         let ram = &mut Ram::new(bytes);
         let z80 = &mut Z80::new();
         z80.stack_pointer = 3;
-        z80.h = 0x22;
-        z80.l = 0x33;
+        z80.set_hl(0x2233);
 
         let t_states = z80.push_qqhl(ram);
         assert_eq!(11, t_states);
@@ -1483,8 +1484,8 @@ mod tests {
         let ram = &mut Ram::new(bytes);
         let z80 = &mut Z80::new();
         z80.stack_pointer = 3;
-        z80.a = 0x22;
-        z80.f = 0x33;
+        z80.a.set_value(0x22);
+        z80.f.set_value(0x33);
 
         let t_states = z80.push_qqaf(ram);
         assert_eq!(11, t_states);
@@ -1537,8 +1538,8 @@ mod tests {
         assert_eq!(10, t_states);
 
         assert_eq!(3, z80.stack_pointer);
-        assert_eq!(0x33, z80.b);
-        assert_eq!(0x55, z80.c);
+        assert_eq!(0x33, z80.b.value());
+        assert_eq!(0x55, z80.c.value());
     }
 
     #[test]
@@ -1552,8 +1553,8 @@ mod tests {
         assert_eq!(10, t_states);
 
         assert_eq!(3, z80.stack_pointer);
-        assert_eq!(0x33, z80.d);
-        assert_eq!(0x55, z80.e);
+        assert_eq!(0x33, z80.d.value());
+        assert_eq!(0x55, z80.e.value());
     }
 
     #[test]
@@ -1567,8 +1568,8 @@ mod tests {
         assert_eq!(10, t_states);
 
         assert_eq!(3, z80.stack_pointer);
-        assert_eq!(0x33, z80.h);
-        assert_eq!(0x55, z80.l);
+        assert_eq!(0x33, z80.h.value());
+        assert_eq!(0x55, z80.l.value());
     }
 
     #[test]
@@ -1582,8 +1583,8 @@ mod tests {
         assert_eq!(10, t_states);
 
         assert_eq!(3, z80.stack_pointer);
-        assert_eq!(0x33, z80.a);
-        assert_eq!(0x55, z80.f);
+        assert_eq!(0x33, z80.a.value());
+        assert_eq!(0x55, z80.f.value());
     }
 
     #[test]
