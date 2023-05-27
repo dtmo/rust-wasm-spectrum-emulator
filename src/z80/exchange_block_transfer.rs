@@ -1,5 +1,5 @@
 use super::{
-    register_flags::{set_p_flag_with, unset_h_flag, unset_n_flag},
+    register_flags::{set_p_flag_with, unset_h_flag, unset_n_flag, set_y_flag_with, set_x_flag, set_x_flag_with},
     Z80Memory, Z80,
 };
 
@@ -318,8 +318,13 @@ impl Z80 {
         self.set_bc(bc);
 
         unset_h_flag(&mut self.f);
-        set_p_flag_with(&mut self.f, bc.wrapping_sub(1) != 0);
+        set_p_flag_with(&mut self.f, bc != 0);
         unset_n_flag(&mut self.f);
+
+        // Extra behaviour from http://www.z80.info/zip/z80-documented.pdf p.16
+        let n = self.a.value().wrapping_add(data);
+        set_y_flag_with(&mut self.f, n & 0b00000010 != 0);
+        set_x_flag_with(&mut self.f, n & 0b00001000 != 0);
 
         // T states
         16
@@ -410,8 +415,13 @@ impl Z80 {
         }
 
         unset_h_flag(&mut self.f);
-        set_p_flag_with(&mut self.f, bc.wrapping_sub(1) != 0);
+        set_p_flag_with(&mut self.f, bc != 0);
         unset_n_flag(&mut self.f);
+
+        // Extra behaviour from http://www.z80.info/zip/z80-documented.pdf p.16
+        let n = self.a.value().wrapping_add(data);
+        set_y_flag_with(&mut self.f, n & 0b00000010 != 0);
+        set_x_flag_with(&mut self.f, n & 0b00001000 != 0);
 
         t_states
     }
@@ -473,8 +483,13 @@ impl Z80 {
         self.set_bc(bc);
 
         unset_h_flag(&mut self.f);
-        set_p_flag_with(&mut self.f, bc.wrapping_sub(1) != 0);
+        set_p_flag_with(&mut self.f, bc != 0);
         unset_n_flag(&mut self.f);
+        
+        // Extra behaviour from http://www.z80.info/zip/z80-documented.pdf p.16
+        let n = self.a.value().wrapping_add(data);
+        set_y_flag_with(&mut self.f, n & 0b00000010 != 0);
+        set_x_flag_with(&mut self.f, n & 0b00001000 != 0);
 
         // T states
         16
@@ -568,8 +583,13 @@ impl Z80 {
         }
 
         unset_h_flag(&mut self.f);
-        set_p_flag_with(&mut self.f, bc.wrapping_sub(1) != 0);
+        set_p_flag_with(&mut self.f, bc != 0);
         unset_n_flag(&mut self.f);
+        
+        // Extra behaviour from http://www.z80.info/zip/z80-documented.pdf p.16
+        let n = self.a.value().wrapping_add(data);
+        set_y_flag_with(&mut self.f, n & 0b00000010 != 0);
+        set_x_flag_with(&mut self.f, n & 0b00001000 != 0);
 
         t_states
     }
@@ -724,14 +744,14 @@ mod tests {
     }
 
     #[test]
-    fn test_ldi_bc_result_1() {
+    fn test_ldi_bc_result_0() {
         let bytes = &mut [0xED, 0xA0, 0xFF, 0x00];
         let mut ram = Ram::new(bytes);
         let mut z80 = Z80::new();
         z80.program_counter = 2;
         z80.set_hl(0x0002);
         z80.set_de(0x0003);
-        z80.set_bc(0x0002);
+        z80.set_bc(0x0001);
 
         let t_states = z80.ldi(&mut ram);
         assert_eq!(16, t_states);
@@ -739,7 +759,7 @@ mod tests {
         assert_eq!(ram.read(2), ram.read(3));
         assert_eq!(0x0003, z80.hl());
         assert_eq!(0x0004, z80.de());
-        assert_eq!(0x0001, z80.bc());
+        assert_eq!(0x0000, z80.bc());
 
         assert!(!h_flag_set(&z80.f));
         assert!(!p_flag_set(&z80.f));
@@ -794,30 +814,6 @@ mod tests {
     }
 
     #[test]
-    fn test_ldir_bc_result_1() {
-        let bytes = &mut [0xED, 0xB0, 0xFF, 0x00];
-        let mut ram = Ram::new(bytes);
-        let mut z80 = Z80::new();
-        z80.program_counter = 2;
-        z80.set_hl(0x0002);
-        z80.set_de(0x0003);
-        z80.set_bc(0x0002);
-
-        let t_states = z80.ldir(&mut ram);
-        assert_eq!(21, t_states);
-
-        assert_eq!(0, z80.program_counter);
-        assert_eq!(ram.read(2), ram.read(3));
-        assert_eq!(0x0003, z80.hl());
-        assert_eq!(0x0004, z80.de());
-        assert_eq!(0x0001, z80.bc());
-
-        assert!(!h_flag_set(&z80.f));
-        assert!(!p_flag_set(&z80.f));
-        assert!(!n_flag_set(&z80.f));
-    }
-
-    #[test]
     fn test_ldir_bc_result_0() {
         let bytes = &mut [0xED, 0xB0, 0xFF, 0x00];
         let mut ram = Ram::new(bytes);
@@ -837,7 +833,7 @@ mod tests {
         assert_eq!(0x0000, z80.bc());
 
         assert!(!h_flag_set(&z80.f));
-        assert!(p_flag_set(&z80.f));
+        assert!(!p_flag_set(&z80.f));
         assert!(!n_flag_set(&z80.f));
     }
 
@@ -889,14 +885,14 @@ mod tests {
     }
 
     #[test]
-    fn test_ldd_bc_result_1() {
+    fn test_ldd_bc_result_0() {
         let bytes = &mut [0xED, 0xA0, 0xFF, 0x00];
         let mut ram = Ram::new(bytes);
         let mut z80 = Z80::new();
         z80.program_counter = 2;
         z80.set_hl(0x0002);
         z80.set_de(0x0003);
-        z80.set_bc(0x0002);
+        z80.set_bc(0x0001);
 
         let t_states = z80.ldd(&mut ram);
         assert_eq!(16, t_states);
@@ -904,7 +900,7 @@ mod tests {
         assert_eq!(ram.read(2), ram.read(3));
         assert_eq!(0x0001, z80.hl());
         assert_eq!(0x0002, z80.de());
-        assert_eq!(0x0001, z80.bc());
+        assert_eq!(0x0000, z80.bc());
 
         assert!(!h_flag_set(&z80.f));
         assert!(!p_flag_set(&z80.f));
@@ -957,31 +953,6 @@ mod tests {
         assert!(p_flag_set(&z80.f));
         assert!(!n_flag_set(&z80.f));
     }
-
-    #[test]
-    fn test_lddr_bc_result_1() {
-        let bytes = &mut [0xED, 0xB0, 0xFF, 0x00];
-        let mut ram = Ram::new(bytes);
-        let mut z80 = Z80::new();
-        z80.program_counter = 2;
-        z80.set_hl(0x0002);
-        z80.set_de(0x0003);
-        z80.set_bc(0x0002);
-
-        let t_states = z80.lddr(&mut ram);
-        assert_eq!(21, t_states);
-
-        assert_eq!(0, z80.program_counter);
-        assert_eq!(ram.read(2), ram.read(3));
-        assert_eq!(0x0001, z80.hl());
-        assert_eq!(0x0002, z80.de());
-        assert_eq!(0x0001, z80.bc());
-
-        assert!(!h_flag_set(&z80.f));
-        assert!(!p_flag_set(&z80.f));
-        assert!(!n_flag_set(&z80.f));
-    }
-
     #[test]
     fn test_lddr_bc_result_0() {
         let bytes = &mut [0xED, 0xB0, 0xFF, 0x00];
@@ -1002,7 +973,7 @@ mod tests {
         assert_eq!(0x0000, z80.bc());
 
         assert!(!h_flag_set(&z80.f));
-        assert!(p_flag_set(&z80.f));
+        assert!(!p_flag_set(&z80.f));
         assert!(!n_flag_set(&z80.f));
     }
 
