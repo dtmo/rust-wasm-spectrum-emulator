@@ -415,6 +415,164 @@ impl Z80 {
 
         t_states
     }
+
+    /// ## LDD
+    /// ### Operation
+    /// (DE) ← (HL), DE ← DE - 1, HL ← HL - 1, BC ← BC – 1
+    /// ### Op Code
+    /// LDD
+    /// ### Operands
+    /// None
+    /// `1 1 1 0 1 1 0 1` (ED)
+    /// `1 0 1 0 1 0 0 0` (A8)
+    /// ### Description
+    /// This 2-byte instruction transfers a byte of data from the memory
+    /// location addressed by the contents of the HL register pair to the memory
+    /// location addressed by the contents of the DE register pair. Then both of
+    /// these register pairs including the Byte Counter (BC) Register pair are
+    /// decremented.
+    ///
+    /// | M Cycles | T States        | 4 MHz E.T. |
+    /// | -------- | --------------- | ---------- |
+    /// | 4        | 16 (4, 4, 3, 5) | 4.00       |
+    ///
+    /// ### Condition Bits Affected
+    /// * S is not affected.
+    /// * Z is not affected.
+    /// * H is reset.
+    /// * P/V is set if BC – 1 ≠ 0; otherwise, it is reset.
+    /// * N is reset.
+    /// * C is not affected.
+    /// ### Example
+    /// If the HL register pair contains 1111h, memory location 1111h contains
+    /// byte 88h, the DE register pair contains 2222h, the memory location 2222h
+    /// contains byte 66h, and the BC register pair contains 7h, then the
+    /// instruction LDD results in the following contents in register pairs and
+    /// memory addresses:
+    ///
+    /// |         |          |       |
+    /// | ------- | -------- | ----- |
+    /// | HL      | contains | 1110h |
+    /// | (1111h) | contains | 88h   |
+    /// | DE      | contains | 2221h |
+    /// | (2222h) | contains | 88h   |
+    /// | BC      | contains | 6h    |
+    pub fn ldd(&mut self, mem: &mut dyn Z80Memory) -> u8 {
+        // Transfer data from HL address to DE address
+        let hl = self.hl();
+        let data = mem.read(hl);
+        let de = self.de();
+        mem.write(de, data);
+
+        // Increment HL and DE
+        self.set_hl(hl - 1);
+        self.set_de(de - 1);
+
+        // Read and decrement BC
+        let bc = self.bc().wrapping_sub(1);
+        self.set_bc(bc);
+
+        unset_h_flag(&mut self.f);
+        set_p_flag_with(&mut self.f, bc.wrapping_sub(1) != 0);
+        unset_n_flag(&mut self.f);
+
+        // T states
+        16
+    }
+
+    /// ## LDDR
+    /// ### Operation
+    /// repeat {(DE) ← (HL), DE ← DE - 1, HL ← HL - 1, BC ← BC – 1} while (BC ≠ 0)
+    /// ### Op Code
+    /// LDDR
+    /// ### Operand
+    /// None
+    /// `1 1 1 0 1 1 0 1` (ED)
+    /// `1 0 1 1 1 0 0 0` (B0)
+    /// ### Description
+    /// This 2-byte instruction transfers a byte of data from the memory
+    /// location addressed by the contents of the HL register pair to the memory
+    /// location addressed by the contents of the DE register pair. Then both of
+    /// these registers, and the BC (Byte Counter), are decremented. If
+    /// decrementing causes BC to go to 0, the instruction is terminated. If BC
+    /// is not 0, the program counter is decremented by two and the instruction
+    /// is repeated. Interrupts are recognized and two refresh cycles execute
+    /// after each data transfer.
+    ///
+    /// When the BC is set to 0 prior to instruction execution, the instruction
+    /// loops through 64 KB.
+    ///
+    /// For BC ≠ 0:
+    ///
+    /// | M Cycles | T States           | 4 MHz E.T. |
+    /// | -------- | ------------------ | ---------- |
+    /// | 5        | 21 (4, 4, 3, 5, 5) | 5.25       |
+    ///
+    /// For BC = 0:
+    ///
+    /// | M Cycles | T States        | 4 MHz E.T. |
+    /// | -------- | --------------- | ---------- |
+    /// | 4        | 16 (4, 4, 3, 5) | 4.00       |
+    ///
+    /// ### Condition Bits Affected
+    /// * S is not affected.
+    /// * Z is not affected.
+    /// * H is reset.
+    /// * P/V is set if BC – 1 ≠ 0; otherwise, it is reset.
+    /// * N is reset.
+    /// * C is not affected.
+    /// ### Example
+    /// The HL register pair contains 1114h, the DE register pair contains
+    /// 2225h, the BC register pair contains 0003h, and memory locations contain
+    /// the following data.
+    ///
+    /// |         |          |     |         |          |     |
+    /// | ------- | -------- | --- | ------- | -------- | --- |
+    /// | (1114h) | contains | A5h | (2225h) | contains | C5h |
+    /// | (1113h) | contains | 36h | (2224h) | contains | 59h |
+    /// | (1112h) | contains | 88h | (2223h) | contains | 66h |
+    ///
+    /// Upon the execution of an LDDR instruction, the contents of register
+    /// pairs and memory locations now contain:
+    ///
+    /// |         |          |       |         |          |     |
+    /// | ------- | -------- | ----- | ------- | -------- | --- |
+    /// | HL      | contains | 1111h |         |          |     |
+    /// | DE      | contains | 2222h |         |          |     |
+    /// | BC      | contains | 0000h |         |          |     |
+    /// | (1114h) | contains | A5h   | (2225h) | contains | A5h |
+    /// | (1113h) | contains | 36h   | (2224h) | contains | 36h |
+    /// | (1112h) | contains | 88h   | (2223h) | contains | 88h |
+    pub fn lddr(&mut self, mem: &mut dyn Z80Memory) -> u8 {
+        // Transfer data from HL address to DE address
+        let hl = self.hl();
+        let data = mem.read(hl);
+        let de = self.de();
+        mem.write(de, data);
+
+        // Increment HL and DE
+        self.set_hl(hl - 1);
+        self.set_de(de - 1);
+
+        // Read and decrement BC
+        let bc = self.bc().wrapping_sub(1);
+        self.set_bc(bc);
+
+        let t_states;
+
+        if bc != 0 {
+            self.program_counter -= 2;
+            t_states = 21;
+        } else {
+            t_states = 16;
+        }
+
+        unset_h_flag(&mut self.f);
+        set_p_flag_with(&mut self.f, bc.wrapping_sub(1) != 0);
+        unset_n_flag(&mut self.f);
+
+        t_states
+    }
 }
 
 mod tests {
@@ -556,6 +714,8 @@ mod tests {
         assert_eq!(16, t_states);
 
         assert_eq!(ram.read(2), ram.read(3));
+        assert_eq!(0x0003, z80.hl());
+        assert_eq!(0x0004, z80.de());
         assert_eq!(0x00FF, z80.bc());
 
         assert!(!h_flag_set(&z80.f));
@@ -577,6 +737,8 @@ mod tests {
         assert_eq!(16, t_states);
 
         assert_eq!(ram.read(2), ram.read(3));
+        assert_eq!(0x0003, z80.hl());
+        assert_eq!(0x0004, z80.de());
         assert_eq!(0x0001, z80.bc());
 
         assert!(!h_flag_set(&z80.f));
@@ -598,6 +760,8 @@ mod tests {
         assert_eq!(16, t_states);
 
         assert_eq!(ram.read(2), ram.read(3));
+        assert_eq!(0x0003, z80.hl());
+        assert_eq!(0x0004, z80.de());
         assert_eq!(0xFFFF, z80.bc());
 
         assert!(!h_flag_set(&z80.f));
@@ -620,6 +784,8 @@ mod tests {
 
         assert_eq!(0, z80.program_counter);
         assert_eq!(ram.read(2), ram.read(3));
+        assert_eq!(0x0003, z80.hl());
+        assert_eq!(0x0004, z80.de());
         assert_eq!(0x00FF, z80.bc());
 
         assert!(!h_flag_set(&z80.f));
@@ -642,6 +808,8 @@ mod tests {
 
         assert_eq!(0, z80.program_counter);
         assert_eq!(ram.read(2), ram.read(3));
+        assert_eq!(0x0003, z80.hl());
+        assert_eq!(0x0004, z80.de());
         assert_eq!(0x0001, z80.bc());
 
         assert!(!h_flag_set(&z80.f));
@@ -664,6 +832,8 @@ mod tests {
 
         assert_eq!(2, z80.program_counter);
         assert_eq!(ram.read(2), ram.read(3));
+        assert_eq!(0x0003, z80.hl());
+        assert_eq!(0x0004, z80.de());
         assert_eq!(0x0000, z80.bc());
 
         assert!(!h_flag_set(&z80.f));
@@ -686,6 +856,173 @@ mod tests {
 
         assert_eq!(0, z80.program_counter);
         assert_eq!(ram.read(2), ram.read(3));
+        assert_eq!(0x0003, z80.hl());
+        assert_eq!(0x0004, z80.de());
+        assert_eq!(0xFFFF, z80.bc());
+
+        assert!(!h_flag_set(&z80.f));
+        assert!(p_flag_set(&z80.f));
+        assert!(!n_flag_set(&z80.f));
+    }
+
+    #[test]
+    fn test_ldd() {
+        let bytes = &mut [0xED, 0xA0, 0xFF, 0x00];
+        let mut ram = Ram::new(bytes);
+        let mut z80 = Z80::new();
+        z80.program_counter = 2;
+        z80.set_hl(0x0002);
+        z80.set_de(0x0003);
+        z80.set_bc(0x0100);
+
+        let t_states = z80.ldd(&mut ram);
+        assert_eq!(16, t_states);
+
+        assert_eq!(ram.read(2), ram.read(3));
+        assert_eq!(0x0001, z80.hl());
+        assert_eq!(0x0002, z80.de());
+        assert_eq!(0x00FF, z80.bc());
+
+        assert!(!h_flag_set(&z80.f));
+        assert!(p_flag_set(&z80.f));
+        assert!(!n_flag_set(&z80.f));
+    }
+
+    #[test]
+    fn test_ldd_bc_result_1() {
+        let bytes = &mut [0xED, 0xA0, 0xFF, 0x00];
+        let mut ram = Ram::new(bytes);
+        let mut z80 = Z80::new();
+        z80.program_counter = 2;
+        z80.set_hl(0x0002);
+        z80.set_de(0x0003);
+        z80.set_bc(0x0002);
+
+        let t_states = z80.ldd(&mut ram);
+        assert_eq!(16, t_states);
+
+        assert_eq!(ram.read(2), ram.read(3));
+        assert_eq!(0x0001, z80.hl());
+        assert_eq!(0x0002, z80.de());
+        assert_eq!(0x0001, z80.bc());
+
+        assert!(!h_flag_set(&z80.f));
+        assert!(!p_flag_set(&z80.f));
+        assert!(!n_flag_set(&z80.f));
+    }
+
+    #[test]
+    fn test_ldd_bc_result_ffff() {
+        let bytes = &mut [0xED, 0xA0, 0xFF, 0x00];
+        let mut ram = Ram::new(bytes);
+        let mut z80 = Z80::new();
+        z80.program_counter = 2;
+        z80.set_hl(0x0002);
+        z80.set_de(0x0003);
+        z80.set_bc(0x0000);
+
+        let t_states = z80.ldd(&mut ram);
+        assert_eq!(16, t_states);
+
+        assert_eq!(ram.read(2), ram.read(3));
+        assert_eq!(0x0001, z80.hl());
+        assert_eq!(0x0002, z80.de());
+        assert_eq!(0xFFFF, z80.bc());
+
+        assert!(!h_flag_set(&z80.f));
+        assert!(p_flag_set(&z80.f));
+        assert!(!n_flag_set(&z80.f));
+    }
+
+    #[test]
+    fn test_lddr() {
+        let bytes = &mut [0xED, 0xB0, 0xFF, 0x00];
+        let mut ram = Ram::new(bytes);
+        let mut z80 = Z80::new();
+        z80.program_counter = 2;
+        z80.set_hl(0x0002);
+        z80.set_de(0x0003);
+        z80.set_bc(0x0100);
+
+        let t_states = z80.lddr(&mut ram);
+        assert_eq!(21, t_states);
+
+        assert_eq!(0, z80.program_counter);
+        assert_eq!(ram.read(2), ram.read(3));
+        assert_eq!(0x0001, z80.hl());
+        assert_eq!(0x0002, z80.de());
+        assert_eq!(0x00FF, z80.bc());
+
+        assert!(!h_flag_set(&z80.f));
+        assert!(p_flag_set(&z80.f));
+        assert!(!n_flag_set(&z80.f));
+    }
+
+    #[test]
+    fn test_lddr_bc_result_1() {
+        let bytes = &mut [0xED, 0xB0, 0xFF, 0x00];
+        let mut ram = Ram::new(bytes);
+        let mut z80 = Z80::new();
+        z80.program_counter = 2;
+        z80.set_hl(0x0002);
+        z80.set_de(0x0003);
+        z80.set_bc(0x0002);
+
+        let t_states = z80.lddr(&mut ram);
+        assert_eq!(21, t_states);
+
+        assert_eq!(0, z80.program_counter);
+        assert_eq!(ram.read(2), ram.read(3));
+        assert_eq!(0x0001, z80.hl());
+        assert_eq!(0x0002, z80.de());
+        assert_eq!(0x0001, z80.bc());
+
+        assert!(!h_flag_set(&z80.f));
+        assert!(!p_flag_set(&z80.f));
+        assert!(!n_flag_set(&z80.f));
+    }
+
+    #[test]
+    fn test_lddr_bc_result_0() {
+        let bytes = &mut [0xED, 0xB0, 0xFF, 0x00];
+        let mut ram = Ram::new(bytes);
+        let mut z80 = Z80::new();
+        z80.program_counter = 2;
+        z80.set_hl(0x0002);
+        z80.set_de(0x0003);
+        z80.set_bc(0x0001);
+
+        let t_states = z80.lddr(&mut ram);
+        assert_eq!(16, t_states);
+
+        assert_eq!(2, z80.program_counter);
+        assert_eq!(ram.read(2), ram.read(3));
+        assert_eq!(0x0001, z80.hl());
+        assert_eq!(0x0002, z80.de());
+        assert_eq!(0x0000, z80.bc());
+
+        assert!(!h_flag_set(&z80.f));
+        assert!(p_flag_set(&z80.f));
+        assert!(!n_flag_set(&z80.f));
+    }
+
+    #[test]
+    fn test_lddr_bc_result_ffff() {
+        let bytes = &mut [0xED, 0xB0, 0xFF, 0x00];
+        let mut ram = Ram::new(bytes);
+        let mut z80 = Z80::new();
+        z80.program_counter = 2;
+        z80.set_hl(0x0002);
+        z80.set_de(0x0003);
+        z80.set_bc(0x0000);
+
+        let t_states = z80.lddr(&mut ram);
+        assert_eq!(21, t_states);
+
+        assert_eq!(0, z80.program_counter);
+        assert_eq!(ram.read(2), ram.read(3));
+        assert_eq!(0x0001, z80.hl());
+        assert_eq!(0x0002, z80.de());
         assert_eq!(0xFFFF, z80.bc());
 
         assert!(!h_flag_set(&z80.f));

@@ -1169,7 +1169,7 @@ const IX_BIT_INSTRUCTIONS: [fn(&mut Z80, &mut dyn Z80Memory) -> u8; 0] = [
     ];
 
 // ED prefix
-const MISC_INSTRUCTIONS: [fn(&mut Z80, &mut dyn Z80Memory) -> u8; 14] = [
+const MISC_INSTRUCTIONS: [fn(&mut Z80, &mut dyn Z80Memory) -> u8; 16] = [
     // 00000000
     // 00000001
     // 00000010
@@ -1351,7 +1351,8 @@ const MISC_INSTRUCTIONS: [fn(&mut Z80, &mut dyn Z80Memory) -> u8; 14] = [
     // 10100101
     // 10100110
     // 10100111
-    // 10101000
+    // 10101000 LDD
+    Z80::ldd,
     // 10101001
     // 10101010
     // 10101011
@@ -1368,7 +1369,8 @@ const MISC_INSTRUCTIONS: [fn(&mut Z80, &mut dyn Z80Memory) -> u8; 14] = [
     // 10110101
     // 10110110
     // 10110111
-    // 10111000
+    // 10111000 LDDR
+    Z80::lddr,
     // 10111001
     // 10111010
     // 10111011
