@@ -2129,7 +2129,7 @@ impl Z80 {
 
     pub fn fetch_next_opcode(&mut self, mem: &dyn Z80Memory) -> u8 {
         let opcode = mem.read(self.program_counter);
-        self.program_counter += 1;
+        self.program_counter = self.program_counter.wrapping_add(1);
         opcode
     }
 

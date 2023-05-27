@@ -1,5 +1,7 @@
 use super::{
-    register_flags::{set_p_flag_with, unset_h_flag, unset_n_flag, set_y_flag_with, set_x_flag, set_x_flag_with},
+    register_flags::{
+        set_p_flag_with, set_x_flag, set_x_flag_with, set_y_flag_with, unset_h_flag, unset_n_flag,
+    },
     Z80Memory, Z80,
 };
 
@@ -207,10 +209,10 @@ impl Z80 {
         let ixh = (self.ix >> 8) as u8;
 
         let mem_spl = mem.read(self.stack_pointer);
-        let mem_sph = mem.read(self.stack_pointer + 1);
+        let mem_sph = mem.read(self.stack_pointer.wrapping_add(1));
 
         mem.write(self.stack_pointer, ixl);
-        mem.write(self.stack_pointer + 1, ixh);
+        mem.write(self.stack_pointer.wrapping_add(1), ixh);
 
         self.ix = (mem_sph as u16) << 8 | mem_spl as u16;
 
@@ -251,10 +253,10 @@ impl Z80 {
         let iyh = (self.iy >> 8) as u8;
 
         let mem_spl = mem.read(self.stack_pointer);
-        let mem_sph = mem.read(self.stack_pointer + 1);
+        let mem_sph = mem.read(self.stack_pointer.wrapping_add(1));
 
         mem.write(self.stack_pointer, iyl);
-        mem.write(self.stack_pointer + 1, iyh);
+        mem.write(self.stack_pointer.wrapping_add(1), iyh);
 
         self.iy = (mem_sph as u16) << 8 | mem_spl as u16;
 
@@ -310,8 +312,8 @@ impl Z80 {
         mem.write(de, data);
 
         // Increment HL and DE
-        self.set_hl(hl + 1);
-        self.set_de(de + 1);
+        self.set_hl(hl.wrapping_add(1));
+        self.set_de(de.wrapping_add(1));
 
         // Read and decrement BC
         let bc = self.bc().wrapping_sub(1);
@@ -398,8 +400,8 @@ impl Z80 {
         mem.write(de, data);
 
         // Increment HL and DE
-        self.set_hl(hl + 1);
-        self.set_de(de + 1);
+        self.set_hl(hl.wrapping_add(1));
+        self.set_de(de.wrapping_add(1));
 
         // Read and decrement BC
         let bc = self.bc().wrapping_sub(1);
@@ -475,8 +477,8 @@ impl Z80 {
         mem.write(de, data);
 
         // Increment HL and DE
-        self.set_hl(hl - 1);
-        self.set_de(de - 1);
+        self.set_hl(hl.wrapping_sub(1));
+        self.set_de(de.wrapping_sub(1));
 
         // Read and decrement BC
         let bc = self.bc().wrapping_sub(1);
@@ -485,7 +487,7 @@ impl Z80 {
         unset_h_flag(&mut self.f);
         set_p_flag_with(&mut self.f, bc != 0);
         unset_n_flag(&mut self.f);
-        
+
         // Extra behaviour from http://www.z80.info/zip/z80-documented.pdf p.16
         let n = self.a.value().wrapping_add(data);
         set_y_flag_with(&mut self.f, n & 0b00000010 != 0);
@@ -566,8 +568,8 @@ impl Z80 {
         mem.write(de, data);
 
         // Increment HL and DE
-        self.set_hl(hl - 1);
-        self.set_de(de - 1);
+        self.set_hl(hl.wrapping_sub(1));
+        self.set_de(de.wrapping_sub(1));
 
         // Read and decrement BC
         let bc = self.bc().wrapping_sub(1);
@@ -585,7 +587,7 @@ impl Z80 {
         unset_h_flag(&mut self.f);
         set_p_flag_with(&mut self.f, bc != 0);
         unset_n_flag(&mut self.f);
-        
+
         // Extra behaviour from http://www.z80.info/zip/z80-documented.pdf p.16
         let n = self.a.value().wrapping_add(data);
         set_y_flag_with(&mut self.f, n & 0b00000010 != 0);

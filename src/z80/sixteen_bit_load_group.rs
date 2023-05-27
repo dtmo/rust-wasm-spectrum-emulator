@@ -222,7 +222,7 @@ impl Z80 {
 
         let address = ((nh as u16) << 8) | nl as u16;
         self.l.set_value(mem.read(address));
-        self.h.set_value(mem.read(address + 1));
+        self.h.set_value(mem.read(address.wrapping_add(1)));
 
         // T states
         16
@@ -282,7 +282,7 @@ impl Z80 {
 
         let address = ((high_n as u16) << 8) | low_n as u16;
         self.c.set_value(mem.read(address));
-        self.b.set_value(mem.read(address + 1));
+        self.b.set_value(mem.read(address.wrapping_add(1)));
 
         // T states
         20
@@ -294,7 +294,7 @@ impl Z80 {
 
         let address = ((high_n as u16) << 8) | low_n as u16;
         self.e.set_value(mem.read(address));
-        self.d.set_value(mem.read(address + 1));
+        self.d.set_value(mem.read(address.wrapping_add(1)));
 
         // T states
         20
@@ -306,7 +306,7 @@ impl Z80 {
 
         let address = ((high_n as u16) << 8) | low_n as u16;
         self.l.set_value(mem.read(address));
-        self.h.set_value(mem.read(address + 1));
+        self.h.set_value(mem.read(address.wrapping_add(1)));
 
         // T states
         20
@@ -318,7 +318,7 @@ impl Z80 {
 
         let address = ((high_n as u16) << 8) | low_n as u16;
         let val_low = mem.read(address);
-        let val_high = mem.read(address + 1);
+        let val_high = mem.read(address.wrapping_add(1));
 
         self.stack_pointer = ((val_high as u16) << 8) | val_low as u16;
 
@@ -370,7 +370,7 @@ impl Z80 {
 
         let address = ((high_n as u16) << 8) | low_n as u16;
         let val_low = mem.read(address);
-        let val_high = mem.read(address + 1);
+        let val_high = mem.read(address.wrapping_add(1));
 
         self.ix = ((val_high as u16) << 8) | val_low as u16;
 
@@ -475,7 +475,7 @@ impl Z80 {
         let address = ((high_n as u16) << 8) | low_n as u16;
 
         mem.write(address, self.l.value());
-        mem.write(address + 1, self.h.value());
+        mem.write(address.wrapping_add(1), self.h.value());
 
         // T states
         16
@@ -537,7 +537,7 @@ impl Z80 {
         let address = ((high_n as u16) << 8) | low_n as u16;
 
         mem.write(address, self.c.value());
-        mem.write(address + 1, self.b.value());
+        mem.write(address.wrapping_add(1), self.b.value());
 
         // T states
         20
@@ -550,7 +550,7 @@ impl Z80 {
         let address = ((high_n as u16) << 8) | low_n as u16;
 
         mem.write(address, self.e.value());
-        mem.write(address + 1, self.d.value());
+        mem.write(address.wrapping_add(1), self.d.value());
 
         // T states
         20
@@ -563,7 +563,7 @@ impl Z80 {
         let address = ((high_n as u16) << 8) | low_n as u16;
 
         mem.write(address, self.l.value());
-        mem.write(address + 1, self.h.value());
+        mem.write(address.wrapping_add(1), self.h.value());
 
         // T states
         20
@@ -578,7 +578,7 @@ impl Z80 {
         let sp_low: u8 = self.stack_pointer as u8;
         let sp_high: u8 = (self.stack_pointer >> 8) as u8;
         mem.write(address, sp_low);
-        mem.write(address + 1, sp_high);
+        mem.write(address.wrapping_add(1), sp_high);
 
         // T states
         20
@@ -630,7 +630,7 @@ impl Z80 {
         let ix_low: u8 = self.ix as u8;
         let ix_high: u8 = (self.ix >> 8) as u8;
         mem.write(address, ix_low);
-        mem.write(address + 1, ix_high);
+        mem.write(address.wrapping_add(1), ix_high);
 
         // T states
         20
@@ -682,7 +682,7 @@ impl Z80 {
         let iy_low: u8 = self.iy as u8;
         let iy_high: u8 = (self.iy >> 8) as u8;
         mem.write(address, iy_low);
-        mem.write(address + 1, iy_high);
+        mem.write(address.wrapping_add(1), iy_high);
 
         // T states
         20
@@ -826,10 +826,10 @@ impl Z80 {
     /// Pointer contains 1005h.
 
     pub fn push_qqbc(&mut self, mem: &mut dyn Z80Memory) -> u8 {
-        self.stack_pointer -= 1;
+        self.stack_pointer = self.stack_pointer.wrapping_sub(1);
         mem.write(self.stack_pointer, self.b.value());
 
-        self.stack_pointer -= 1;
+        self.stack_pointer = self.stack_pointer.wrapping_sub(1);
         mem.write(self.stack_pointer, self.c.value());
 
         // T states
@@ -837,10 +837,10 @@ impl Z80 {
     }
 
     pub fn push_qqde(&mut self, mem: &mut dyn Z80Memory) -> u8 {
-        self.stack_pointer -= 1;
+        self.stack_pointer = self.stack_pointer.wrapping_sub(1);
         mem.write(self.stack_pointer, self.d.value());
 
-        self.stack_pointer -= 1;
+        self.stack_pointer = self.stack_pointer.wrapping_sub(1);
         mem.write(self.stack_pointer, self.e.value());
 
         // T states
@@ -848,10 +848,10 @@ impl Z80 {
     }
 
     pub fn push_qqhl(&mut self, mem: &mut dyn Z80Memory) -> u8 {
-        self.stack_pointer -= 1;
+        self.stack_pointer = self.stack_pointer.wrapping_sub(1);
         mem.write(self.stack_pointer, self.h.value());
 
-        self.stack_pointer -= 1;
+        self.stack_pointer = self.stack_pointer.wrapping_sub(1);
         mem.write(self.stack_pointer, self.l.value());
 
         // T states
@@ -859,10 +859,10 @@ impl Z80 {
     }
 
     pub fn push_qqaf(&mut self, mem: &mut dyn Z80Memory) -> u8 {
-        self.stack_pointer -= 1;
+        self.stack_pointer = self.stack_pointer.wrapping_sub(1);
         mem.write(self.stack_pointer, self.a.value());
 
-        self.stack_pointer -= 1;
+        self.stack_pointer = self.stack_pointer.wrapping_sub(1);
         mem.write(self.stack_pointer, self.f.value());
 
         // T states
@@ -900,11 +900,11 @@ impl Z80 {
     /// Pointer contains 1005h.
     pub fn push_ix(&mut self, mem: &mut dyn Z80Memory) -> u8 {
         let ix_high: u8 = (self.ix >> 8) as u8;
-        self.stack_pointer -= 1;
+        self.stack_pointer = self.stack_pointer.wrapping_sub(1);
         mem.write(self.stack_pointer, ix_high);
 
         let ix_low: u8 = self.ix as u8;
-        self.stack_pointer -= 1;
+        self.stack_pointer = self.stack_pointer.wrapping_sub(1);
         mem.write(self.stack_pointer, ix_low);
 
         // T states
@@ -942,11 +942,11 @@ impl Z80 {
     /// Pointer contains 1005h.
     pub fn push_iy(&mut self, mem: &mut dyn Z80Memory) -> u8 {
         let iy_high: u8 = (self.iy >> 8) as u8;
-        self.stack_pointer -= 1;
+        self.stack_pointer = self.stack_pointer.wrapping_sub(1);
         mem.write(self.stack_pointer, iy_high);
 
         let iy_low: u8 = self.iy as u8;
-        self.stack_pointer -= 1;
+        self.stack_pointer = self.stack_pointer.wrapping_sub(1);
         mem.write(self.stack_pointer, iy_low);
 
         // T states
@@ -992,10 +992,10 @@ impl Z80 {
     /// 1002h.
     pub fn pop_qqbc(&mut self, mem: &dyn Z80Memory) -> u8 {
         self.c.set_value(mem.read(self.stack_pointer));
-        self.stack_pointer += 1;
+        self.stack_pointer = self.stack_pointer.wrapping_add(1);
 
         self.b.set_value(mem.read(self.stack_pointer));
-        self.stack_pointer += 1;
+        self.stack_pointer = self.stack_pointer.wrapping_add(1);
 
         // T states
         10
@@ -1003,10 +1003,10 @@ impl Z80 {
 
     pub fn pop_qqde(&mut self, mem: &dyn Z80Memory) -> u8 {
         self.e.set_value(mem.read(self.stack_pointer));
-        self.stack_pointer += 1;
+        self.stack_pointer = self.stack_pointer.wrapping_add(1);
 
         self.d.set_value(mem.read(self.stack_pointer));
-        self.stack_pointer += 1;
+        self.stack_pointer = self.stack_pointer.wrapping_add(1);
 
         // T states
         10
@@ -1014,10 +1014,10 @@ impl Z80 {
 
     pub fn pop_qqhl(&mut self, mem: &dyn Z80Memory) -> u8 {
         self.l.set_value(mem.read(self.stack_pointer));
-        self.stack_pointer += 1;
+        self.stack_pointer = self.stack_pointer.wrapping_add(1);
 
         self.h.set_value(mem.read(self.stack_pointer));
-        self.stack_pointer += 1;
+        self.stack_pointer = self.stack_pointer.wrapping_add(1);
 
         // T states
         10
@@ -1025,10 +1025,10 @@ impl Z80 {
 
     pub fn pop_qqaf(&mut self, mem: &dyn Z80Memory) -> u8 {
         self.f.set_value(mem.read(self.stack_pointer));
-        self.stack_pointer += 1;
+        self.stack_pointer = self.stack_pointer.wrapping_add(1);
 
         self.a.set_value(mem.read(self.stack_pointer));
-        self.stack_pointer += 1;
+        self.stack_pointer = self.stack_pointer.wrapping_add(1);
 
         // T states
         10
@@ -1065,10 +1065,10 @@ impl Z80 {
     /// Register IX containing 3355h, and the Stack Pointer containing 1002h.
     pub fn pop_ix(&mut self, mem: &dyn Z80Memory) -> u8 {
         let ix_low = mem.read(self.stack_pointer);
-        self.stack_pointer += 1;
+        self.stack_pointer = self.stack_pointer.wrapping_add(1);
 
         let ix_high = mem.read(self.stack_pointer);
-        self.stack_pointer += 1;
+        self.stack_pointer = self.stack_pointer.wrapping_add(1);
 
         self.ix = ((ix_high as u16) << 8) | ix_low as u16;
 
@@ -1107,10 +1107,10 @@ impl Z80 {
     /// Register IY containing 3355h, and the Stack Pointer containing 1002h.
     pub fn pop_iy(&mut self, mem: &dyn Z80Memory) -> u8 {
         let iy_low = mem.read(self.stack_pointer);
-        self.stack_pointer += 1;
+        self.stack_pointer = self.stack_pointer.wrapping_add(1);
 
         let iy_high = mem.read(self.stack_pointer);
-        self.stack_pointer += 1;
+        self.stack_pointer = self.stack_pointer.wrapping_add(1);
 
         self.iy = ((iy_high as u16) << 8) | iy_low as u16;
 
