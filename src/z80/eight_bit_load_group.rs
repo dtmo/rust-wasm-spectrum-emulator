@@ -1,6 +1,6 @@
 use super::{
     register_flags::{
-        s_flag_set, set_p_flag_with, set_s_flag_with, set_z_flag_with, unset_h_flag, unset_n_flag,
+        s_flag, set_p_flag_with, set_s_flag_with, set_z_flag_with, unset_h_flag, unset_n_flag,
     },
     Register, Z80Memory, Z80,
 };
@@ -1284,7 +1284,7 @@ impl Z80 {
         self.a.set_value(self.i.value());
 
         // S is set if the I Register is negative; otherwise, it is reset.
-        set_s_flag_with(&mut self.f, s_flag_set(&self.i));
+        set_s_flag_with(&mut self.f, s_flag(&self.i));
 
         // Z is set if the I Register is 0; otherwise, it is reset.
         set_z_flag_with(&mut self.f, self.i.value() == 0);
@@ -1343,7 +1343,7 @@ impl Z80 {
         self.a.set_value(self.r.value());
 
         // S is set if the R-Register is negative; otherwise, it is reset.
-        set_s_flag_with(&mut self.f, s_flag_set(&self.r));
+        set_s_flag_with(&mut self.f, s_flag(&self.r));
 
         // Z is set if the R Register is 0; otherwise, it is reset.
         set_z_flag_with(&mut self.f, self.r.value() == 0);
@@ -1439,7 +1439,7 @@ mod tests {
     use super::*;
 
     use crate::z80::{
-        register_flags::{h_flag_set, n_flag_set, p_flag_set, z_flag_set},
+        register_flags::{h_flag, n_flag, p_flag, z_flag},
         tests::Ram,
     };
 
@@ -1867,19 +1867,19 @@ mod tests {
         assert_eq!(z80.i, z80.a);
 
         // S is set if the I Register is negative; otherwise, it is reset.
-        assert_eq!(false, s_flag_set(&z80.f));
+        assert_eq!(false, s_flag(&z80.f));
 
         // Z is set if the I Register is 0; otherwise, it is reset.
-        assert_eq!(false, z_flag_set(&z80.f));
+        assert_eq!(false, z_flag(&z80.f));
 
         // H is reset.
-        assert_eq!(false, h_flag_set(&z80.f));
+        assert_eq!(false, h_flag(&z80.f));
 
         // P/V contains contents of IFF2.
-        assert_eq!(z80.iff2, p_flag_set(&z80.f));
+        assert_eq!(z80.iff2, p_flag(&z80.f));
 
         // N is reset.
-        assert_eq!(false, n_flag_set(&z80.f));
+        assert_eq!(false, n_flag(&z80.f));
 
         // TODO: If an interrupt occurs during execution of this instruction, the Parity flag contains a 0.
     }
@@ -1894,19 +1894,19 @@ mod tests {
         assert_eq!(z80.i, z80.a);
 
         // S is set if the I Register is negative; otherwise, it is reset.
-        assert_eq!(false, s_flag_set(&z80.f));
+        assert_eq!(false, s_flag(&z80.f));
 
         // Z is set if the I Register is 0; otherwise, it is reset.
-        assert_eq!(true, z_flag_set(&z80.f));
+        assert_eq!(true, z_flag(&z80.f));
 
         // H is reset.
-        assert_eq!(false, h_flag_set(&z80.f));
+        assert_eq!(false, h_flag(&z80.f));
 
         // P/V contains contents of IFF2.
-        assert_eq!(z80.iff2, p_flag_set(&z80.f));
+        assert_eq!(z80.iff2, p_flag(&z80.f));
 
         // N is reset.
-        assert_eq!(false, n_flag_set(&z80.f));
+        assert_eq!(false, n_flag(&z80.f));
 
         // TODO: If an interrupt occurs during execution of this instruction, the Parity flag contains a 0.
     }
@@ -1921,19 +1921,19 @@ mod tests {
         assert_eq!(z80.i, z80.a);
 
         // S is set if the I Register is negative; otherwise, it is reset.
-        assert_eq!(true, s_flag_set(&z80.f));
+        assert_eq!(true, s_flag(&z80.f));
 
         // Z is set if the I Register is 0; otherwise, it is reset.
-        assert_eq!(false, z_flag_set(&z80.f));
+        assert_eq!(false, z_flag(&z80.f));
 
         // H is reset.
-        assert_eq!(false, h_flag_set(&z80.f));
+        assert_eq!(false, h_flag(&z80.f));
 
         // P/V contains contents of IFF2.
-        assert_eq!(z80.iff2, p_flag_set(&z80.f));
+        assert_eq!(z80.iff2, p_flag(&z80.f));
 
         // N is reset.
-        assert_eq!(false, n_flag_set(&z80.f));
+        assert_eq!(false, n_flag(&z80.f));
 
         // TODO: If an interrupt occurs during execution of this instruction, the Parity flag contains a 0.
     }
@@ -1948,19 +1948,19 @@ mod tests {
         assert_eq!(z80.r, z80.a);
 
         // S is set if the R Register is negative; otherwise, it is reset.
-        assert_eq!(false, s_flag_set(&z80.f));
+        assert_eq!(false, s_flag(&z80.f));
 
         // Z is set if the R Register is 0; otherwise, it is reset.
-        assert_eq!(false, z_flag_set(&z80.f));
+        assert_eq!(false, z_flag(&z80.f));
 
         // H is reset.
-        assert_eq!(false, h_flag_set(&z80.f));
+        assert_eq!(false, h_flag(&z80.f));
 
         // P/V contains contents of IFF2.
-        assert_eq!(z80.iff2, p_flag_set(&z80.f));
+        assert_eq!(z80.iff2, p_flag(&z80.f));
 
         // N is reset.
-        assert_eq!(false, n_flag_set(&z80.f));
+        assert_eq!(false, n_flag(&z80.f));
 
         // TODO: If an interrupt occurs during execution of this instruction, the Parity flag contains a 0.
     }
@@ -1975,19 +1975,19 @@ mod tests {
         assert_eq!(z80.r, z80.a);
 
         // S is set if the R Register is negative; otherwise, it is reset.
-        assert_eq!(false, s_flag_set(&z80.f));
+        assert_eq!(false, s_flag(&z80.f));
 
         // Z is set if the R Register is 0; otherwise, it is reset.
-        assert_eq!(true, z_flag_set(&z80.f));
+        assert_eq!(true, z_flag(&z80.f));
 
         // H is reset.
-        assert_eq!(false, h_flag_set(&z80.f));
+        assert_eq!(false, h_flag(&z80.f));
 
         // P/V contains contents of IFF2.
-        assert_eq!(z80.iff2, p_flag_set(&z80.f));
+        assert_eq!(z80.iff2, p_flag(&z80.f));
 
         // N is reset.
-        assert_eq!(false, n_flag_set(&z80.f));
+        assert_eq!(false, n_flag(&z80.f));
 
         // TODO: If an interrupt occurs during execution of this instruction, the Parity flag contains a 0.
     }
@@ -2002,19 +2002,19 @@ mod tests {
         assert_eq!(z80.r, z80.a);
 
         // S is set if the R Register is negative; otherwise, it is reset.
-        assert_eq!(true, s_flag_set(&z80.f));
+        assert_eq!(true, s_flag(&z80.f));
 
         // Z is set if the R Register is 0; otherwise, it is reset.
-        assert_eq!(false, z_flag_set(&z80.f));
+        assert_eq!(false, z_flag(&z80.f));
 
         // H is reset.
-        assert_eq!(false, h_flag_set(&z80.f));
+        assert_eq!(false, h_flag(&z80.f));
 
         // P/V contains contents of IFF2.
-        assert_eq!(z80.iff2, p_flag_set(&z80.f));
+        assert_eq!(z80.iff2, p_flag(&z80.f));
 
         // N is reset.
-        assert_eq!(false, n_flag_set(&z80.f));
+        assert_eq!(false, n_flag(&z80.f));
 
         // TODO: If an interrupt occurs during execution of this instruction, the Parity flag contains a 0.
     }

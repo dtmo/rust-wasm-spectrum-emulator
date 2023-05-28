@@ -2231,7 +2231,7 @@ impl Z80 {
     fn daa(&mut self) -> u8 {
         let a_high = self.a.value() & 0xF0;
         let a_low = self.a.value() & 0x0F;
-        let diff: u8 = match (c_flag_set(&self.f), a_high, h_flag_set(&self.f), a_low) {
+        let diff: u8 = match (c_flag(&self.f), a_high, h_flag(&self.f), a_low) {
             (false, a_high, false, a_low) if a_high <= 0x09 && a_low <= 0x09 => 0x00,
             (false, a_high, true, a_low) if a_high <= 0x09 && a_low <= 0x09 => 0x06,
             (false, a_high, _, a_low) if a_high <= 0x08 && a_low >= 0x0A => 0x06,
@@ -2244,22 +2244,22 @@ impl Z80 {
             _ => 0x00,
         };
 
-        let new_c_flag: bool = match (c_flag_set(&self.f), a_high, a_low) {
+        let new_c_flag: bool = match (c_flag(&self.f), a_high, a_low) {
             (false, a_high, a_low) if a_high <= 0x09 && a_low <= 0x09 => false,
             (false, a_high, a_low) if a_high <= 0x08 && a_low >= 0x0A => false,
             (false, a_high, a_low) if a_high >= 0x09 && a_low >= 0x0A => true,
             (false, a_high, a_low) if a_high >= 0x0A && a_low <= 0x09 => true,
             (true, _, _) => true,
-            _ => c_flag_set(&self.f),
+            _ => c_flag(&self.f),
         };
 
-        let new_h_flag: bool = match (n_flag_set(&self.f), h_flag_set(&self.f), a_low) {
+        let new_h_flag: bool = match (n_flag(&self.f), h_flag(&self.f), a_low) {
             (false, _, a_low) if a_low <= 0x09 => false,
             (false, _, a_low) if a_low >= 0x0A => true,
             (true, false, _) => false,
             (true, true, a_low) if a_low >= 0x06 => false,
             (true, true, a_low) if a_low <= 0x05 => true,
-            _ => h_flag_set(&self.f),
+            _ => h_flag(&self.f),
         };
 
         self.a.add(diff);
