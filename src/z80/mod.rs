@@ -1169,7 +1169,7 @@ const IX_BIT_INSTRUCTIONS: [fn(&mut Z80, &mut dyn Z80Memory) -> u8; 0] = [
     ];
 
 // ED prefix
-const MISC_INSTRUCTIONS: [fn(&mut Z80, &mut dyn Z80Memory) -> u8; 16] = [
+const MISC_INSTRUCTIONS: [fn(&mut Z80, &mut dyn Z80Memory) -> u8; 17] = [
     // 00000000
     // 00000001
     // 00000010
@@ -1344,7 +1344,8 @@ const MISC_INSTRUCTIONS: [fn(&mut Z80, &mut dyn Z80Memory) -> u8; 16] = [
     // 10011111
     // 10100000 LDI
     Z80::ldi,
-    // 10100001
+    // 10100001 CPI
+    |z80, mem| z80.cpi(mem),
     // 10100010
     // 10100011
     // 10100100

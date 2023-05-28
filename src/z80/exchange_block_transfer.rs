@@ -1,6 +1,8 @@
 use super::{
     register_flags::{
-        set_p_flag_with, set_x_flag, set_x_flag_with, set_y_flag_with, unset_h_flag, unset_n_flag,
+        set_h_flag, set_h_flag_with, set_n_flag, set_p_flag_with, set_s_flag_with, set_x_flag,
+        set_x_flag_with, set_y_flag_with, set_z_flag_with, unset_h_flag, unset_n_flag,
+        S_FLAG_BITMASK,
     },
     Z80Memory, Z80,
 };
@@ -595,11 +597,73 @@ impl Z80 {
 
         t_states
     }
+
+    /// ## CPI
+    /// ### Operation
+    /// A – (HL), HL ← HL +1, BC ← BC – 1
+    /// ### Op Code
+    /// CPI
+    /// ### Operands
+    /// None.
+    /// ### Description
+    /// The contents of the memory location addressed by the HL register is
+    /// compared with the contents of the Accumulator. With a true compare, a
+    /// condition bit is set. Then HL is incremented and the Byte Counter
+    /// (register pair BC) is decremented.
+    ///
+    /// | M Cycles | T States        | 4 MHz E.T. |
+    /// | -------- | --------------- | ---------- |
+    /// | 4        | 16 (4, 4, 3, 5) | 4.00       |
+    ///
+    /// ### Condition Bits Affected
+    /// * S is set if result is negative; otherwise, it is reset.
+    /// * Z is set if A is (HL); otherwise, it is reset.
+    /// * H is set if borrow from bit 4; otherwise, it is reset.
+    /// * P/V is set if BC – 1 is not 0; otherwise, it is reset.
+    /// * N is set.
+    /// * C is not affected.
+    /// ### Example
+    /// If the HL register pair contains 1111h, memory location 1111h contains
+    /// 3Bh, the Accumulator contains 3Bh, and the Byte Counter contains 0001h.
+    /// Upon the execution of a CPI instruction, the Byte Counter contains
+    /// 0000h, the HL register pair contains 1112h, the Z flag in the F register
+    /// is set, and the P/V flag in the F Register is reset. There is no effect
+    /// on the contents of the Accumulator or to address 1111h.
+    pub fn cpi(&mut self, mem: &dyn Z80Memory) -> u8 {
+        let address = self.hl();
+        let data = mem.read(address);
+
+        let a = self.a.value();
+        let n = a.wrapping_sub(data);
+
+        let hl = address.wrapping_add(1);
+        self.set_hl(hl);
+
+        let bc = self.bc().wrapping_sub(1);
+        self.set_bc(bc);
+
+        let sign_flag = n & S_FLAG_BITMASK == S_FLAG_BITMASK;
+        set_s_flag_with(&mut self.f, sign_flag);
+        set_z_flag_with(&mut self.f, n == 0);
+        let half_carry_borrow = (a & 0x10) != (n & 0x10);
+        set_h_flag_with(&mut self.f, half_carry_borrow);
+        set_p_flag_with(&mut self.f, bc != 0);
+        set_n_flag(&mut self.f);
+
+        // Extra behaviour from http://www.z80.info/zip/z80-documented.pdf p.16
+        let y_flag = n & 0b00000010 == 0b00000010;
+        set_y_flag_with(&mut self.f, y_flag);
+        let x_flag = n & 0b00001000 == 0b00001000;
+        set_x_flag_with(&mut self.f, x_flag);
+
+        // T states
+        16
+    }
 }
 
 mod tests {
     use crate::z80::{
-        register_flags::{h_flag_set, n_flag_set, p_flag_set},
+        register_flags::{h_flag, n_flag, p_flag, s_flag, z_flag},
         tests::Ram,
     };
 
@@ -740,9 +804,9 @@ mod tests {
         assert_eq!(0x0004, z80.de());
         assert_eq!(0x00FF, z80.bc());
 
-        assert!(!h_flag_set(&z80.f));
-        assert!(p_flag_set(&z80.f));
-        assert!(!n_flag_set(&z80.f));
+        assert!(!h_flag(&z80.f));
+        assert!(p_flag(&z80.f));
+        assert!(!n_flag(&z80.f));
     }
 
     #[test]
@@ -763,9 +827,9 @@ mod tests {
         assert_eq!(0x0004, z80.de());
         assert_eq!(0x0000, z80.bc());
 
-        assert!(!h_flag_set(&z80.f));
-        assert!(!p_flag_set(&z80.f));
-        assert!(!n_flag_set(&z80.f));
+        assert!(!h_flag(&z80.f));
+        assert!(!p_flag(&z80.f));
+        assert!(!n_flag(&z80.f));
     }
 
     #[test]
@@ -786,9 +850,9 @@ mod tests {
         assert_eq!(0x0004, z80.de());
         assert_eq!(0xFFFF, z80.bc());
 
-        assert!(!h_flag_set(&z80.f));
-        assert!(p_flag_set(&z80.f));
-        assert!(!n_flag_set(&z80.f));
+        assert!(!h_flag(&z80.f));
+        assert!(p_flag(&z80.f));
+        assert!(!n_flag(&z80.f));
     }
 
     #[test]
@@ -810,9 +874,9 @@ mod tests {
         assert_eq!(0x0004, z80.de());
         assert_eq!(0x00FF, z80.bc());
 
-        assert!(!h_flag_set(&z80.f));
-        assert!(p_flag_set(&z80.f));
-        assert!(!n_flag_set(&z80.f));
+        assert!(!h_flag(&z80.f));
+        assert!(p_flag(&z80.f));
+        assert!(!n_flag(&z80.f));
     }
 
     #[test]
@@ -834,9 +898,9 @@ mod tests {
         assert_eq!(0x0004, z80.de());
         assert_eq!(0x0000, z80.bc());
 
-        assert!(!h_flag_set(&z80.f));
-        assert!(!p_flag_set(&z80.f));
-        assert!(!n_flag_set(&z80.f));
+        assert!(!h_flag(&z80.f));
+        assert!(!p_flag(&z80.f));
+        assert!(!n_flag(&z80.f));
     }
 
     #[test]
@@ -858,9 +922,9 @@ mod tests {
         assert_eq!(0x0004, z80.de());
         assert_eq!(0xFFFF, z80.bc());
 
-        assert!(!h_flag_set(&z80.f));
-        assert!(p_flag_set(&z80.f));
-        assert!(!n_flag_set(&z80.f));
+        assert!(!h_flag(&z80.f));
+        assert!(p_flag(&z80.f));
+        assert!(!n_flag(&z80.f));
     }
 
     #[test]
@@ -881,9 +945,9 @@ mod tests {
         assert_eq!(0x0002, z80.de());
         assert_eq!(0x00FF, z80.bc());
 
-        assert!(!h_flag_set(&z80.f));
-        assert!(p_flag_set(&z80.f));
-        assert!(!n_flag_set(&z80.f));
+        assert!(!h_flag(&z80.f));
+        assert!(p_flag(&z80.f));
+        assert!(!n_flag(&z80.f));
     }
 
     #[test]
@@ -904,9 +968,9 @@ mod tests {
         assert_eq!(0x0002, z80.de());
         assert_eq!(0x0000, z80.bc());
 
-        assert!(!h_flag_set(&z80.f));
-        assert!(!p_flag_set(&z80.f));
-        assert!(!n_flag_set(&z80.f));
+        assert!(!h_flag(&z80.f));
+        assert!(!p_flag(&z80.f));
+        assert!(!n_flag(&z80.f));
     }
 
     #[test]
@@ -927,9 +991,9 @@ mod tests {
         assert_eq!(0x0002, z80.de());
         assert_eq!(0xFFFF, z80.bc());
 
-        assert!(!h_flag_set(&z80.f));
-        assert!(p_flag_set(&z80.f));
-        assert!(!n_flag_set(&z80.f));
+        assert!(!h_flag(&z80.f));
+        assert!(p_flag(&z80.f));
+        assert!(!n_flag(&z80.f));
     }
 
     #[test]
@@ -951,9 +1015,9 @@ mod tests {
         assert_eq!(0x0002, z80.de());
         assert_eq!(0x00FF, z80.bc());
 
-        assert!(!h_flag_set(&z80.f));
-        assert!(p_flag_set(&z80.f));
-        assert!(!n_flag_set(&z80.f));
+        assert!(!h_flag(&z80.f));
+        assert!(p_flag(&z80.f));
+        assert!(!n_flag(&z80.f));
     }
     #[test]
     fn test_lddr_bc_result_0() {
@@ -974,9 +1038,9 @@ mod tests {
         assert_eq!(0x0002, z80.de());
         assert_eq!(0x0000, z80.bc());
 
-        assert!(!h_flag_set(&z80.f));
-        assert!(!p_flag_set(&z80.f));
-        assert!(!n_flag_set(&z80.f));
+        assert!(!h_flag(&z80.f));
+        assert!(!p_flag(&z80.f));
+        assert!(!n_flag(&z80.f));
     }
 
     #[test]
@@ -998,8 +1062,68 @@ mod tests {
         assert_eq!(0x0002, z80.de());
         assert_eq!(0xFFFF, z80.bc());
 
-        assert!(!h_flag_set(&z80.f));
-        assert!(p_flag_set(&z80.f));
-        assert!(!n_flag_set(&z80.f));
+        assert!(!h_flag(&z80.f));
+        assert!(p_flag(&z80.f));
+        assert!(!n_flag(&z80.f));
+    }
+
+    #[test]
+    fn test_cpi_true_compare_with_bc_zero() {
+        let mut bytes = [0xED, 0xA1, 0x80];
+        let mem = Ram::new(&mut bytes);
+        let mut z80 = Z80::new();
+        z80.set_hl(0x0002);
+        z80.set_bc(0x0001);
+        z80.set_a(0x80);
+
+        let t_states = z80.cpi(&mem);
+
+        assert_eq!(16, t_states);
+
+        assert_eq!(false, s_flag(&z80.f));
+        assert_eq!(true, z_flag(&z80.f));
+        assert_eq!(false, h_flag(&z80.f));
+        assert_eq!(false, p_flag(&z80.f));
+        assert_eq!(true, n_flag(&z80.f));
+    }
+
+    #[test]
+    fn test_cpi_positive_compare_with_half_carry_borrow_and_bc_not_zero() {
+        let mut bytes = [0xED, 0xA1, 0x01];
+        let mem = Ram::new(&mut bytes);
+        let mut z80 = Z80::new();
+        z80.set_hl(0x0002);
+        z80.set_bc(0x0002);
+        z80.set_a(0x10);
+
+        let t_states = z80.cpi(&mem);
+
+        assert_eq!(16, t_states);
+
+        assert_eq!(false, s_flag(&z80.f));
+        assert_eq!(false, z_flag(&z80.f));
+        assert_eq!(true, h_flag(&z80.f));
+        assert_eq!(true, p_flag(&z80.f));
+        assert_eq!(true, n_flag(&z80.f));
+    }
+
+    #[test]
+    fn test_cpi_negative_compare() {
+        let mut bytes = [0xED, 0xA1, 0x10];
+        let mem = Ram::new(&mut bytes);
+        let mut z80 = Z80::new();
+        z80.set_hl(0x0002);
+        z80.set_bc(0x0002);
+        z80.set_a(0x08);
+
+        let t_states = z80.cpi(&mem);
+
+        assert_eq!(16, t_states);
+
+        assert_eq!(true, s_flag(&z80.f));
+        assert_eq!(false, z_flag(&z80.f));
+        assert_eq!(true, h_flag(&z80.f));
+        assert_eq!(true, p_flag(&z80.f));
+        assert_eq!(true, n_flag(&z80.f));
     }
 }
