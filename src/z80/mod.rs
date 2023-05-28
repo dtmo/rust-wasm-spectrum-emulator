@@ -2099,6 +2099,70 @@ impl Z80 {
         low.set_value(value as u8);
     }
 
+    pub fn a(&self) -> u8 {
+        self.a.value()
+    }
+
+    pub fn set_a(&mut self, value: u8) {
+        self.a.set_value(value);
+    }
+
+    pub fn f(&self) -> u8 {
+        self.f.value()
+    }
+
+    pub fn set_f(&mut self, value: u8) {
+        self.f.set_value(value);
+    }
+
+    pub fn b(&self) -> u8 {
+        self.b.value()
+    }
+
+    pub fn set_b(&mut self, value: u8) {
+        self.b.set_value(value);
+    }
+
+    pub fn c(&self) -> u8 {
+        self.c.value()
+    }
+
+    pub fn set_c(&mut self, value: u8) {
+        self.c.set_value(value);
+    }
+
+    pub fn d(&self) -> u8 {
+        self.d.value()
+    }
+
+    pub fn set_d(&mut self, value: u8) {
+        self.d.set_value(value);
+    }
+
+    pub fn e(&self) -> u8 {
+        self.e.value()
+    }
+
+    pub fn set_e(&mut self, value: u8) {
+        self.e.set_value(value);
+    }
+
+    pub fn h(&self) -> u8 {
+        self.h.value()
+    }
+
+    pub fn set_h(&mut self, value: u8) {
+        self.h.set_value(value);
+    }
+
+    pub fn l(&self) -> u8 {
+        self.l.value()
+    }
+
+    pub fn set_l(&mut self, value: u8) {
+        self.l.set_value(value);
+    }
+
     pub fn set_bc(&mut self, value: u16) {
         Z80::load_register_pair(&mut self.b, &mut self.c, value);
     }
