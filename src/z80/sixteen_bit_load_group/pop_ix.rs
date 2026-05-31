@@ -8,8 +8,8 @@ impl Z80 {
     /// POP
     /// ### Operand
     /// IX
-    /// `1 1 0 1 1 1 0 1` (DD)
-    /// `1 1 1 0 0 0 0 1` (E1)
+    /// `11011101` (DD)
+    /// `11100001` (E1)
     /// ### Description
     /// The top two bytes of the external memory last-in, first-out (LIFO) stack
     /// are popped to Index Register IX. The Stack Pointer (SP) Register pair
@@ -31,11 +31,11 @@ impl Z80 {
     /// and location 1001h contains 33h, the instruction POP IX results in Index
     /// Register IX containing 3355h, and the Stack Pointer containing 1002h.
     pub fn pop_ix(&mut self, mem: &dyn Z80Memory) -> u8 {
-        let ix_low = mem.read(self.stack_pointer);
-        self.stack_pointer = self.stack_pointer.wrapping_add(1);
+        let ix_low = mem.read(self.sp);
+        self.sp = self.sp.wrapping_add(1);
 
-        let ix_high = mem.read(self.stack_pointer);
-        self.stack_pointer = self.stack_pointer.wrapping_add(1);
+        let ix_high = mem.read(self.sp);
+        self.sp = self.sp.wrapping_add(1);
 
         self.ix = ((ix_high as u16) << 8) | ix_low as u16;
 
@@ -54,12 +54,12 @@ mod tests {
         let bytes = &mut [0xDD, 0xE1, 0x55, 0x33];
         let ram = &mut Ram::new(bytes);
         let z80 = &mut Z80::new();
-        z80.stack_pointer = 2;
+        z80.sp = 2;
 
         let t_states = z80.pop_ix(ram);
         assert_eq!(14, t_states);
 
-        assert_eq!(4, z80.stack_pointer);
+        assert_eq!(4, z80.sp);
         assert_eq!(0x3355, z80.ix);
     }
 }

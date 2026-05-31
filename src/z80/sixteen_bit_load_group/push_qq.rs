@@ -40,44 +40,44 @@ impl Z80 {
     /// Pointer contains 1005h.
 
     pub fn push_qqbc(&mut self, mem: &mut dyn Z80Memory) -> u8 {
-        self.stack_pointer = self.stack_pointer.wrapping_sub(1);
-        mem.write(self.stack_pointer, self.b.value());
+        self.sp = self.sp.wrapping_sub(1);
+        mem.write(self.sp, self.b.value());
 
-        self.stack_pointer = self.stack_pointer.wrapping_sub(1);
-        mem.write(self.stack_pointer, self.c.value());
+        self.sp = self.sp.wrapping_sub(1);
+        mem.write(self.sp, self.c.value());
 
         // T states
         11
     }
 
     pub fn push_qqde(&mut self, mem: &mut dyn Z80Memory) -> u8 {
-        self.stack_pointer = self.stack_pointer.wrapping_sub(1);
-        mem.write(self.stack_pointer, self.d.value());
+        self.sp = self.sp.wrapping_sub(1);
+        mem.write(self.sp, self.d.value());
 
-        self.stack_pointer = self.stack_pointer.wrapping_sub(1);
-        mem.write(self.stack_pointer, self.e.value());
+        self.sp = self.sp.wrapping_sub(1);
+        mem.write(self.sp, self.e.value());
 
         // T states
         11
     }
 
     pub fn push_qqhl(&mut self, mem: &mut dyn Z80Memory) -> u8 {
-        self.stack_pointer = self.stack_pointer.wrapping_sub(1);
-        mem.write(self.stack_pointer, self.h.value());
+        self.sp = self.sp.wrapping_sub(1);
+        mem.write(self.sp, self.h.value());
 
-        self.stack_pointer = self.stack_pointer.wrapping_sub(1);
-        mem.write(self.stack_pointer, self.l.value());
+        self.sp = self.sp.wrapping_sub(1);
+        mem.write(self.sp, self.l.value());
 
         // T states
         11
     }
 
     pub fn push_qqaf(&mut self, mem: &mut dyn Z80Memory) -> u8 {
-        self.stack_pointer = self.stack_pointer.wrapping_sub(1);
-        mem.write(self.stack_pointer, self.a.value());
+        self.sp = self.sp.wrapping_sub(1);
+        mem.write(self.sp, self.a.value());
 
-        self.stack_pointer = self.stack_pointer.wrapping_sub(1);
-        mem.write(self.stack_pointer, self.f.value());
+        self.sp = self.sp.wrapping_sub(1);
+        mem.write(self.sp, self.f.value());
 
         // T states
         11
@@ -94,7 +94,7 @@ mod tests {
         let bytes = &mut [0xC5, 0x00, 0x00];
         let ram = &mut Ram::new(bytes);
         let z80 = &mut Z80::new();
-        z80.stack_pointer = 3;
+        z80.sp = 3;
         z80.set_bc(0x2233);
 
         let t_states = z80.push_qqbc(ram);
@@ -102,7 +102,7 @@ mod tests {
 
         assert_eq!(0x22, ram.read(2));
         assert_eq!(0x33, ram.read(1));
-        assert_eq!(1, z80.stack_pointer);
+        assert_eq!(1, z80.sp);
     }
 
     #[test]
@@ -110,7 +110,7 @@ mod tests {
         let bytes = &mut [0xD5, 0x00, 0x00];
         let ram = &mut Ram::new(bytes);
         let z80 = &mut Z80::new();
-        z80.stack_pointer = 3;
+        z80.sp = 3;
         z80.set_de(0x2233);
 
         let t_states = z80.push_qqde(ram);
@@ -118,7 +118,7 @@ mod tests {
 
         assert_eq!(0x22, ram.read(2));
         assert_eq!(0x33, ram.read(1));
-        assert_eq!(1, z80.stack_pointer);
+        assert_eq!(1, z80.sp);
     }
 
     #[test]
@@ -126,7 +126,7 @@ mod tests {
         let bytes = &mut [0xE5, 0x00, 0x00];
         let ram = &mut Ram::new(bytes);
         let z80 = &mut Z80::new();
-        z80.stack_pointer = 3;
+        z80.sp = 3;
         z80.set_hl(0x2233);
 
         let t_states = z80.push_qqhl(ram);
@@ -134,7 +134,7 @@ mod tests {
 
         assert_eq!(0x22, ram.read(2));
         assert_eq!(0x33, ram.read(1));
-        assert_eq!(1, z80.stack_pointer);
+        assert_eq!(1, z80.sp);
     }
 
     #[test]
@@ -142,7 +142,7 @@ mod tests {
         let bytes = &mut [0xF5, 0x00, 0x00];
         let ram = &mut Ram::new(bytes);
         let z80 = &mut Z80::new();
-        z80.stack_pointer = 3;
+        z80.sp = 3;
         z80.a.set_value(0x22);
         z80.f.set_value(0x33);
 
@@ -151,6 +151,6 @@ mod tests {
 
         assert_eq!(0x22, ram.read(2));
         assert_eq!(0x33, ram.read(1));
-        assert_eq!(1, z80.stack_pointer);
+        assert_eq!(1, z80.sp);
     }
 }

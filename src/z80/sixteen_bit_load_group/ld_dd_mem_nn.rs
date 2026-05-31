@@ -14,7 +14,7 @@ impl Z80 {
     /// ### Operands
     ///
     /// dd, (nn)
-    /// `1 1 1 0 1 1 0 1` (ED)
+    /// `11101101` (ED)
     /// `0 1 d d 1 0 1 1`
     /// `n n n n n n n n`
     /// `n n n n n n n n`
@@ -93,7 +93,7 @@ impl Z80 {
         let val_low = mem.read(address);
         let val_high = mem.read(address.wrapping_add(1));
 
-        self.stack_pointer = ((val_high as u16) << 8) | val_low as u16;
+        self.sp = ((val_high as u16) << 8) | val_low as u16;
 
         // T states
         20
@@ -110,7 +110,7 @@ mod tests {
         let bytes = &mut [0xED, 0x4B, 0x04, 0x00, 0x0F, 0xF0];
         let ram = &mut Ram::new(bytes);
         let z80 = &mut Z80::new();
-        z80.program_counter = 2;
+        z80.pc = 2;
 
         let t_states = z80.ld_ddbc_mem_nn(ram);
         assert_eq!(20, t_states);
@@ -124,7 +124,7 @@ mod tests {
         let bytes = &mut [0xED, 0x5B, 0x04, 0x00, 0x0F, 0xF0];
         let ram = &mut Ram::new(bytes);
         let z80 = &mut Z80::new();
-        z80.program_counter = 2;
+        z80.pc = 2;
 
         let t_states = z80.ld_ddde_mem_nn(ram);
         assert_eq!(20, t_states);
@@ -138,7 +138,7 @@ mod tests {
         let bytes = &mut [0xED, 0x6B, 0x04, 0x00, 0x0F, 0xF0];
         let ram = &mut Ram::new(bytes);
         let z80 = &mut Z80::new();
-        z80.program_counter = 2;
+        z80.pc = 2;
 
         let t_states = z80.ld_ddhl_mem_nn(ram);
         assert_eq!(20, t_states);
@@ -152,11 +152,11 @@ mod tests {
         let bytes = &mut [0xED, 0x7B, 0x04, 0x00, 0x0F, 0xF0];
         let ram = &mut Ram::new(bytes);
         let z80 = &mut Z80::new();
-        z80.program_counter = 2;
+        z80.pc = 2;
 
         let t_states = z80.ld_ddsp_mem_nn(ram);
         assert_eq!(20, t_states);
 
-        assert_eq!(0xF00F, z80.stack_pointer);
+        assert_eq!(0xF00F, z80.sp);
     }
 }

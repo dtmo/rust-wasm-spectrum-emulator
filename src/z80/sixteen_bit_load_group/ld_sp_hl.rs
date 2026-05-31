@@ -14,7 +14,7 @@ impl Z80 {
     /// ### Operands
     ///
     /// SP, HL
-    /// `1 1 1 1 1 0 0 1` (F9)
+    /// `11111001` (F9)
     ///
     /// ### Description
     ///
@@ -34,7 +34,7 @@ impl Z80 {
     /// If the register pair HL contains 442Eh, then upon the execution of an LD
     /// SP, HL instruction, the Stack Pointer also contains 442Eh.
     pub fn ld_sp_hl(&mut self) -> u8 {
-        self.stack_pointer = ((self.h.value() as u16) << 8) | self.l.value() as u16;
+        self.sp = ((self.h.value() as u16) << 8) | self.l.value() as u16;
 
         // T states
         6
@@ -53,6 +53,6 @@ mod tests {
         let t_states = z80.ld_sp_hl();
         assert_eq!(6, t_states);
 
-        assert_eq!(0x442E, z80.stack_pointer);
+        assert_eq!(0x442E, z80.sp);
     }
 }

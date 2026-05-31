@@ -8,8 +8,8 @@ impl Z80 {
     /// EX
     /// ### Operands
     /// (SP), IX
-    /// `1 1 0 1 1 1 0 1` (DD)
-    /// `1 1 1 0 0 0 1 1` (E3)
+    /// `11011101` (DD)
+    /// `11100011` (E3)
     /// ### Description
     /// The low-order byte contained in register IX is exchanged with the
     /// contents of the memory address specified by the contents of register
@@ -33,11 +33,11 @@ impl Z80 {
         let ixl = self.ix as u8;
         let ixh = (self.ix >> 8) as u8;
 
-        let mem_spl = mem.read(self.stack_pointer);
-        let mem_sph = mem.read(self.stack_pointer.wrapping_add(1));
+        let mem_spl = mem.read(self.sp);
+        let mem_sph = mem.read(self.sp.wrapping_add(1));
 
-        mem.write(self.stack_pointer, ixl);
-        mem.write(self.stack_pointer.wrapping_add(1), ixh);
+        mem.write(self.sp, ixl);
+        mem.write(self.sp.wrapping_add(1), ixh);
 
         self.ix = (mem_sph as u16) << 8 | mem_spl as u16;
 
@@ -56,7 +56,7 @@ mod tests {
         let bytes = &mut [0xDD, 0xE3, 0x90, 0x48];
         let mut ram = Ram::new(bytes);
         let mut z80 = Z80::new();
-        z80.stack_pointer = 2;
+        z80.sp = 2;
         z80.ix = 0x3988;
 
         let t_states = z80.ex_mem_sp_ix(&mut ram);

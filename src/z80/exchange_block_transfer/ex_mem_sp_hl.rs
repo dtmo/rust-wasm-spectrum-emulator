@@ -8,7 +8,7 @@ impl Z80 {
     /// EX
     /// ### Operands
     /// (SP), HL
-    /// `1 1 1 0 0 0 1 1` (E3)
+    /// `11100011` (E3)
     /// ### Description
     /// The low-order byte contained in register pair HL is exchanged with the
     /// contents of the memory address specified by the contents of register
@@ -29,12 +29,12 @@ impl Z80 {
     /// containing byte 12h, memory location 8857h containing byte 70h and Stack
     /// Pointer containing 8856h.
     pub fn ex_mem_sp_hl(&mut self, mem: &mut dyn Z80Memory) -> u8 {
-        let mem_sp = mem.read(self.stack_pointer);
-        mem.write(self.stack_pointer, self.l.value());
+        let mem_sp = mem.read(self.sp);
+        mem.write(self.sp, self.l.value());
         self.l.set_value(mem_sp);
 
-        let mem_sp = mem.read(self.stack_pointer + 1);
-        mem.write(self.stack_pointer + 1, self.h.value());
+        let mem_sp = mem.read(self.sp + 1);
+        mem.write(self.sp + 1, self.h.value());
         self.h.set_value(mem_sp);
 
         // T states
@@ -52,7 +52,7 @@ mod tests {
         let bytes = &mut [0xE3, 0x11, 0x22];
         let mut ram = Ram::new(bytes);
         let mut z80 = Z80::new();
-        z80.stack_pointer = 1;
+        z80.sp = 1;
         z80.h.set_value(0x70);
         z80.l.set_value(0x12);
 

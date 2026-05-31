@@ -82,7 +82,7 @@ impl Z80 {
         let low_n = self.fetch_next_opcode(mem);
         let high_n = self.fetch_next_opcode(mem);
 
-        self.stack_pointer = ((high_n as u16) << 8) | low_n as u16;
+        self.sp = ((high_n as u16) << 8) | low_n as u16;
 
         // T states
         10
@@ -142,6 +142,6 @@ mod tests {
         let t_states = z80.ld_sp_nn(ram);
         assert_eq!(10, t_states);
 
-        assert_eq!(0x0102, z80.stack_pointer);
+        assert_eq!(0x0102, z80.sp);
     }
 }

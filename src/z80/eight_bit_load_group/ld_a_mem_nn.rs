@@ -14,7 +14,7 @@ impl Z80 {
     /// ### Operands
     ///
     /// A, (nn)
-    /// `0 0 1 1 1 0 1 0` (3A)
+    /// `00111010` (3A)
     /// `n n n n n n n n`
     /// `n n n n n n n n`
     ///
@@ -59,7 +59,7 @@ mod tests {
         let ram = &Ram::new(bytes);
 
         let z80 = &mut Z80::new();
-        z80.program_counter = 1;
+        z80.pc = 1;
         let t_states = z80.ld_a_mem_nn(ram);
 
         assert_eq!(13, t_states);

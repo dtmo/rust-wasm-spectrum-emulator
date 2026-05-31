@@ -14,7 +14,7 @@ impl Z80 {
     /// ### Operands
     ///
     /// (nn), dd
-    /// `1 1 1 0 1 1 0 1` (ED)
+    /// `11101101` (ED)
     /// `0 1 d d 0 0 1 1`
     /// `n n n n n n n n`
     /// `n n n n n n n n`
@@ -94,8 +94,8 @@ impl Z80 {
 
         let address = ((high_n as u16) << 8) | low_n as u16;
 
-        let sp_low: u8 = self.stack_pointer as u8;
-        let sp_high: u8 = (self.stack_pointer >> 8) as u8;
+        let sp_low: u8 = self.sp as u8;
+        let sp_high: u8 = (self.sp >> 8) as u8;
         mem.write(address, sp_low);
         mem.write(address.wrapping_add(1), sp_high);
 
@@ -114,7 +114,7 @@ mod tests {
         let bytes = &mut [0xED, 0x43, 0x04, 0x00, 0x00, 0x00];
         let ram = &mut Ram::new(bytes);
         let z80 = &mut Z80::new();
-        z80.program_counter = 2;
+        z80.pc = 2;
         z80.set_bc(0xEEFF);
 
         let t_states = z80.ld_mem_nn_ddbc(ram);
@@ -129,7 +129,7 @@ mod tests {
         let bytes = &mut [0xED, 0x53, 0x04, 0x00, 0x00, 0x00];
         let ram = &mut Ram::new(bytes);
         let z80 = &mut Z80::new();
-        z80.program_counter = 2;
+        z80.pc = 2;
         z80.set_de(0xEEFF);
 
         let t_states = z80.ld_mem_nn_ddde(ram);
@@ -144,7 +144,7 @@ mod tests {
         let bytes = &mut [0xED, 0x63, 0x04, 0x00, 0x00, 0x00];
         let ram = &mut Ram::new(bytes);
         let z80 = &mut Z80::new();
-        z80.program_counter = 2;
+        z80.pc = 2;
         z80.set_hl(0xEEFF);
 
         let t_states = z80.ld_mem_nn_ddhl(ram);
@@ -159,8 +159,8 @@ mod tests {
         let bytes = &mut [0xED, 0x73, 0x04, 0x00, 0x00, 0x00];
         let ram = &mut Ram::new(bytes);
         let z80 = &mut Z80::new();
-        z80.program_counter = 2;
-        z80.stack_pointer = 0xEEFF;
+        z80.pc = 2;
+        z80.sp = 0xEEFF;
 
         let t_states = z80.ld_mem_nn_ddsp(ram);
         assert_eq!(20, t_states);

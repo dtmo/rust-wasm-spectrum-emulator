@@ -14,7 +14,7 @@ impl Z80 {
     /// ### Operands
     ///
     /// (HL), n
-    /// `0 0 1 1 0 1 1 0` (36)
+    /// `00110110` (36)
     /// `n n n n n n n n`
     ///
     /// ### Description
@@ -54,7 +54,7 @@ mod tests {
         let ram = &mut Ram::new(bytes);
 
         let z80 = &mut Z80::new();
-        z80.program_counter = 1;
+        z80.pc = 1;
         z80.set_hl(0x0002);
         let t_states = z80.ld_mem_hl_n(ram);
 

@@ -10,7 +10,7 @@ impl Z80 {
     /// EX
     /// ### Operands
     /// DE, HL
-    /// `1 1 1 0 1 0 1 1` (EB)
+    /// `11101011` (EB)
     /// ### Description
     /// The 2-byte contents of register pairs DE and HL are exchanged.
     ///

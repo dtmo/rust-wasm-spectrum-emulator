@@ -14,7 +14,7 @@ impl Z80 {
     /// ### Operands
     ///
     /// A, (BC)
-    /// `0 0 0 0 1 0 1 0` (AA)
+    /// `00001010` (AA)
     ///
     /// ### Description
     ///
@@ -53,7 +53,7 @@ mod tests {
         let ram = &mut Ram::new(bytes);
 
         let z80 = &mut Z80::new();
-        z80.program_counter = 1;
+        z80.pc = 1;
         z80.set_bc(0x0001);
 
         let t_states = z80.ld_a_mem_bc(ram);

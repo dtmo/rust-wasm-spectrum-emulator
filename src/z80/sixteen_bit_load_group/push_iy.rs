@@ -8,8 +8,8 @@ impl Z80 {
     /// PUSH
     /// ### Operand
     /// IY
-    /// `1 1 1 1 1 1 0 1` (FD)
-    /// `1 1 1 0 0 1 0 1` (E5)
+    /// `11111101` (FD)
+    /// `11100101` (E5)
     /// ### Description
     /// The contents of Index Register IY are pushed to the external memory
     /// last-in, first-out (LIFO) stack. The Stack Pointer (SP) Register pair
@@ -32,12 +32,12 @@ impl Z80 {
     /// Pointer contains 1005h.
     pub fn push_iy(&mut self, mem: &mut dyn Z80Memory) -> u8 {
         let iy_high: u8 = (self.iy >> 8) as u8;
-        self.stack_pointer = self.stack_pointer.wrapping_sub(1);
-        mem.write(self.stack_pointer, iy_high);
+        self.sp = self.sp.wrapping_sub(1);
+        mem.write(self.sp, iy_high);
 
         let iy_low: u8 = self.iy as u8;
-        self.stack_pointer = self.stack_pointer.wrapping_sub(1);
-        mem.write(self.stack_pointer, iy_low);
+        self.sp = self.sp.wrapping_sub(1);
+        mem.write(self.sp, iy_low);
 
         // T states
         15
@@ -54,7 +54,7 @@ mod tests {
         let bytes = &mut [0xFD, 0xE5, 0x00, 0x00];
         let ram = &mut Ram::new(bytes);
         let z80 = &mut Z80::new();
-        z80.stack_pointer = 4;
+        z80.sp = 4;
         z80.iy = 0x2233;
 
         let t_states = z80.push_iy(ram);
@@ -62,6 +62,6 @@ mod tests {
 
         assert_eq!(0x22, ram.read(3));
         assert_eq!(0x33, ram.read(2));
-        assert_eq!(2, z80.stack_pointer);
+        assert_eq!(2, z80.sp);
     }
 }

@@ -13,8 +13,8 @@ impl Z80 {
     /// LDD
     /// ### Operands
     /// None
-    /// `1 1 1 0 1 1 0 1` (ED)
-    /// `1 0 1 0 1 0 0 0` (A8)
+    /// `11101101` (ED)
+    /// `10101000` (A8)
     /// ### Description
     /// This 2-byte instruction transfers a byte of data from the memory
     /// location addressed by the contents of the HL register pair to the memory
@@ -89,7 +89,7 @@ mod tests {
         let bytes = &mut [0xED, 0xA0, 0xFF, 0x00];
         let mut ram = Ram::new(bytes);
         let mut z80 = Z80::new();
-        z80.program_counter = 2;
+        z80.pc = 2;
         z80.set_hl(0x0002);
         z80.set_de(0x0003);
         z80.set_bc(0x0100);
@@ -112,7 +112,7 @@ mod tests {
         let bytes = &mut [0xED, 0xA0, 0xFF, 0x00];
         let mut ram = Ram::new(bytes);
         let mut z80 = Z80::new();
-        z80.program_counter = 2;
+        z80.pc = 2;
         z80.set_hl(0x0002);
         z80.set_de(0x0003);
         z80.set_bc(0x0001);
@@ -135,7 +135,7 @@ mod tests {
         let bytes = &mut [0xED, 0xA0, 0xFF, 0x00];
         let mut ram = Ram::new(bytes);
         let mut z80 = Z80::new();
-        z80.program_counter = 2;
+        z80.pc = 2;
         z80.set_hl(0x0002);
         z80.set_de(0x0003);
         z80.set_bc(0x0000);

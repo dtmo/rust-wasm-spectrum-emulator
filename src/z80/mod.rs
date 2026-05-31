@@ -2026,23 +2026,79 @@ impl Register {
 
 #[derive(Clone, Debug)]
 pub struct Z80 {
-    program_counter: u16,
-    stack_pointer: u16,
-    // Index registers
+    /// Program Counter (PC).
+    /// The program counter holds the 16-bit address of the current instruction being fetched from memory.
+    /// The Program Counter is automatically incremented after its contents are transferred to the address lines.
+    /// When a program jump occurs, the new value is automatically placed in the Program Counter,
+    /// overriding the incrementer.
+    pc: u16,
+
+    /// Stack Pointer (SP).
+    /// The stack pointer holds the 16-bit address of the current top of a stack located anywhere
+    /// in external system RAM memory. The external stack memory is organized as a last-in
+    /// first-out (LIFO) file. Data can be pushed onto the stack from specific CPU registers or popped
+    /// off of the stack to specific CPU registers through the execution of PUSH and POP instructions.
+    /// The data popped from the stack is always the most recent data pushed onto it. The stack allows
+    /// simple implementation of multiple level interrupts, unlimited subroutine nesting and
+    /// simplification of many types of data manipulation.
+    sp: u16,
+
+    /// Index Register (IX).
+    /// The two independent index registers hold a 16-bit base address that is used in indexed addressing modes.
+    /// In this mode, an index register is used as a base to point to a region in memory from which data is to
+    /// be stored or retrieved. An additional byte is included in indexed instructions to specify a displacement
+    /// from this base. This displacement is specified as a two’s complement signed integer. This mode of
+    /// addressing greatly simplifies many types of programs, especially when tables of data are used.
     ix: u16,
+
+    /// Index Register (IY).
+    /// The two independent index registers hold a 16-bit base address that is used in indexed addressing modes.
+    /// In this mode, an index register is used as a base to point to a region in memory from which data is to
+    /// be stored or retrieved. An additional byte is included in indexed instructions to specify a displacement
+    /// from this base. This displacement is specified as a two’s complement signed integer. This mode of
+    /// addressing greatly simplifies many types of programs, especially when tables of data are used.
     iy: u16,
-    // Interrupt vector
+
+    /// Interrupt Page Address (I) Register.
+    /// The Z80 CPU can be operated in a mode in which an indirect call to any memory location can be achieved
+    /// in response to an interrupt. The I register is used for this purpose and stores the high-order eight
+    /// bits of the indirect address while the interrupting device provides the lower eight bits of the address.
+    /// This feature allows interrupt routines to be dynamically located anywhere in memory with minimal access
+    /// time to the routine.
     i: Register,
-    // Memory refresh
+
+    /// Memory Refresh (R) Register.
+    /// The Z80 CPU contains a memory refresh counter, enabling dynamic memories to be used with the same ease
+    /// as static memories. Seven bits of this 8-bit register are automatically incremented after each
+    /// instruction fetch. The eighth bit remains as programmed, resulting from an LD R, A instruction.
+    /// The data in the refresh counter is sent out on the lower portion of the address bus along with a refresh
+    /// control signal while the CPU is decoding and executing the fetched instruction. This mode of refresh is
+    /// transparent to the programmer and does not slow the CPU operation. The programmer can load the R register
+    /// for testing purposes, but this register is normally not used by the programmer. During refresh, the
+    /// contents of the I Register are placed on the upper eight bits of the address bus.
     r: Register,
-    // Main accumulator register
+
+    /// Accumulator (A) and Flag (F) Registers.
+    /// The CPU includes two independent 8-bit Accumulators and associated 8-bit Flag registers.
+    /// The Accumulator (A) holds the results of 8-bit arithmetic or logical operations while the Flag Register (F)
+    /// indicates specific conditions for 8-bit or 16-bit operations, such as indicating whether or not the
+    /// result of an operation is equal to 0. The programmer selects the Accumulator and flag pair with a
+    /// single exchange instruction so that it is possible to work with either pair.
     a: Register,
-    // Main flag register
+
+    /// Accumulator and Flag Registers.
+    /// The CPU includes two independent 8-bit Accumulators and associated 8-bit Flag registers.
+    /// The Accumulator holds the results of 8-bit arithmetic or logical operations while the Flag Register
+    /// indicates specific conditions for 8-bit or 16-bit operations, such as indicating whether or not the
+    /// result of an operation is equal to 0. The programmer selects the Accumulator and flag pair with a
+    /// single exchange instruction so that it is possible to work with either pair.
     f: Register,
-    // Alternate accumulator register
+
+    /// Alternate accumulator register
     a_prime: Register,
-    // Alternate flag register
+    /// Alternate flag register
     f_prime: Register,
+
     // General purpose registers
     b: Register,
     c: Register,
@@ -2050,6 +2106,7 @@ pub struct Z80 {
     e: Register,
     h: Register,
     l: Register,
+
     // Alternate general purpose registers
     b_prime: Register,
     c_prime: Register,
@@ -2068,8 +2125,8 @@ pub struct Z80 {
 impl Z80 {
     pub fn new() -> Z80 {
         Z80 {
-            program_counter: 0,
-            stack_pointer: 0,
+            pc: 0,
+            sp: 0,
             ix: 0,
             iy: 0,
             i: Register::new(),
@@ -2193,8 +2250,8 @@ impl Z80 {
     }
 
     pub fn fetch_next_opcode(&mut self, mem: &dyn Z80Memory) -> u8 {
-        let opcode = mem.read(self.program_counter);
-        self.program_counter = self.program_counter.wrapping_add(1);
+        let opcode = mem.read(self.pc);
+        self.pc = self.pc.wrapping_add(1);
         opcode
     }
 
@@ -2219,7 +2276,7 @@ impl Z80 {
     ///
     /// ### Op Code
     ///
-    /// DAA: `0 0 1 0 0 1 1 1` (0x27)
+    /// DAA: `00100111` (0x27)
     ///
     /// ### Operands
     ///
@@ -2395,19 +2452,19 @@ mod tests {
 
         let mut z80 = Z80::new();
 
-        assert_eq!(0, z80.program_counter);
+        assert_eq!(0, z80.pc);
 
         assert_eq!(ram.bytes[0], z80.fetch_next_opcode(&ram));
 
-        assert_eq!(1, z80.program_counter);
+        assert_eq!(1, z80.pc);
 
         assert_eq!(ram.bytes[1], z80.fetch_next_opcode(&ram));
 
-        assert_eq!(2, z80.program_counter);
+        assert_eq!(2, z80.pc);
 
         assert_eq!(ram.bytes[2], z80.fetch_next_opcode(&ram));
 
-        assert_eq!(3, z80.program_counter);
+        assert_eq!(3, z80.pc);
     }
 
     #[test]

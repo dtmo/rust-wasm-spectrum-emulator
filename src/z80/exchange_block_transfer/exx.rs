@@ -8,7 +8,7 @@ impl Z80 {
     /// EXX
     /// ### Operands
     /// None.
-    /// `1 1 0 1 1 0 0 1` (D9)
+    /// `11011001` (D9)
     /// ### Description
     /// Each 2-byte value in register pairs BC, DE, and HL is exchanged with the
     /// 2-byte value in BC', DE', and HL', respectively.

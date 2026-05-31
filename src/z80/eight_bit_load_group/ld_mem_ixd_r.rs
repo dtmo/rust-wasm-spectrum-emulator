@@ -14,7 +14,7 @@ impl Z80 {
     /// ### Operands
     ///
     /// (IX+d), r
-    /// `1 1 1 0 1 1 0 1` (DD)
+    /// `11101101` (DD)
     /// `0 1 1 1 0 r r r`
     /// `d d d d d d d d`
     ///
@@ -118,7 +118,7 @@ mod tests {
 
         for (opcode, register_supplier) in scenarios {
             let z80 = &mut Z80::new();
-            z80.program_counter = 2;
+            z80.pc = 2;
             z80.ix = 5;
             register_supplier(z80).set_value(0xFF);
 

@@ -39,44 +39,44 @@ impl Z80 {
     /// register pair HL containing 3355h, and the Stack Pointer containing
     /// 1002h.
     pub fn pop_qqbc(&mut self, mem: &dyn Z80Memory) -> u8 {
-        self.c.set_value(mem.read(self.stack_pointer));
-        self.stack_pointer = self.stack_pointer.wrapping_add(1);
+        self.c.set_value(mem.read(self.sp));
+        self.sp = self.sp.wrapping_add(1);
 
-        self.b.set_value(mem.read(self.stack_pointer));
-        self.stack_pointer = self.stack_pointer.wrapping_add(1);
+        self.b.set_value(mem.read(self.sp));
+        self.sp = self.sp.wrapping_add(1);
 
         // T states
         10
     }
 
     pub fn pop_qqde(&mut self, mem: &dyn Z80Memory) -> u8 {
-        self.e.set_value(mem.read(self.stack_pointer));
-        self.stack_pointer = self.stack_pointer.wrapping_add(1);
+        self.e.set_value(mem.read(self.sp));
+        self.sp = self.sp.wrapping_add(1);
 
-        self.d.set_value(mem.read(self.stack_pointer));
-        self.stack_pointer = self.stack_pointer.wrapping_add(1);
+        self.d.set_value(mem.read(self.sp));
+        self.sp = self.sp.wrapping_add(1);
 
         // T states
         10
     }
 
     pub fn pop_qqhl(&mut self, mem: &dyn Z80Memory) -> u8 {
-        self.l.set_value(mem.read(self.stack_pointer));
-        self.stack_pointer = self.stack_pointer.wrapping_add(1);
+        self.l.set_value(mem.read(self.sp));
+        self.sp = self.sp.wrapping_add(1);
 
-        self.h.set_value(mem.read(self.stack_pointer));
-        self.stack_pointer = self.stack_pointer.wrapping_add(1);
+        self.h.set_value(mem.read(self.sp));
+        self.sp = self.sp.wrapping_add(1);
 
         // T states
         10
     }
 
     pub fn pop_qqaf(&mut self, mem: &dyn Z80Memory) -> u8 {
-        self.f.set_value(mem.read(self.stack_pointer));
-        self.stack_pointer = self.stack_pointer.wrapping_add(1);
+        self.f.set_value(mem.read(self.sp));
+        self.sp = self.sp.wrapping_add(1);
 
-        self.a.set_value(mem.read(self.stack_pointer));
-        self.stack_pointer = self.stack_pointer.wrapping_add(1);
+        self.a.set_value(mem.read(self.sp));
+        self.sp = self.sp.wrapping_add(1);
 
         // T states
         10
@@ -93,12 +93,12 @@ mod tests {
         let bytes = &mut [0xC1, 0x55, 0x33];
         let ram = &mut Ram::new(bytes);
         let z80 = &mut Z80::new();
-        z80.stack_pointer = 1;
+        z80.sp = 1;
 
         let t_states = z80.pop_qqbc(ram);
         assert_eq!(10, t_states);
 
-        assert_eq!(3, z80.stack_pointer);
+        assert_eq!(3, z80.sp);
         assert_eq!(0x33, z80.b.value());
         assert_eq!(0x55, z80.c.value());
     }
@@ -108,12 +108,12 @@ mod tests {
         let bytes = &mut [0xD1, 0x55, 0x33];
         let ram = &mut Ram::new(bytes);
         let z80 = &mut Z80::new();
-        z80.stack_pointer = 1;
+        z80.sp = 1;
 
         let t_states = z80.pop_qqde(ram);
         assert_eq!(10, t_states);
 
-        assert_eq!(3, z80.stack_pointer);
+        assert_eq!(3, z80.sp);
         assert_eq!(0x33, z80.d.value());
         assert_eq!(0x55, z80.e.value());
     }
@@ -123,12 +123,12 @@ mod tests {
         let bytes = &mut [0xE1, 0x55, 0x33];
         let ram = &mut Ram::new(bytes);
         let z80 = &mut Z80::new();
-        z80.stack_pointer = 1;
+        z80.sp = 1;
 
         let t_states = z80.pop_qqhl(ram);
         assert_eq!(10, t_states);
 
-        assert_eq!(3, z80.stack_pointer);
+        assert_eq!(3, z80.sp);
         assert_eq!(0x33, z80.h.value());
         assert_eq!(0x55, z80.l.value());
     }
@@ -138,12 +138,12 @@ mod tests {
         let bytes = &mut [0xF1, 0x55, 0x33];
         let ram = &mut Ram::new(bytes);
         let z80 = &mut Z80::new();
-        z80.stack_pointer = 1;
+        z80.sp = 1;
 
         let t_states = z80.pop_qqaf(ram);
         assert_eq!(10, t_states);
 
-        assert_eq!(3, z80.stack_pointer);
+        assert_eq!(3, z80.sp);
         assert_eq!(0x33, z80.a.value());
         assert_eq!(0x55, z80.f.value());
     }

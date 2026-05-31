@@ -8,7 +8,7 @@ impl Z80 {
     /// EX
     /// ### Operands
     /// AF, AF′
-    /// `0 0 0 0 1 0 0 0` (08)
+    /// `00001000` (08)
     /// ### Description
     /// The 2-byte contents of the register pairs AF and AF' are exchanged.
     /// Register pair AF consists of registers A′ and F′.

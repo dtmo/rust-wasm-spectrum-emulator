@@ -9,11 +9,13 @@ use crate::z80::{
 impl Z80 {
     /// ## CPI
     /// ### Operation
-    /// A – (HL), HL ← HL +1, BC ← BC – 1
+    /// A – (HL), HL ← HL+1, BC ← BC – 1
     /// ### Op Code
     /// CPI
     /// ### Operands
     /// None.
+    /// `11101101` (ED)
+    /// `10100001` (A1)
     /// ### Description
     /// The contents of the memory location addressed by the HL register is
     /// compared with the contents of the Accumulator. With a true compare, a

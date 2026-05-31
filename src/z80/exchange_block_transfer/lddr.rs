@@ -13,8 +13,8 @@ impl Z80 {
     /// LDDR
     /// ### Operand
     /// None
-    /// `1 1 1 0 1 1 0 1` (ED)
-    /// `1 0 1 1 1 0 0 0` (B0)
+    /// `11101101` (ED)
+    /// `10111000` (B0)
     /// ### Description
     /// This 2-byte instruction transfers a byte of data from the memory
     /// location addressed by the contents of the HL register pair to the memory
@@ -87,7 +87,7 @@ impl Z80 {
         let t_states;
 
         if bc != 0 {
-            self.program_counter -= 2;
+            self.pc -= 2;
             t_states = 21;
         } else {
             t_states = 16;
@@ -119,7 +119,7 @@ mod tests {
         let bytes = &mut [0xED, 0xB0, 0xFF, 0x00];
         let mut ram = Ram::new(bytes);
         let mut z80 = Z80::new();
-        z80.program_counter = 2;
+        z80.pc = 2;
         z80.set_hl(0x0002);
         z80.set_de(0x0003);
         z80.set_bc(0x0100);
@@ -127,7 +127,7 @@ mod tests {
         let t_states = z80.lddr(&mut ram);
         assert_eq!(21, t_states);
 
-        assert_eq!(0, z80.program_counter);
+        assert_eq!(0, z80.pc);
         assert_eq!(ram.read(2), ram.read(3));
         assert_eq!(0x0001, z80.hl());
         assert_eq!(0x0002, z80.de());
@@ -142,7 +142,7 @@ mod tests {
         let bytes = &mut [0xED, 0xB0, 0xFF, 0x00];
         let mut ram = Ram::new(bytes);
         let mut z80 = Z80::new();
-        z80.program_counter = 2;
+        z80.pc = 2;
         z80.set_hl(0x0002);
         z80.set_de(0x0003);
         z80.set_bc(0x0001);
@@ -150,7 +150,7 @@ mod tests {
         let t_states = z80.lddr(&mut ram);
         assert_eq!(16, t_states);
 
-        assert_eq!(2, z80.program_counter);
+        assert_eq!(2, z80.pc);
         assert_eq!(ram.read(2), ram.read(3));
         assert_eq!(0x0001, z80.hl());
         assert_eq!(0x0002, z80.de());
@@ -166,7 +166,7 @@ mod tests {
         let bytes = &mut [0xED, 0xB0, 0xFF, 0x00];
         let mut ram = Ram::new(bytes);
         let mut z80 = Z80::new();
-        z80.program_counter = 2;
+        z80.pc = 2;
         z80.set_hl(0x0002);
         z80.set_de(0x0003);
         z80.set_bc(0x0000);
@@ -174,7 +174,7 @@ mod tests {
         let t_states = z80.lddr(&mut ram);
         assert_eq!(21, t_states);
 
-        assert_eq!(0, z80.program_counter);
+        assert_eq!(0, z80.pc);
         assert_eq!(ram.read(2), ram.read(3));
         assert_eq!(0x0001, z80.hl());
         assert_eq!(0x0002, z80.de());

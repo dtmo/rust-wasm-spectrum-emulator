@@ -14,8 +14,8 @@ impl Z80 {
     /// ### Operands
     ///
     /// (nn), IY
-    /// `1 1 0 1 1 1 0 1` (FD)
-    /// `0 0 1 0 0 0 1 0` (22)
+    /// `11011101` (FD)
+    /// `00100010` (22)
     /// `n n n n n n n n`
     /// `n n n n n n n n`
     ///
@@ -64,7 +64,7 @@ mod tests {
         let bytes = &mut [0xFD, 0x22, 0x04, 0x00, 0x00, 0x00];
         let ram = &mut Ram::new(bytes);
         let z80 = &mut Z80::new();
-        z80.program_counter = 2;
+        z80.pc = 2;
         z80.iy = 0xEEFF;
 
         let t_states = z80.ld_mem_nn_iy(ram);
