@@ -65,11 +65,10 @@ impl Z80 {
     }
 }
 
+#[cfg(test)]
 mod tests {
-    use crate::z80::{
-        register_flags::{h_flag, n_flag, p_flag, s_flag, z_flag},
-        Z80,
-    };
+    use super::*;
+    use crate::z80::register_flags::{h_flag, n_flag, p_flag, s_flag, z_flag};
 
     #[test]
     fn test_ld_a_i_positive() {

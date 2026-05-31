@@ -37,9 +37,10 @@ impl Z80 {
     }
 }
 
+#[cfg(test)]
 mod tests {
-    use crate::z80::Z80;
-
+    use super::*;
+    
     #[test]
     fn test_ld_i_a() {
         let z80 = &mut Z80::new();

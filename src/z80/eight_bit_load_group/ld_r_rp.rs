@@ -251,8 +251,9 @@ impl Z80 {
     }
 }
 
+#[cfg(test)]
 mod tests {
-    use crate::z80::{Register, Z80};
+    use super::*;
 
     #[test]
     fn test_ld_r_rp() {

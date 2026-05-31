@@ -79,6 +79,8 @@ impl Z80 {
     }
 }
 
+#[cfg(test)]
 mod tests {
+    use super::*;
     // TODO: Implement ld_r_n tests
 }

@@ -2363,8 +2363,9 @@ impl Z80 {
     }
 }
 
+#[cfg(test)]
 mod tests {
-    use super::*;
+    use crate::z80::{Z80Memory, Z80};
 
     pub struct Ram<'a> {
         bytes: &'a mut [u8],

@@ -47,8 +47,10 @@ impl Z80 {
     }
 }
 
+#[cfg(test)]
 mod tests {
-    use crate::z80::{tests::Ram, Z80Memory, Z80};
+    use super::*;
+    use crate::z80::tests::Ram;
 
     #[test]
     fn test_ld_mem_nn_a() {

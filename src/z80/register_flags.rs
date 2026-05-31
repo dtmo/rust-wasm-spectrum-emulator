@@ -191,6 +191,7 @@ pub fn set_c_flag_with(register: &mut Register, value: bool) {
     set_flags_with(C_FLAG_BITMASK, register, value);
 }
 
+#[cfg(test)]
 mod tests {
     use crate::z80::Register;
 
