@@ -2429,7 +2429,7 @@ mod tests {
     }
 
     impl<'a> Ram<'a> {
-        pub fn new(bytes: &'a mut [u8]) -> Ram {
+        pub fn new(bytes: &'a mut [u8]) -> Ram<'a> {
             Ram { bytes }
         }
     }
