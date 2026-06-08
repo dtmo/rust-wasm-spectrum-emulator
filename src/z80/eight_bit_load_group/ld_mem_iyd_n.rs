@@ -24,9 +24,9 @@ impl Z80 {
     /// The n operand is loaded to the memory address specified by the sum of
     /// Index Register IX and the two’s complement displacement operand d.
     ///
-    /// | M Cycles | T States         | 4 MHz E.T. |
-    /// | -------- | ---------------- | ---------- |
-    /// | 5        | 19 (4, 4, 3,5,3) | 4.75       |
+    /// | M Cycles | T States           | 4 MHz E.T. |
+    /// | -------- | ------------------ | ---------- |
+    /// | 5        | 19 (4, 4, 3, 5, 3) | 4.75       |
     ///
     /// ### Condition Bits Affected
     ///

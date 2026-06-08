@@ -19,6 +19,7 @@ impl Z80 {
     /// ### Operands
     ///
     /// None.
+    /// 
     /// `11101101` (ED)
     /// `10110001` (B1)
     ///
@@ -44,7 +45,7 @@ impl Z80 {
     ///
     /// | M Cycles | T States        | 4 MHz E.T. |
     /// | -------- | --------------- | ---------- |
-    /// | 5        | 16 (4, 4, 3, 5) | 4.00       |
+    /// | 4        | 16 (4, 4, 3, 5) | 4.00       |
     ///
     /// ### Condition Bits Affected
     ///
@@ -73,7 +74,7 @@ impl Z80 {
         let address = self.hl();
         let hl_data = mem.read(address);
 
-        let a = self.a.value();
+        let a = self.a();
         let n = a.wrapping_sub(hl_data);
 
         // During a compare operation, a condition bit is set.
@@ -117,7 +118,7 @@ impl Z80 {
         } else {
             // If BC is not 0 and A ≠ (HL), the program counter is decremented by two and the instruction is repeated.
             self.pc = self.pc.wrapping_sub(2);
-            t_states = 25;
+            t_states = 21;
         }
         
         t_states
@@ -154,10 +155,10 @@ mod tests {
         
         // Upon the execution of a CPIR instruction,
         let t_states = z80.cpir(&mem);
-        assert_eq!(25, t_states);
+        assert_eq!(21, t_states);
         
         let t_states = z80.cpir(&mem);
-        assert_eq!(25, t_states);
+        assert_eq!(21, t_states);
         
         let t_states = z80.cpir(&mem);
         assert_eq!(16, t_states);
@@ -174,64 +175,4 @@ mod tests {
         // and the Z flag in the F Register is set
         assert_eq!(true, z_flag(&z80.f));
     }
-
-    // #[test]
-    // fn test_cpi_true_compare_with_bc_zero() {
-    //     let mut bytes = [0xED, 0xA1, 0x80];
-    //     let mem = Ram::new(&mut bytes);
-    //     let mut z80 = Z80::new();
-    //     z80.set_hl(0x0002);
-    //     z80.set_bc(0x0001);
-    //     z80.set_a(0x80);
-
-    //     let t_states = z80.cpi(&mem);
-
-    //     assert_eq!(16, t_states);
-
-    //     assert_eq!(false, s_flag(&z80.f));
-    //     assert_eq!(true, z_flag(&z80.f));
-    //     assert_eq!(false, h_flag(&z80.f));
-    //     assert_eq!(false, p_flag(&z80.f));
-    //     assert_eq!(true, n_flag(&z80.f));
-    // }
-
-    // #[test]
-    // fn test_cpi_positive_compare_with_half_carry_borrow_and_bc_not_zero() {
-    //     let mut bytes = [0xED, 0xA1, 0x01];
-    //     let mem = Ram::new(&mut bytes);
-    //     let mut z80 = Z80::new();
-    //     z80.set_hl(0x0002);
-    //     z80.set_bc(0x0002);
-    //     z80.set_a(0x10);
-
-    //     let t_states = z80.cpi(&mem);
-
-    //     assert_eq!(16, t_states);
-
-    //     assert_eq!(false, s_flag(&z80.f));
-    //     assert_eq!(false, z_flag(&z80.f));
-    //     assert_eq!(true, h_flag(&z80.f));
-    //     assert_eq!(true, p_flag(&z80.f));
-    //     assert_eq!(true, n_flag(&z80.f));
-    // }
-
-    // #[test]
-    // fn test_cpi_negative_compare() {
-    //     let mut bytes = [0xED, 0xA1, 0x10];
-    //     let mem = Ram::new(&mut bytes);
-    //     let mut z80 = Z80::new();
-    //     z80.set_hl(0x0002);
-    //     z80.set_bc(0x0002);
-    //     z80.set_a(0x08);
-
-    //     let t_states = z80.cpi(&mem);
-
-    //     assert_eq!(16, t_states);
-
-    //     assert_eq!(true, s_flag(&z80.f));
-    //     assert_eq!(false, z_flag(&z80.f));
-    //     assert_eq!(true, h_flag(&z80.f));
-    //     assert_eq!(true, p_flag(&z80.f));
-    //     assert_eq!(true, n_flag(&z80.f));
-    // }
 }

@@ -1,4 +1,4 @@
-mod ld_bc_nn;
+mod ld_dd_nn;
 mod ld_ix_nn;
 mod ld_iy_nn;
 mod ld_hl_mem_nn;

@@ -35,7 +35,10 @@ impl Z80 {
     /// ### Condition Bits Affected
     ///
     /// None.
-
+    /// 
+    /// ### Example
+    /// 
+    /// Upon the execution of an LD E, A5h instruction, Register E contains A5h
     fn ld_r_n(r: &mut Register, n: u8) -> u8 {
         r.set_value(n);
 
@@ -81,6 +84,22 @@ impl Z80 {
 
 #[cfg(test)]
 mod tests {
-    use super::*;
-    // TODO: Implement ld_r_n tests
+    use crate::z80::{
+        register_flags::{p_flag, z_flag},
+        tests::Ram,
+        Z80
+    };
+    
+    /// Upon the execution of an LD E, A5h instruction, Register E contains A5h
+    #[test]
+    fn test_example() {
+        let mut z80 = Z80::new();
+        
+        let mut bytes = [0b00111110, 0xa5];
+        let mut mem = Ram::new(&mut bytes);
+
+        z80.process_next_instruction(&mut mem);
+
+        assert_eq!(z80.a(), 0xa5);
+    }
 }

@@ -56,19 +56,24 @@ impl Z80 {
 
 #[cfg(test)]
 mod tests {
-    use super::*;
-    use crate::z80::tests::Ram;
+    use crate::z80::{Z80, tests::Ram};
 
     #[test]
-    fn test_ld_ix_mem_nn() {
-        let bytes = &mut [0xDD, 0x2A, 0x04, 0x00, 0x0F, 0xF0];
-        let ram = &mut Ram::new(bytes);
+    fn test_example() {
         let z80 = &mut Z80::new();
-        z80.pc = 2;
+        
+        // If address 0004h contains 92h,
+        // and address 0005h contains DAh,
+        let bytes = &mut [0xFD, 0x2A, 0x04, 0x00, 0x92, 0xDA];
+        let ram = &mut Ram::new(bytes);
 
-        let t_states = z80.ld_ix_mem_nn(ram);
+        z80.pc = 2;
+        
+        // then upon the execution of an LD IY, (0004h) instruction,
+        let t_states = z80.ld_iy_mem_nn(ram);
         assert_eq!(20, t_states);
 
-        assert_eq!(0xF00F, z80.ix);
+        // Index Register IY contains DA92h.
+        assert_eq!(0xDA92, z80.iy);
     }
 }
